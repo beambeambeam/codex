@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.v1 import app_v1_route
 
 
 app = FastAPI(
@@ -18,6 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+app.include_router(app_v1_route)
 
 
 def main():
@@ -45,7 +48,7 @@ def main():
     if args.command == "serve":
         print(f"Starting API server on {args.host}:{args.port}")
 
-        uvicorn.run("api.main:app", host=args.host, port=args.port, reload=args.reload)
+        uvicorn.run("app.main:app", host=args.host, port=args.port, reload=args.reload)
 
 
 if __name__ == "__main__":
