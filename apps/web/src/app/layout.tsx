@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/provider/themes";
 
-import "./global.css";
+import "./globals.css";
 
 export const metadata = {
   title: "The Codex",
