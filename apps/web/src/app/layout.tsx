@@ -2,6 +2,8 @@ import { ThemeProvider } from "@/provider/themes";
 
 import "./globals.css";
 
+import { BreakpointIndicator } from "@/components/dev/breakpoint-indicator";
+
 export const metadata = {
   title: "The Codex",
   description: "Your personal Librarian that handle every file for you.",
@@ -23,6 +25,7 @@ export default function RootLayout({
           themes={["light", "dark"]}
         >
           {children}
+          <BreakpointIndicator />
         </ThemeProvider>
       </body>
     </html>
