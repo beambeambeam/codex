@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.py",
   "scripts": {
-    "dev": "uv run uvicorn app.main:app --reload",
+    "dev": "uv run python -m app.main serve --reload",
     "lint": "uv run ruff check --fix"
   },
   "keywords": [],
