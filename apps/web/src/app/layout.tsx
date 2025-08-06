@@ -7,8 +7,8 @@ import { LineSeedSans, Sarabun } from "@/fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
-  title: "The Codex",
-  description: "Your personal Librarian that handle every file for you.",
+  title: "Codex",
+  description: "Make your data, Askable",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "bg-background font-line-seed-sans h-full min-h-screen w-full antialiased",
+          "bg-background h-full min-h-screen w-full font-mono antialiased",
           LineSeedSans.variable,
           Sarabun.variable,
         )}
