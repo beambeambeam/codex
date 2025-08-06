@@ -8,6 +8,7 @@ function LandingPage() {
       <div className="flex w-fit">
         <ToggleThemeButton />
       </div>
+      กาาร
     </div>
   );
 }

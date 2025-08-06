@@ -118,3 +118,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme {
+  --font-line-seed-sans: "var(--font-line-seed-sans)", sans-serif;
+  --font-sarabun: "var(--font-sarabun)", sans-serif;
+  --font-inter: "var(--font-inter)", sans-serif;
+}
