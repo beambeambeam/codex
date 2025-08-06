@@ -5,7 +5,7 @@ import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 
-import { cn } from "@/lib/style";
+import { cn } from "@/lib/utils";
 
 const themes = [
   {
