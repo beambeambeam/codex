@@ -1,0 +1,25 @@
+name: "codex"
+
+services:
+  codex-pg-db:
+    image: pgvector/pgvector:pg17
+    container_name: codex-pg-db
+    restart: always
+    ports:
+      - "3002:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdb-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - default
+
+volumes:
+  pgdb-data:
+
+networks:
+  default:
+    driver: bridge
