@@ -5,8 +5,7 @@
   "main": "main.py",
   "scripts": {
     "dev": "uv run uvicorn app.main:app --reload",
-    "lint": "uv run ruff check",
-    "lint:fix": "uv run ruff check --fix"
+    "lint": "uv run ruff check --fix"
   },
   "keywords": [],
   "author": "",
