@@ -5,6 +5,7 @@ import "./globals.css";
 import { BreakpointIndicator } from "@/components/dev/breakpoint-indicator";
 import { LineSeedSans, Sarabun } from "@/fonts";
 import { cn } from "@/lib/utils";
+import QueryProvider from "@/provider/query";
 
 export const metadata = {
   title: "Codex",
@@ -25,16 +26,18 @@ export default function RootLayout({
           Sarabun.variable,
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          themes={["light", "dark"]}
-        >
-          {children}
-          <BreakpointIndicator />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            themes={["light", "dark"]}
+          >
+            {children}
+            <BreakpointIndicator />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
