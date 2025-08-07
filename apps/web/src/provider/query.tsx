@@ -7,7 +7,28 @@ interface QueryProviderProps {
   children: Readonly<ReactNode>;
 }
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 30,
+      gcTime: 1000 * 60 * 60 * 24,
+
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+      networkMode: "offlineFirst",
+    },
+    mutations: {
+      retry: 1,
+      networkMode: "offlineFirst",
+    },
+  },
+});
 
 function QueryProvider(props: QueryProviderProps) {
   return (
