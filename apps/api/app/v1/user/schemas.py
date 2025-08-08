@@ -45,14 +45,16 @@ class AuthStatusResponse(BaseModel):
 
 
 class UserEditRequest(BaseModel):
-    """User Register response payload"""
+    """User edit request payload"""
 
-    display: Optional[str] = Field(..., example="John Doe")
-    username: Optional[str] = Field(..., example="john_doe")
-    email: Optional[EmailStr] = Field(..., example="john@example.com")
+    display: Optional[str] = Field(None, example="John Doe")
+    username: Optional[str] = Field(None, example="john_doe")
+    email: Optional[EmailStr] = Field(None, example="john@example.com")
 
 
-class UserEditResponse(UserLoginRequest):
-    """User Edit response payload"""
+class UserEditResponse(BaseModel):
+    """User edit response payload"""
 
-    pass
+    display: str = Field(..., example="John Doe")
+    username: str = Field(..., example="john_doe")
+    email: EmailStr = Field(..., example="john@example.com")

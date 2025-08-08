@@ -6,7 +6,6 @@ import bcrypt
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
-
 from ..models.user import Account, User, Session as UserSession
 
 
@@ -166,3 +165,59 @@ class UserService:
     def logout_user(self, session_id: str) -> None:
         """Logout user by deleting session."""
         self.delete_session(session_id)
+
+    def edit_user(
+        self, user_id: str, display: str = None, username: str = None, email: str = None
+    ) -> User:
+        """Edit user information."""
+
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+
+        # Check if email is already taken by another user
+        if email and email != user.email:
+            existing_user = (
+                self.db.query(User)
+                .filter(User.email == email, User.id != user_id)
+                .first()
+            )
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already exists",
+                )
+
+        # Check if username is already taken by another user
+        if username and username != user.username:
+            clean_username = "".join(
+                c.lower() if c.isalnum() or c == " " else "" for c in username
+            ).replace(" ", "_")
+
+            existing_user = (
+                self.db.query(User)
+                .filter(User.username == clean_username, User.id != user_id)
+                .first()
+            )
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Username already exists",
+                )
+            username = clean_username
+
+        # Update user fields if provided
+        if display is not None:
+            user.display = display
+        if username is not None:
+            user.username = username
+        if email is not None:
+            user.email = email
+
+        self.db.commit()
+        self.db.refresh(user)
+
+        return user

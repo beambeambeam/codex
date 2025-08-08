@@ -6,6 +6,8 @@ from .schemas import (
     UserLoginRequest,
     UserLoginResponse,
     AuthStatusResponse,
+    UserEditRequest,
+    UserEditResponse,
 )
 from .service import UserService
 from .dependencies import get_user_service, get_current_user
@@ -157,3 +159,32 @@ def check_auth_status(
             message="Session invalid or expired",
             detail=AuthStatusResponse(logged_in=False),
         )
+
+
+@router.put(
+    "/edit",
+    response_model=CommonResponse[UserEditResponse],
+    status_code=status.HTTP_200_OK,
+)
+def edit_user(
+    user_data: UserEditRequest,
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> CommonResponse[UserEditResponse]:
+    """Edit current user information."""
+
+    updated_user = user_service.edit_user(
+        user_id=current_user.id,
+        display=user_data.display,
+        username=user_data.username,
+        email=user_data.email,
+    )
+
+    return CommonResponse[UserEditResponse](
+        message="User updated successfully",
+        detail=UserEditResponse(
+            username=updated_user.username,
+            email=updated_user.email,
+            display=updated_user.display,
+        ),
+    )
