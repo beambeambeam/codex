@@ -48,13 +48,9 @@ class UserEditRequest(BaseModel):
     """User edit request payload"""
 
     display: Optional[str] = Field(None, example="John Doe")
-    username: Optional[str] = Field(None, example="john_doe")
-    email: Optional[EmailStr] = Field(None, example="john@example.com")
 
 
 class UserEditResponse(BaseModel):
     """User edit response payload"""
 
     display: str = Field(..., example="John Doe")
-    username: str = Field(..., example="john_doe")
-    email: EmailStr = Field(..., example="john@example.com")

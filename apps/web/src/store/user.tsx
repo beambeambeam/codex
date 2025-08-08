@@ -13,6 +13,7 @@ interface UserStore {
   user: UserState | null;
   setUser: (user: UserState) => void;
   reset: () => void;
+  setDisplay: (display: string) => void;
 }
 
 const UserStoreContext = createContext<StoreApi<UserStore> | null>(null);
@@ -33,6 +34,10 @@ export const UserProvider = ({
           user: initialUser,
           setUser: (user) => set({ user }),
           reset: () => set({ user: null }),
+          setDisplay: (display: string) =>
+            set((state) => ({
+              user: state.user ? { ...state.user, display } : state.user,
+            })),
         }),
         {
           name: "user-storage",
@@ -80,6 +85,7 @@ export const useUserActions = () => {
     useShallow((state) => ({
       setUser: state.setUser,
       reset: state.reset,
+      setDisplay: state.setDisplay,
     })),
   );
 };

@@ -116,6 +116,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/edit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Edit User
+     * @description Edit current user information.
+     */
+    put: operations["edit_user_api_v1_auth_edit_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -137,6 +157,12 @@ export interface components {
       /** Message */
       message: string;
       detail: components["schemas"]["AuthStatusResponse"] | null;
+    };
+    /** CommonResponse[UserEditResponse] */
+    CommonResponse_UserEditResponse_: {
+      /** Message */
+      message: string;
+      detail: components["schemas"]["UserEditResponse"] | null;
     };
     /** CommonResponse[UserLoginResponse] */
     CommonResponse_UserLoginResponse_: {
@@ -163,6 +189,28 @@ export interface components {
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /**
+     * UserEditRequest
+     * @description User edit request payload
+     */
+    UserEditRequest: {
+      /**
+       * Display
+       * @example John Doe
+       */
+      display?: string | null;
+    };
+    /**
+     * UserEditResponse
+     * @description User edit response payload
+     */
+    UserEditResponse: {
+      /**
+       * Display
+       * @example John Doe
+       */
+      display: string;
     };
     /**
      * UserLoginRequest
@@ -412,6 +460,39 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CommonResponse_AuthStatusResponse_"];
+        };
+      };
+    };
+  };
+  edit_user_api_v1_auth_edit_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserEditRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommonResponse_UserEditResponse_"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

@@ -176,15 +176,11 @@ def edit_user(
     updated_user = user_service.edit_user(
         user_id=current_user.id,
         display=user_data.display,
-        username=user_data.username,
-        email=user_data.email,
     )
 
     return CommonResponse[UserEditResponse](
         message="User updated successfully",
         detail=UserEditResponse(
-            username=updated_user.username,
-            email=updated_user.email,
             display=updated_user.display,
         ),
     )
