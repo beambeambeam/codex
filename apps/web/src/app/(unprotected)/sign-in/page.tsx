@@ -30,12 +30,7 @@ function SignInPage() {
               Sign in to your account and continue managing your data.
             </CardDescription>
           </CardHeader>
-          <SignInForm
-            defaultValues={{
-              username: "",
-              password: "",
-            }}
-          />
+          <SignInForm />
         </Card>
         <p className="text-accent-foreground/60">
           Don&apos;t have an account?{" "}
