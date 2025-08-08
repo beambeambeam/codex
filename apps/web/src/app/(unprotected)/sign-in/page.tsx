@@ -1,16 +1,17 @@
+"use client";
+
 import Link from "next/link";
 
-import SignUpForm from "@/app/(unprotected)/sign-up/form";
+import SignInForm from "@/app/(unprotected)/sign-in/form";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
 
-function SignUpPage() {
+function SignInPage() {
   return (
     <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
       <div className="hidden h-full flex-col items-center justify-center lg:flex">
@@ -22,33 +23,28 @@ function SignUpPage() {
       <div className="flex h-full flex-col items-center justify-center gap-2.5 p-3">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-xl">
               🤗 Create an Account and Join us today.
             </CardTitle>
             <CardDescription className="text-sm">
-              Create your account and start managing your data with Codex, your
-              intelligent data assistant.
+              Sign in to your account and continue managing your data.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <SignUpForm
-              defaultValues={{
-                email: "",
-                username: "",
-                password: "",
-                confirmPassword: "",
-              }}
-            />
-          </CardContent>
+          <SignInForm
+            defaultValues={{
+              username: "",
+              password: "",
+            }}
+          />
         </Card>
         <p className="text-accent-foreground/60">
-          Already have an account?{" "}
-          <Link href="/sign-in">
-            <b>Sign in!</b>
+          Don&apos;t have an account?{" "}
+          <Link href="/sign-up">
+            <b>Register now!</b>
           </Link>
         </p>
       </div>
     </div>
   );
 }
-export default SignUpPage;
+export default SignInPage;
