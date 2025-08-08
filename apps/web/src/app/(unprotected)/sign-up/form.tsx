@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useState } from "react";
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "lucide-react";
+import { toast } from "sonner";
 import z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
+import { useQueryFetchClient } from "@/lib/api/client";
+import { parseErrorDetail } from "@/lib/utils";
 import FormProps from "@/types/form";
 
 const signUpFormSchema = z
@@ -27,19 +30,38 @@ export type SignUpFormSchemaType = z.infer<typeof signUpFormSchema>;
 
 function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
   const passwordId = useId();
-  const [isPending, setIsPending] = useState<boolean>(false);
+
+  const { mutate, isPending } = useQueryFetchClient.useMutation(
+    "post",
+    "/api/v1/auth/register",
+    {
+      onSuccess: () => {
+        toast.success("Account created successfully!");
+      },
+      onError: (error: unknown) => {
+        toast.error(
+          parseErrorDetail(error) ||
+            "Failed to create account. Please try again.",
+        );
+      },
+    },
+  );
 
   const form = useAppForm({
     validators: { onChange: signUpFormSchema },
     defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
       ...props.defaultValues,
     },
     onSubmit: async ({ value }) => {
-      setIsPending(true);
-      // Simulate API call - replace this with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(value);
-      setIsPending(false);
+      mutate({
+        body: {
+          ...value,
+        },
+      });
     },
   });
 
