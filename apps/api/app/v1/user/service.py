@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import bcrypt
@@ -23,7 +23,7 @@ class UserService:
     def create_session(self, user_id: str, remember_me: bool = False) -> str:
         """Create a new session for the user."""
         session_id = str(uuid4())
-        expires_at = datetime.utcnow() + (
+        expires_at = datetime.now(timezone.utc) + (
             self.remember_me_duration if remember_me else self.default_session_duration
         )
 
@@ -46,7 +46,7 @@ class UserService:
                 detail="Invalid session",
             )
 
-        if session.expires_at and session.expires_at < datetime.utcnow():
+        if session.expires_at and session.expires_at < datetime.now(timezone.utc):
             self.db.delete(session)
             self.db.commit()
             raise HTTPException(
@@ -119,13 +119,13 @@ class UserService:
             .first()
         )
 
-        if not user or not user.accounts:
+        if not user or not user.account:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username/email or password",
             )
 
-        account = user.accounts[0]
+        account = user.account
         if not self.verify_password(password, account.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

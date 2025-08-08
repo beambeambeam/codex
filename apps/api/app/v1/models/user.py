@@ -29,8 +29,8 @@ class User(Base):
         onupdate=func.current_timestamp(),
     )
 
-    accounts: Mapped[list["Account"]] = relationship(
-        "Account", back_populates="user", cascade="all, delete-orphan"
+    account: Mapped[Optional["Account"]] = relationship(
+        "Account", back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
     sessions: Mapped[list["Session"]] = relationship(
         "Session", back_populates="user", cascade="all, delete-orphan"
@@ -65,7 +65,7 @@ class Account(Base):
         onupdate=func.current_timestamp(),
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="accounts")
+    user: Mapped["User"] = relationship("User", back_populates="account")
 
 
 class Session(Base):
