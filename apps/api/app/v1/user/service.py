@@ -6,6 +6,7 @@ import bcrypt
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
+
 from ..models.user import Account, User, Session as UserSession
 
 
@@ -23,7 +24,6 @@ class UserService:
 
     def create_session(self, user_id: str, remember_me: bool = False) -> str:
         """Create a new session for the user."""
-
         session_id = str(uuid4())
         expires_at = datetime.now(timezone.utc) + (
             self.remember_me_duration if remember_me else self.default_session_duration
@@ -31,6 +31,7 @@ class UserService:
 
         session = UserSession(id=session_id, user_id=user_id, expires_at=expires_at)
 
+        # Single operation, no need for transaction block
         self.db.add(session)
         self.db.commit()
 
@@ -54,8 +55,10 @@ class UserService:
             expires_at = expires_at.replace(tzinfo=timezone.utc)
 
         if expires_at and expires_at < datetime.now(timezone.utc):
-            self.db.delete(session)
-            self.db.commit()
+            # Expired session — delete it atomically
+            with self.db.begin():
+                self.db.delete(session)
+
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Session expired",
@@ -75,12 +78,10 @@ class UserService:
 
     def hash_password(self, password: str) -> str:
         """Hash a password using bcrypt with random salt."""
-
         return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     def verify_password(self, password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
-
         return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
 
     def create_user(self, username: str, email: str, password: str) -> User:
@@ -102,19 +103,20 @@ class UserService:
             c.lower() if c.isalnum() or c == " " else "" for c in username
         ).replace(" ", "_")
 
-        user = User(
-            id=str(uuid4()), username=clean_username, email=email, display=username
-        )
-        self.db.add(user)
-        self.db.flush()
+        # Use transaction block to ensure atomic creation of user + account
+        with self.db.begin():
+            user = User(
+                id=str(uuid4()), username=clean_username, email=email, display=username
+            )
+            self.db.add(user)
+            self.db.flush()  # get user.id
 
-        account = Account(
-            id=str(uuid4()), password=self.hash_password(password), user_id=user.id
-        )
-        self.db.add(account)
-        self.db.commit()
+            account = Account(
+                id=str(uuid4()), password=self.hash_password(password), user_id=user.id
+            )
+            self.db.add(account)
+
         self.db.refresh(user)
-
         return user
 
     def authenticate_user(
@@ -137,13 +139,13 @@ class UserService:
                 detail="Invalid username/email or password",
             )
 
-        account = user.account
-        if not self.verify_password(password, account.password):
+        if not self.verify_password(password, user.account.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username/email or password",
             )
 
+        # Creating a session is a single atomic operation so no need for extra transaction block here
         session_id = self.create_session(user.id, remember_me)
 
         return user, session_id
@@ -163,5 +165,4 @@ class UserService:
 
     def logout_user(self, session_id: str) -> None:
         """Logout user by deleting session."""
-
         self.delete_session(session_id)
