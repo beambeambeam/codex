@@ -21,14 +21,16 @@ class UserLoginRequest(BaseModel):
 
 
 class UserRegisterResponse(BaseModel):
-    """User Register reponse payload"""
+    """User Register response payload"""
 
+    display: str = Field(..., example="John Doe")
     username: str = Field(..., example="john_doe")
     email: EmailStr = Field(..., example="john@example.com")
 
 
 class UserLoginResponse(BaseModel):
-    """User Login reponse payload"""
+    """User Login response payload"""
 
+    display: str = Field(..., example="John Doe")
     username: str = Field(..., example="john_doe")
     email: EmailStr = Field(..., example="john@example.com")

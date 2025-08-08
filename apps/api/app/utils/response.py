@@ -1,9 +1,9 @@
 from typing import Generic, TypeVar, Optional
-from pydantic.generics import GenericModel
+from pydantic import BaseModel
 
 T = TypeVar("T")
 
 
-class CommonResponse(GenericModel, Generic[T]):
+class CommonResponse(BaseModel, Generic[T]):
     message: str
     detail: Optional[T]
