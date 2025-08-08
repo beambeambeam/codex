@@ -57,8 +57,6 @@ export async function middleware(request: NextRequest) {
 
   const isAuthenticated = await checkAuthentication(request);
 
-  console.log(isAuthenticated);
-
   if (isProtectedRoute) {
     if (!isAuthenticated) {
       const signInUrl = new URL("/sign-in", request.url);
