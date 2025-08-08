@@ -9,6 +9,7 @@ import z from "zod";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { parseErrorDetail } from "@/lib/utils";
@@ -35,7 +36,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
     }
   }, [user, router]);
 
-  const { mutate } = useQueryFetchClient.useMutation(
+  const { mutate, isPending } = useQueryFetchClient.useMutation(
     "post",
     "/api/v1/auth/login",
     {
@@ -101,6 +102,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
+                    disabled={isPending}
                   />
                 </field.FormControl>
                 <field.FormMessage />
@@ -123,6 +125,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
                       onChange={(e) => field.handleChange(e.target.value)}
                       type={isPasswordVisible ? "text" : "password"}
                       className="pe-9"
+                      disabled={isPending}
                     />
                     <button
                       type="button"
@@ -133,6 +136,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
                       }
                       aria-pressed={isPasswordVisible}
                       aria-controls="password"
+                      disabled={isPending}
                     >
                       {isPasswordVisible ? (
                         <EyeOffIcon size={16} aria-hidden="true" />
@@ -149,8 +153,19 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
         </CardContent>
 
         <CardFooter className="flex w-full items-center justify-center pt-5">
-          <Button type="submit" disabled={props.disabled}>
-            Sign In
+          <Button
+            type="submit"
+            disabled={props.disabled || isPending}
+            variant="outline"
+          >
+            {isPending ? (
+              <>
+                <Loader variant="circular" size="sm" className="mr-2" />
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </CardFooter>
       </form>

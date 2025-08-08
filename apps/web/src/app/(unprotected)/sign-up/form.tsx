@@ -7,6 +7,7 @@ import z from "zod";
 import { Button } from "@/components/ui/button";
 import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import FormProps from "@/types/form";
 
@@ -26,12 +27,20 @@ export type SignUpFormSchemaType = z.infer<typeof signUpFormSchema>;
 
 function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
   const passwordId = useId();
+  const [isPending, setIsPending] = useState<boolean>(false);
+
   const form = useAppForm({
     validators: { onChange: signUpFormSchema },
     defaultValues: {
       ...props.defaultValues,
     },
-    onSubmit: ({ value }) => console.log(value),
+    onSubmit: async ({ value }) => {
+      setIsPending(true);
+      // Simulate API call - replace this with actual API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(value);
+      setIsPending(false);
+    },
   });
 
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -97,6 +106,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
+                  disabled={isPending}
                 />
               </field.FormControl>
               <field.FormDescription>
@@ -120,6 +130,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
+                  disabled={isPending}
                 />
               </field.FormControl>
               <field.FormMessage />
@@ -148,6 +159,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                       type={isPasswordVisible ? "text" : "password"}
                       aria-describedby={`${passwordId}-description`}
                       className="pe-9"
+                      disabled={isPending}
                     />
                     <button
                       type="button"
@@ -158,6 +170,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                       }
                       aria-pressed={isPasswordVisible}
                       aria-controls="password"
+                      disabled={isPending}
                     >
                       {isPasswordVisible ? (
                         <EyeOffIcon size={16} aria-hidden="true" />
@@ -253,6 +266,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                     onChange={(e) => field.handleChange(e.target.value)}
                     type={isConfirmPasswordVisible ? "text" : "password"}
                     className="pe-9"
+                    disabled={isPending}
                   />
                   <button
                     type="button"
@@ -265,6 +279,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                     }
                     aria-pressed={isConfirmPasswordVisible}
                     aria-controls="confirmPassword"
+                    disabled={isPending}
                   >
                     {isConfirmPasswordVisible ? (
                       <EyeOffIcon size={16} aria-hidden="true" />
@@ -280,8 +295,19 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
         </form.AppField>
 
         <CardFooter className="flex w-full items-center justify-center pt-5">
-          <Button type="submit" disabled={props.disabled}>
-            Create Account
+          <Button
+            type="submit"
+            disabled={props.disabled || isPending}
+            variant="outline"
+          >
+            {isPending ? (
+              <>
+                <Loader variant="circular" size="sm" className="mr-2" />
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </CardFooter>
       </form>
