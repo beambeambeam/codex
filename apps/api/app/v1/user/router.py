@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, status, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 
 from .schemas import (
     UserRegisterRequest,
     UserRegisterResponse,
     UserLoginRequest,
     UserLoginResponse,
+    AuthStatusResponse,
 )
 from .service import UserService
 from .dependencies import get_user_service, get_current_user
@@ -123,3 +124,36 @@ def get_current_user_info(
             display=current_user.display,
         ),
     )
+
+
+@router.get(
+    "/check-auth",
+    response_model=CommonResponse[AuthStatusResponse],
+    status_code=status.HTTP_200_OK,
+)
+def check_auth_status(
+    request: Request,
+    user_service: UserService = Depends(get_user_service),
+) -> CommonResponse[AuthStatusResponse]:
+    """Check if user is currently logged in based on session cookie."""
+
+    session_id = request.cookies.get("session_id")
+
+    if not session_id:
+        return CommonResponse[AuthStatusResponse](
+            message="Not authenticated",
+            detail=AuthStatusResponse(logged_in=False),
+        )
+
+    try:
+        # Try to get current user to validate session
+        user_service.get_current_user(session_id)
+        return CommonResponse[AuthStatusResponse](
+            message="User is authenticated",
+            detail=AuthStatusResponse(logged_in=True),
+        )
+    except HTTPException:
+        return CommonResponse[AuthStatusResponse](
+            message="Session invalid or expired",
+            detail=AuthStatusResponse(logged_in=False),
+        )

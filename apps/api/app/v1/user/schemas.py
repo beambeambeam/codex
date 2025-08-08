@@ -34,3 +34,11 @@ class UserLoginResponse(BaseModel):
     display: str = Field(..., example="John Doe")
     username: str = Field(..., example="john_doe")
     email: EmailStr = Field(..., example="john@example.com")
+
+
+class AuthStatusResponse(BaseModel):
+    """Auth status check response payload"""
+
+    logged_in: bool = Field(
+        ..., example=True, description="Whether the user is currently logged in"
+    )

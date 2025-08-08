@@ -96,10 +96,48 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/check-auth": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Check Auth Status
+     * @description Check if user is currently logged in based on session cookie.
+     */
+    get: operations["check_auth_status_api_v1_auth_check_auth_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /**
+     * AuthStatusResponse
+     * @description Auth status check response payload
+     */
+    AuthStatusResponse: {
+      /**
+       * Logged In
+       * @description Whether the user is currently logged in
+       * @example true
+       */
+      logged_in: boolean;
+    };
+    /** CommonResponse[AuthStatusResponse] */
+    CommonResponse_AuthStatusResponse_: {
+      /** Message */
+      message: string;
+      detail: components["schemas"]["AuthStatusResponse"] | null;
+    };
     /** CommonResponse[UserLoginResponse] */
     CommonResponse_UserLoginResponse_: {
       /** Message */
@@ -354,6 +392,26 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CommonResponse_UserLoginResponse_"];
+        };
+      };
+    };
+  };
+  check_auth_status_api_v1_auth_check_auth_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommonResponse_AuthStatusResponse_"];
         };
       };
     };
