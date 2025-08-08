@@ -2,28 +2,62 @@
 
 import { useCallback, useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { toast } from "sonner";
 import z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
+import { useQueryFetchClient } from "@/lib/api/client";
+import { queryClient } from "@/provider/query";
 import FormProps from "@/types/form";
 
 const signInFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
+  remeber_me: z.boolean(),
 });
 
 export type SignInFormSchemaType = z.infer<typeof signInFormSchema>;
 
 function SignInForm(props: FormProps<SignInFormSchemaType>) {
+  const { mutate } = useQueryFetchClient.useMutation(
+    "post",
+    "/api/v1/auth/login",
+    {
+      onSuccess: () => {
+        toast.success("Signed in successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["get", "/api/v1/auth/me"],
+        });
+      },
+      onError: (error: unknown) => {
+        const message =
+          typeof error === "object" && error !== null && "detail" in error
+            ? (error as { detail?: string }).detail
+            : undefined;
+        toast.error(message || "Failed to sign in. Please try again.");
+      },
+    },
+  );
+
   const form = useAppForm({
     validators: { onChange: signInFormSchema },
     defaultValues: {
+      username: "",
+      password: "",
+      remeber_me: false,
       ...props.defaultValues,
     },
-    onSubmit: ({ value }) => console.log(value),
+    onSubmit: ({ value }) =>
+      mutate({
+        body: {
+          username_or_email: value.username,
+          password: value.password,
+          remember_me: value.remeber_me,
+        },
+      }),
   });
 
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
