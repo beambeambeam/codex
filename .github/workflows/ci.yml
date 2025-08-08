@@ -7,6 +7,10 @@ permissions:
   actions: read
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -34,6 +38,9 @@ jobs:
 
       - name: Run check types
         run: pnpm run check-types
+
+      - name: Run lint
+        run: pnpm run lint
 
       - name: Run build job
         run: pnpm run build
