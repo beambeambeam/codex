@@ -42,3 +42,17 @@ class AuthStatusResponse(BaseModel):
     logged_in: bool = Field(
         ..., example=True, description="Whether the user is currently logged in"
     )
+
+
+class UserEditRequest(BaseModel):
+    """User Register response payload"""
+
+    display: Optional[str] = Field(..., example="John Doe")
+    username: Optional[str] = Field(..., example="john_doe")
+    email: Optional[EmailStr] = Field(..., example="john@example.com")
+
+
+class UserEditResponse(UserLoginRequest):
+    """User Edit response payload"""
+
+    pass
