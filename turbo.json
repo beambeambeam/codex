@@ -6,7 +6,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["SKIP_ENV_VALIDATION"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -22,5 +23,10 @@
       "persistent": true
     }
   },
-  "globalEnv": ["NODE_ENV", "API_URL", "NEXT_PUBLIC_API_URL"]
+  "globalEnv": [
+    "NODE_ENV",
+    "API_URL",
+    "NEXT_PUBLIC_API_URL",
+    "SKIP_ENV_VALIDATION"
+  ]
 }
