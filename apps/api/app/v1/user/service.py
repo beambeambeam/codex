@@ -4,7 +4,7 @@ from uuid import uuid4
 import bcrypt
 
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..models.user import Account, User, Session as UserSession
 
@@ -14,6 +14,7 @@ class UserService:
 
     def __init__(self, db: Session, secret_key: str):
         """Initialize auth service."""
+
         self.db = db
         self.secret_key = secret_key
 
@@ -22,6 +23,7 @@ class UserService:
 
     def create_session(self, user_id: str, remember_me: bool = False) -> str:
         """Create a new session for the user."""
+
         session_id = str(uuid4())
         expires_at = datetime.now(timezone.utc) + (
             self.remember_me_duration if remember_me else self.default_session_duration
@@ -36,6 +38,7 @@ class UserService:
 
     def get_session(self, session_id: str) -> UserSession:
         """Get session by ID and validate it's not expired."""
+
         session = (
             self.db.query(UserSession).filter(UserSession.id == session_id).first()
         )
@@ -46,7 +49,11 @@ class UserService:
                 detail="Invalid session",
             )
 
-        if session.expires_at and session.expires_at < datetime.now(timezone.utc):
+        expires_at = session.expires_at
+        if expires_at and expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        if expires_at and expires_at < datetime.now(timezone.utc):
             self.db.delete(session)
             self.db.commit()
             raise HTTPException(
@@ -58,6 +65,7 @@ class UserService:
 
     def delete_session(self, session_id: str) -> None:
         """Delete a session."""
+
         session = (
             self.db.query(UserSession).filter(UserSession.id == session_id).first()
         )
@@ -67,14 +75,17 @@ class UserService:
 
     def hash_password(self, password: str) -> str:
         """Hash a password using bcrypt with random salt."""
+
         return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     def verify_password(self, password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
+
         return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
 
     def create_user(self, username: str, email: str, password: str) -> User:
         """Create a new user with account."""
+
         existing_user = (
             self.db.query(User)
             .filter((User.username == username) | (User.email == email))
@@ -113,6 +124,7 @@ class UserService:
 
         user = (
             self.db.query(User)
+            .options(joinedload(User.account))
             .filter(
                 (User.username == username_or_email) | (User.email == username_or_email)
             )
@@ -151,4 +163,5 @@ class UserService:
 
     def logout_user(self, session_id: str) -> None:
         """Logout user by deleting session."""
+
         self.delete_session(session_id)
