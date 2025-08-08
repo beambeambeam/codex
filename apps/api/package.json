@@ -5,7 +5,8 @@
   "main": "main.py",
   "scripts": {
     "dev": "uv run python -m app.main serve --reload",
-    "lint": "uv run ruff check --fix"
+    "lint": "uv run ruff check --fix",
+    "check-types": "uv run ty check ."
   },
   "keywords": [],
   "author": "",

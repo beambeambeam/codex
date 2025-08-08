@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import bcrypt
+from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
@@ -167,8 +168,13 @@ class UserService:
         self.delete_session(session_id)
 
     def edit_user(
-        self, user_id: str, display: str = None, username: str = None, email: str = None
+        self,
+        user_id: str,
+        display: Optional[str] = None,
+        username: Optional[str] = None,
+        email: Optional[str] = None,
     ) -> User:
+        """Edit user information."""
         """Edit user information."""
 
         user = self.db.query(User).filter(User.id == user_id).first()
