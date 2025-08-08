@@ -37,7 +37,9 @@ def register(
     return CommonResponse[UserRegisterResponse](
         message="User registered successfully",
         detail=UserRegisterResponse(
-            username=user.username, email=user.email, display=user.display
+            username=user.username or "",
+            email=user.email or "",
+            display=user.display or "",
         ),
     )
 
@@ -76,9 +78,9 @@ def login(
     return CommonResponse[UserLoginResponse](
         message="User logged in successfully",
         detail=UserLoginResponse(
-            username=user.username,
-            email=user.email,
-            display=user.display,
+            username=user.username or "",
+            email=user.email or "",
+            display=user.display or "",
         ),
     )
 
@@ -121,9 +123,9 @@ def get_current_user_info(
     return CommonResponse[UserLoginResponse](
         message="User information retrieved successfully",
         detail=UserLoginResponse(
-            username=current_user.username,
-            email=current_user.email,
-            display=current_user.display,
+            username=current_user.username or "",
+            email=current_user.email or "",
+            display=current_user.display or "",
         ),
     )
 
@@ -181,6 +183,6 @@ def edit_user(
     return CommonResponse[UserEditResponse](
         message="User updated successfully",
         detail=UserEditResponse(
-            display=updated_user.display,
+            display=updated_user.display or "",
         ),
     )
