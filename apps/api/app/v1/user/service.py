@@ -62,3 +62,28 @@ class UserService:
         self.db.refresh(user)
 
         return user
+
+    def authenticate_user(self, username_or_email: str, password: str) -> User:
+        """Authenticate the user"""
+
+        user = (
+            self.db.query(User)
+            .filter(
+                (User.username == username_or_email) | (User.email == username_or_email)
+            )
+            .first()
+        )
+
+        if not user or not user.accounts:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username/email or password",
+            )
+
+        if not self.verify_password(password, user.accounts[0].password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username/email or password",
+            )
+
+        return user

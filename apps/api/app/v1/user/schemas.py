@@ -15,7 +15,7 @@ class UserRegisterRequest(BaseModel):
 class UserLoginRequest(BaseModel):
     """User login request payload."""
 
-    username: str = Field(..., example="john_doe")
+    username_or_email: str = Field(..., example="john_doe")
     password: str = Field(..., example="strongpassword123")
     remember_me: Optional[bool] = Field(False, example=True)
 
