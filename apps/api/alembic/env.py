@@ -1,12 +1,13 @@
 import os
 from logging.config import fileConfig
 
-from apps.api.app.v1.models.base import Base
-import pgvector
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 
 from alembic import context
+
+from app.v1.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -63,7 +64,7 @@ def do_run_migrations(connection: Connection) -> None:
     """Configure connection and run migrations with pgvector support."""
     # Need to hack the "vector" type into postgres dialect schema types.
     # Otherwise, `alembic check` does not recognize the type
-    connection.dialect.ischema_names["vector"] = pgvector.sqlalchemy.Vector
+    connection.dialect.ischema_names["vector"] = Vector
 
     context.configure(
         connection=connection,
