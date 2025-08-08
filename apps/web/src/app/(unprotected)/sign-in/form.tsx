@@ -11,6 +11,7 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { useQueryFetchClient } from "@/lib/api/client";
+import { parseErrorDetail } from "@/lib/utils";
 import { useUser, useUserActions } from "@/store/user";
 import FormProps from "@/types/form";
 
@@ -30,7 +31,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
 
   useEffect(() => {
     if (user) {
-      router.push("/home");
+      router.refresh();
     }
   }, [user, router]);
 
@@ -45,11 +46,9 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
         }
       },
       onError: (error: unknown) => {
-        const message =
-          typeof error === "object" && error !== null && "detail" in error
-            ? (error as { detail?: string }).detail
-            : undefined;
-        toast.error(message || "Failed to sign in. Please try again.");
+        toast.error(
+          parseErrorDetail(error) || "Failed to sign in. Please try again.",
+        );
       },
     },
   );
