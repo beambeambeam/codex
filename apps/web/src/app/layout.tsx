@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/provider/themes";
 import "./globals.css";
 
 import { BreakpointIndicator } from "@/components/dev/breakpoint-indicator";
+import { Toaster } from "@/components/ui/sonner";
 import { LineSeedSans, Sarabun } from "@/fonts";
 import { cn } from "@/lib/utils";
 import QueryProvider from "@/provider/query";
@@ -35,6 +36,7 @@ export default function RootLayout({
             themes={["light", "dark"]}
           >
             {children}
+            <Toaster />
             <BreakpointIndicator />
           </ThemeProvider>
         </QueryProvider>
