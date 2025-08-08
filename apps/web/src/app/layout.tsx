@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { LineSeedSans, Sarabun } from "@/fonts";
 import { cn } from "@/lib/utils";
 import QueryProvider from "@/provider/query";
+import { UserProvider } from "@/store/user";
 
 export const metadata = {
   title: "Codex",
@@ -35,9 +36,11 @@ export default function RootLayout({
             disableTransitionOnChange
             themes={["light", "dark"]}
           >
-            {children}
-            <Toaster />
-            <BreakpointIndicator />
+            <UserProvider>
+              {children}
+              <Toaster />
+              <BreakpointIndicator />
+            </UserProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

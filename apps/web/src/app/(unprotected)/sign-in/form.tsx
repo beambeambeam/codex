@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
@@ -10,7 +11,7 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { useQueryFetchClient } from "@/lib/api/client";
-import { queryClient } from "@/provider/query";
+import { useUser, useUserActions } from "@/store/user";
 import FormProps from "@/types/form";
 
 const signInFormSchema = z.object({
@@ -22,15 +23,26 @@ const signInFormSchema = z.object({
 export type SignInFormSchemaType = z.infer<typeof signInFormSchema>;
 
 function SignInForm(props: FormProps<SignInFormSchemaType>) {
+  const router = useRouter();
+
+  const { setUser } = useUserActions();
+  const user = useUser();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/home");
+    }
+  }, [user, router]);
+
   const { mutate } = useQueryFetchClient.useMutation(
     "post",
     "/api/v1/auth/login",
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success("Signed in successfully!");
-        queryClient.invalidateQueries({
-          queryKey: ["get", "/api/v1/auth/me"],
-        });
+        if (data.detail) {
+          setUser(data.detail);
+        }
       },
       onError: (error: unknown) => {
         const message =
