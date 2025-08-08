@@ -168,7 +168,6 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                   </div>
                 </field.FormControl>
 
-                {/* Password strength indicator */}
                 {password && (
                   <div className="mt-3">
                     <div
@@ -187,7 +186,6 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                       ></div>
                     </div>
 
-                    {/* Password strength description */}
                     <p
                       id={`${passwordId}-description`}
                       className="text-foreground mb-2 mt-2 text-sm font-medium"
@@ -195,7 +193,6 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                       {getStrengthText(strengthScore)}. Must contain:
                     </p>
 
-                    {/* Password requirements list */}
                     <ul
                       className="space-y-1.5"
                       aria-label="Password requirements"

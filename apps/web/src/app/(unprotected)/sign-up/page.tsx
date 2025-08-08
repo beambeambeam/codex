@@ -14,9 +14,9 @@ function SignUpPage() {
   return (
     <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
       <div className="hidden h-full flex-col items-center justify-center lg:flex">
-        <div>
+        <div className="flex flex-col gap-2">
           <Logo size={250} />
-          <h1 className="text-3xl">Your&apos;s Agentic Ai Librarians</h1>
+          <p className="text-2xl font-bold">Make every data, Askable.</p>
         </div>
       </div>
       <div className="flex h-full flex-col items-center justify-center gap-2.5">
