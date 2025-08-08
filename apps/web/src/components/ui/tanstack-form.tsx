@@ -51,7 +51,17 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-const useFieldContext = () => {
+interface UseFieldContextReturn {
+  id: string;
+  name: string;
+  formItemId: string;
+  formDescriptionId: string;
+  formMessageId: string;
+  errors: Array<{ message?: string }>;
+  store: ReturnType<typeof useFormFieldContext>["store"];
+}
+
+const useFieldContext = (): UseFieldContextReturn => {
   const { id } = React.useContext(FormItemContext);
   const { name, store, ...fieldContext } = useFormFieldContext();
 
