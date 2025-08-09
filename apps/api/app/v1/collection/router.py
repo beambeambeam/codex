@@ -257,16 +257,3 @@ def revoke_collection_permission(
         )
 
     return None
-
-
-@router.get(
-    "/user/collections",
-    response_model=List[CollectionResponse],
-    status_code=status.HTTP_200_OK,
-)
-def get_user_collections(
-    current_user: User = Depends(get_current_user),
-    collection_service: CollectionService = Depends(get_collection_service),
-) -> List[CollectionResponse]:
-    """Get all collections the current user has access to."""
-    return collection_service.get_user_collections(current_user.id)
