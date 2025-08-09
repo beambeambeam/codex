@@ -60,7 +60,7 @@ class CollectionPermissionAuditResponse(BaseModel):
 
     id: uuid.UUID
     collection_permission_id: uuid.UUID
-    performed_by: Optional[str]
+    performed_by: Optional[uuid.UUID]
     performed_at: str
     old_permission: Optional[CollectionPermissionEnum]
     new_permission: Optional[CollectionPermissionEnum]
