@@ -226,22 +226,6 @@ def revoke_collection_permission(
 ):
     """Revoke permission for a user on a collection."""
 
-    permissions = collection_service.get_collection_permissions(collection_id)
-    owner_count = sum(
-        1 for p in permissions if p.permission_level == CollectionPermissionEnum.OWNER
-    )
-
-    user_permission = next((p for p in permissions if p.user_id == user_id), None)
-    if (
-        user_permission
-        and user_permission.permission_level == CollectionPermissionEnum.OWNER
-        and owner_count <= 1
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot remove the last owner of a collection",
-        )
-
     revoked = collection_service.revoke_permission(
         collection_id=collection_id,
         user_id=user_id,

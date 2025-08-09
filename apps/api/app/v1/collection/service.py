@@ -344,7 +344,7 @@ class CollectionPermissionService:
     def revoke_permission(
         self, collection_id: str, user_id: str, revoked_by: str
     ) -> bool:
-        """Revoke permission for a user on a collection."""
+        """Revoke permission for a user on a collection, preventing removal of last owner."""
 
         permission = (
             self.db.query(CollectionPermission)
@@ -357,6 +357,25 @@ class CollectionPermissionService:
 
         if not permission:
             return False
+
+        # Prevent removing the last owner
+        if permission.permission_level == CollectionPermissionEnum.OWNER:
+            owners = (
+                self.db.query(CollectionPermission)
+                .filter(
+                    CollectionPermission.collection_id == collection_id,
+                    CollectionPermission.permission_level
+                    == CollectionPermissionEnum.OWNER,
+                )
+                .count()
+            )
+            if owners <= 1:
+                from fastapi import HTTPException, status
+
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot remove the last owner of a collection",
+                )
 
         try:
             old_permission = permission.permission_level
