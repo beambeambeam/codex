@@ -11,9 +11,7 @@ from .schemas import (
 from .service import CollectionService
 from .dependencies import (
     get_collection_service,
-    has_read_permission,
-    has_edit_permission,
-    has_owner_permission,
+    has_permission,
 )
 from ..user.dependencies import get_current_user
 from ..models.user import User
@@ -67,7 +65,7 @@ def get_collections(
 )
 def get_collection(
     collection_id: str,
-    _: None = Depends(has_read_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> CollectionResponse:
@@ -90,7 +88,7 @@ def get_collection(
 )
 def get_collection_audits(
     collection_id: str,
-    _: None = Depends(has_read_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> List[CollectionAuditResponse]:
@@ -108,7 +106,7 @@ def get_collection_audits(
 def update_collection(
     collection_id: str,
     collection_data: CollectionCreateRequest = Body(...),
-    _: None = Depends(has_edit_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.EDIT)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> CollectionResponse:
@@ -130,7 +128,7 @@ def update_collection(
 )
 def delete_collection(
     collection_id: str,
-    _: None = Depends(has_owner_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.OWNER)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ):
@@ -153,7 +151,7 @@ def delete_collection(
 )
 def get_collection_permissions(
     collection_id: str,
-    _: None = Depends(has_read_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> List[CollectionPermissionResponse]:
@@ -170,7 +168,7 @@ def get_collection_permissions(
 def grant_collection_permission(
     collection_id: str,
     permission_data: CollectionPermissionRequest,
-    _: None = Depends(has_owner_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.OWNER)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> CollectionPermissionResponse:
@@ -193,7 +191,7 @@ def update_collection_permission(
     collection_id: str,
     user_id: str,
     permission_data: CollectionPermissionRequest,
-    _: None = Depends(has_owner_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.OWNER)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ) -> CollectionPermissionResponse:
@@ -222,7 +220,7 @@ def update_collection_permission(
 def revoke_collection_permission(
     collection_id: str,
     user_id: str,
-    _: None = Depends(has_owner_permission),
+    _: None = Depends(has_permission(CollectionPermissionEnum.OWNER)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
 ):
