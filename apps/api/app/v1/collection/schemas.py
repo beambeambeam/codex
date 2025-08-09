@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+import uuid
 from ..models.enum import CollectionPermissionEnum
 
 
@@ -13,7 +14,7 @@ class CollectionCreateRequest(BaseModel):
 class CollectionResponse(BaseModel):
     """Collection response payload"""
 
-    id: str
+    id: uuid.UUID
     title: Optional[str]
     description: Optional[str]
     summary: Optional[str]
@@ -25,9 +26,9 @@ class CollectionResponse(BaseModel):
 class CollectionAuditResponse(BaseModel):
     """Collection audit response payload"""
 
-    id: str
-    collection_id: str
-    performed_by: Optional[str]
+    id: uuid.UUID
+    collection_id: uuid.UUID
+    performed_by: Optional[uuid.UUID]
     performed_at: str
     action: str
 
@@ -45,9 +46,9 @@ class CollectionPermissionRequest(BaseModel):
 class CollectionPermissionResponse(BaseModel):
     """Collection permission response payload"""
 
-    id: str
-    collection_id: str
-    user_id: str
+    id: uuid.UUID
+    collection_id: uuid.UUID
+    user_id: uuid.UUID
     permission_level: CollectionPermissionEnum
 
     class Config:
@@ -57,8 +58,8 @@ class CollectionPermissionResponse(BaseModel):
 class CollectionPermissionAuditResponse(BaseModel):
     """Collection permission audit response payload"""
 
-    id: str
-    collection_permission_id: str
+    id: uuid.UUID
+    collection_permission_id: uuid.UUID
     performed_by: Optional[str]
     performed_at: str
     old_permission: Optional[CollectionPermissionEnum]
