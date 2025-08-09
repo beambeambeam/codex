@@ -27,7 +27,7 @@ class CollectionService:
         self.permission = CollectionPermissionService(db)
 
     def create_collection(
-        self, collection_data: CollectionCreateRequest, user_id: Optional[str] = None
+        self, collection_data: CollectionCreateRequest, user_id: str
     ) -> CollectionResponse:
         """Create a new collection and audit the action in a transaction."""
 
