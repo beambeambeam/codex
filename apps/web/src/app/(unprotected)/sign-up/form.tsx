@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
@@ -115,11 +114,13 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
 
   return (
     <form.AppForm>
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
         <form.AppField name="username">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Username</field.FormLabel>
+              <field.FormDescription>
+                This is your public display name.
+              </field.FormDescription>
               <field.FormControl>
                 <Input
                   id="username"
@@ -131,9 +132,6 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
                   disabled={isPending}
                 />
               </field.FormControl>
-              <field.FormDescription>
-                This is your public display name.
-              </field.FormDescription>
               <field.FormMessage />
             </field.FormItem>
           )}
@@ -142,7 +140,6 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
         <form.AppField name="email">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Email</field.FormLabel>
               <field.FormControl>
                 <Input
                   id="email"
@@ -168,12 +165,11 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
 
             return (
               <field.FormItem>
-                <field.FormLabel>Password</field.FormLabel>
                 <field.FormControl>
                   <div className="relative">
                     <Input
                       id="password"
-                      placeholder="••••••••"
+                      placeholder="Enter Password, Check the strength"
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -276,12 +272,11 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
         <form.AppField name="confirmPassword">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Confirm Password</field.FormLabel>
               <field.FormControl>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    placeholder="••••••••"
+                    placeholder="Confirm password again."
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
@@ -316,22 +311,21 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
           )}
         </form.AppField>
 
-        <CardFooter className="flex w-full items-center justify-center pt-5">
-          <Button
-            type="submit"
-            disabled={props.disabled || isPending}
-            variant="outline"
-          >
-            {isPending ? (
-              <>
-                <Loader variant="circular" size="sm" className="mr-2" />
-                Creating Account...
-              </>
-            ) : (
-              "Create Account"
-            )}
-          </Button>
-        </CardFooter>
+        <Button
+          type="submit"
+          disabled={props.disabled || isPending}
+          variant="secondary"
+          className="mt-4 w-full"
+        >
+          {isPending ? (
+            <>
+              <Loader variant="circular" size="sm" className="mr-2" />
+              Creating Account...
+            </>
+          ) : (
+            "Create Account"
+          )}
+        </Button>
       </form>
     </form.AppForm>
   );

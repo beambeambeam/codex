@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
@@ -88,86 +87,81 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
 
   return (
     <form.AppForm>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <form.AppField name="username">
-            {(field) => (
-              <field.FormItem>
-                <field.FormLabel>Username</field.FormLabel>
-                <field.FormControl>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form.AppField name="username">
+          {(field) => (
+            <field.FormItem>
+              <field.FormControl>
+                <Input
+                  id="username"
+                  placeholder="Enter your username"
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  disabled={isPending}
+                />
+              </field.FormControl>
+              <field.FormMessage />
+            </field.FormItem>
+          )}
+        </form.AppField>
+
+        <form.AppField name="password">
+          {(field) => (
+            <field.FormItem>
+              <field.FormControl>
+                <div className="relative">
                   <Input
-                    id="username"
-                    placeholder="Enter your username"
+                    id="password"
+                    placeholder="••••••••"
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
+                    type={isPasswordVisible ? "text" : "password"}
+                    className="pe-9"
                     disabled={isPending}
                   />
-                </field.FormControl>
-                <field.FormMessage />
-              </field.FormItem>
-            )}
-          </form.AppField>
+                  <button
+                    type="button"
+                    className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md outline-none transition-[color,box-shadow] focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={togglePasswordVisibility}
+                    aria-label={
+                      isPasswordVisible ? "Hide password" : "Show password"
+                    }
+                    aria-pressed={isPasswordVisible}
+                    aria-controls="password"
+                    disabled={isPending}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOffIcon size={16} aria-hidden="true" />
+                    ) : (
+                      <EyeIcon size={16} aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              </field.FormControl>
+              <field.FormMessage />
+            </field.FormItem>
+          )}
+        </form.AppField>
 
-          <form.AppField name="password">
-            {(field) => (
-              <field.FormItem>
-                <field.FormLabel>Password</field.FormLabel>
-                <field.FormControl>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      placeholder="••••••••"
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      type={isPasswordVisible ? "text" : "password"}
-                      className="pe-9"
-                      disabled={isPending}
-                    />
-                    <button
-                      type="button"
-                      className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md outline-none transition-[color,box-shadow] focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                      onClick={togglePasswordVisibility}
-                      aria-label={
-                        isPasswordVisible ? "Hide password" : "Show password"
-                      }
-                      aria-pressed={isPasswordVisible}
-                      aria-controls="password"
-                      disabled={isPending}
-                    >
-                      {isPasswordVisible ? (
-                        <EyeOffIcon size={16} aria-hidden="true" />
-                      ) : (
-                        <EyeIcon size={16} aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                </field.FormControl>
-                <field.FormMessage />
-              </field.FormItem>
-            )}
-          </form.AppField>
-        </CardContent>
-
-        <CardFooter className="flex w-full items-center justify-center pt-5">
-          <Button
-            type="submit"
-            disabled={props.disabled || isPending}
-            variant="outline"
-          >
-            {isPending ? (
-              <>
-                <Loader variant="circular" size="sm" className="mr-2" />
-                Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </Button>
-        </CardFooter>
+        <Button
+          type="submit"
+          disabled={props.disabled || isPending}
+          variant="secondary"
+          className="mt-4"
+        >
+          {isPending ? (
+            <>
+              <Loader variant="circular" size="sm" className="mr-2" />
+              Signing In...
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
       </form>
     </form.AppForm>
   );
