@@ -5,7 +5,7 @@ from typing import Optional
 class CollectionCreateRequest(BaseModel):
     """Collection Create request payload"""
 
-    title: Optional[str] = Field(None, example="My Collection")
+    title: str = Field(..., example="My Collection")
     description: Optional[str] = Field(None, example="A description of the collection")
 
 
