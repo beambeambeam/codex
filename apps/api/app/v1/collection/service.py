@@ -393,15 +393,11 @@ class CollectionPermissionService:
     def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
         """Get all collections a user has access to."""
 
-        permissions = (
-            self.db.query(CollectionPermission)
+        collections = (
+            self.db.query(Collection)
+            .join(CollectionPermission)
             .filter(CollectionPermission.user_id == user_id)
             .all()
-        )
-
-        collection_ids = [p.collection_id for p in permissions]
-        collections = (
-            self.db.query(Collection).filter(Collection.id.in_(collection_ids)).all()
         )
 
         return [CollectionResponse.model_validate(c) for c in collections]
