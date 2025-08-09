@@ -16,6 +16,10 @@ class CollectionService:
         self.db = db
         self.audit = CollectionAuditService(db)
 
+    def get_collection_audits(self, collection_id: str):
+        """Get audits for a collection by ID."""
+        return self.audit.get_audits_for_collection(collection_id)
+
     def create_collection(
         self, collection_data: CollectionCreateRequest, user_id: Optional[str] = None
     ) -> CollectionResponse:

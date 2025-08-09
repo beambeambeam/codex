@@ -19,3 +19,16 @@ class CollectionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CollectionAuditResponse(BaseModel):
+    """Collection audit response payload"""
+
+    id: str
+    collection_id: str
+    performed_by: Optional[str]
+    performed_at: str
+    action: str
+
+    class Config:
+        from_attributes = True
