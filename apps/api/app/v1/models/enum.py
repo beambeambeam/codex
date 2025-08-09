@@ -6,3 +6,9 @@ class CollectionActionEnum(str, Enum):
     ARCHIVE = "ARCHIVE"
     UPDATE = "UPDATE"
     DELETE = "DELETE"
+
+
+class CollectionPermissionEnum(str, Enum):
+    READ = "READ"
+    EDIT = "EDIT"
+    OWNER = "OWNER"
