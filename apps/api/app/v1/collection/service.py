@@ -131,14 +131,6 @@ class CollectionService:
             return CollectionResponse.model_validate(collection)
         return None
 
-    def get_collections(self) -> List[CollectionResponse]:
-        """Get all collections."""
-
-        collections = self.db.query(Collection).all()
-        return [
-            CollectionResponse.model_validate(collection) for collection in collections
-        ]
-
     # Permission-related methods
     def grant_permission(
         self,
