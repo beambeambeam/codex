@@ -10,6 +10,7 @@ from .service import CollectionService
 from .dependencies import get_collection_service
 from ..user.dependencies import get_current_user
 from ..models.user import User
+from fastapi import Body
 
 
 router = APIRouter(prefix="/collections", tags=["collections"])
@@ -87,3 +88,49 @@ def get_collection_audits(
     """Get audits for a collection by ID."""
     audits = collection_service.get_collection_audits(collection_id)
     return [CollectionAuditResponse.model_validate(a) for a in audits]
+
+
+# Update a collection
+
+
+@router.put(
+    "/{collection_id}",
+    response_model=CollectionResponse,
+    status_code=status.HTTP_200_OK,
+)
+def update_collection(
+    collection_id: str,
+    collection_data: CollectionCreateRequest = Body(...),
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+) -> CollectionResponse:
+    """Update a collection by ID."""
+    updated = collection_service.update_collection(
+        collection_id, collection_data, user_id=current_user.id
+    )
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"
+        )
+    return updated
+
+
+# Delete a collection
+@router.delete(
+    "/{collection_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_collection(
+    collection_id: str,
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+):
+    """Delete a collection by ID."""
+    deleted = collection_service.delete_collection(
+        collection_id, user_id=current_user.id
+    )
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"
+        )
+    return None

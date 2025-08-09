@@ -16,6 +16,47 @@ class CollectionService:
         self.db = db
         self.audit = CollectionAuditService(db)
 
+    def update_collection(
+        self,
+        collection_id: str,
+        collection_data: CollectionCreateRequest,
+        user_id: Optional[str] = None,
+    ) -> Optional[CollectionResponse]:
+        """Update a collection by ID and audit the action."""
+        collection = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection:
+            return None
+        collection.title = collection_data.title
+        collection.description = collection_data.description
+        self.audit.create_audit(
+            collection_id=collection.id,
+            action=CollectionActionEnum.UPDATE,
+            user_id=user_id,
+        )
+        self.db.commit()
+        self.db.refresh(collection)
+        return CollectionResponse.model_validate(collection)
+
+    def delete_collection(
+        self, collection_id: str, user_id: Optional[str] = None
+    ) -> bool:
+        """Delete a collection by ID and audit the action."""
+        collection = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection:
+            return False
+        self.db.delete(collection)
+        self.audit.create_audit(
+            collection_id=collection_id,
+            action=CollectionActionEnum.ARCHIVE,  # Use ARCHIVE for delete
+            user_id=user_id,
+        )
+        self.db.commit()
+        return True
+
     def get_collection_audits(self, collection_id: str):
         """Get audits for a collection by ID."""
         return self.audit.get_audits_for_collection(collection_id)
