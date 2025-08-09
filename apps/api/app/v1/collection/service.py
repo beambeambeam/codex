@@ -51,7 +51,7 @@ class CollectionService:
         self.db.delete(collection)
         self.audit.create_audit(
             collection_id=collection_id,
-            action=CollectionActionEnum.ARCHIVE,  # Use ARCHIVE for delete
+            action=CollectionActionEnum.DELETE,
             user_id=user_id,
         )
         self.db.commit()
