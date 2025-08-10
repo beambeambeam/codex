@@ -162,7 +162,16 @@ class StorageService:
                     status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
                 )
 
-            # TODO: Also delete from MinIO storage
+            try:
+                bucket_name, object_name = file.url.split("/", 1)
+                self.client.remove_object(bucket_name, object_name)
+            except S3Error as e:
+                self.db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Failed to delete file from storage: {e}",
+                ) from e
+
             self.db.delete(file)
             self.db.commit()
         except SQLAlchemyError as e:
