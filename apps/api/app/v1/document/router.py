@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from typing import Optional, Dict
+from typing import Optional
 
 from .schemas import DocumentCreateRequest, DocumentResponse
 from .service import DocumentService
