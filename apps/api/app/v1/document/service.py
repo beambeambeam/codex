@@ -45,9 +45,15 @@ class DocumentService:
                 .first()
             )
 
-            user_display = None
+            user_info = None
             if document.user:
-                user_display = document.user.username or str(document.user_id)
+                from ..user.schemas import UserInfoSchema
+
+                user_info = UserInfoSchema(
+                    display=document.user.display or document.user.username or "",
+                    username=document.user.username or "",
+                    email=document.user.email or "",
+                )
 
             file_response = None
             if document.file:
@@ -55,7 +61,7 @@ class DocumentService:
 
             return DocumentResponse(
                 id=document.id,
-                user=user_display,
+                user=user_info,
                 file=file_response,
                 title=document.title,
                 description=document.description,

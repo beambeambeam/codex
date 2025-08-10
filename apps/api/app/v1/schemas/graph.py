@@ -2,26 +2,26 @@ from pydantic import BaseModel
 from typing import List
 
 
-class NodeData(BaseModel):
+class NodeDataSchema(BaseModel):
     label: str
 
 
-class Node(BaseModel):
+class NodeSchema(BaseModel):
     id: str
-    data: NodeData
+    data: NodeDataSchema
 
 
-class EdgeData(BaseModel):
+class EdgeDataSchema(BaseModel):
     label: str
 
 
-class Edge(BaseModel):
+class EdgeSchema(BaseModel):
     id: str
-    data: EdgeData
+    data: EdgeDataSchema
     source: str
     target: str
 
 
-class Graph(BaseModel):
-    nodes: List[Node]
-    edges: List[Edge]
+class KnowledgeGraph(BaseModel):
+    nodes: List[NodeSchema]
+    edges: List[EdgeSchema]
