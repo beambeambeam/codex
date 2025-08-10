@@ -1,16 +1,16 @@
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event, Enum
+from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event, Enum, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 import uuid
-
 from .base import Base
 from .knowledge_graph import validate_knowledge_graph
 from .enum import DocumentActionEnum
 from .user import User
 from .file import File
+from pgvector.sqlalchemy import Vector
 
 
 class Document(Base):
@@ -48,6 +48,9 @@ class Document(Base):
     audits: Mapped[list["DocumentAudit"]] = relationship(
         "DocumentAudit", back_populates="document"
     )
+    chunks: Mapped[list["Chunk"]] = relationship(
+        "Chunk", back_populates="document", cascade="all, delete-orphan"
+    )
 
     def validate_knowledge_graph_data(
         self, knowledge_graph_data: Optional[dict]
@@ -61,7 +64,36 @@ class Document(Base):
         self.knowledge_graph = knowledge_graph_data
 
 
-# SQLAlchemy event to validate knowledge_graph on insert/update
+class Chunk(Base):
+    __tablename__ = "chunk"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(256), nullable=True)
+    page_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    start_char: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    end_char: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    token_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, nullable=False, server_default=func.current_timestamp()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
+
+    document: Mapped["Document"] = relationship("Document", back_populates="chunks")
+
+
 @event.listens_for(Document, "before_insert")
 @event.listens_for(Document, "before_update")
 def validate_knowledge_graph_on_save(mapper, connection, target):
