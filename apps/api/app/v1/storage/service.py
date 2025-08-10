@@ -193,6 +193,7 @@ class StorageService:
 
             file_dict = file.__dict__.copy()
             file_dict["url"] = f"{self.settings.MINIO_ENDPOINT}/{file.url}"
+            file_dict["upload_by"] = str(file.upload_by) if file.upload_by else None
             resp = FileResponse.model_validate(file_dict)
             resp.upload_by = display_name
             return resp
