@@ -73,7 +73,19 @@ class StorageService:
 
     def _file_to_response(self, file: File) -> FileResponse:
         """Convert File model to FileResponse."""
-        resp = FileResponse.model_validate(file)
+        file_dict = file.__dict__.copy()
+        # Convert UUID fields to string, handle None safely
+        if isinstance(file_dict.get("id"), uuid.UUID):
+            file_dict["id"] = str(file_dict["id"])
+        upload_by_val = file_dict.get("upload_by")
+        if isinstance(upload_by_val, uuid.UUID):
+            file_dict["upload_by"] = str(upload_by_val)
+        elif upload_by_val is None:
+            file_dict["upload_by"] = None
+        else:
+            file_dict["upload_by"] = str(upload_by_val) if upload_by_val else None
+        resp = FileResponse.model_validate(file_dict)
+        # Always set upload_by to display name if available
         resp.upload_by = self._get_display_name(file)
         scheme = "https" if self.settings.MINIO_SECURE else "http"
         resp.url = f"{scheme}://{self.settings.MINIO_ENDPOINT}/{file.url}"
