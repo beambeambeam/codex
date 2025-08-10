@@ -20,3 +20,4 @@ class File(Base):
     url = Column(Text, nullable=False)  # file path in db, return as file preview
 
     uploader = relationship("User", back_populates="files_uploaded")
+    documents = relationship("Document", back_populates="file")
