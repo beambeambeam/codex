@@ -74,11 +74,10 @@ class StorageService:
 
     def _file_to_response(self, file: File) -> FileResponse:
         """Convert File model to FileResponse."""
-        file_dict = file.__dict__.copy()
-        file_dict["upload_by"] = str(file.upload_by) if file.upload_by else None
-        file_dict["url"] = f"{self.settings.MINIO_ENDPOINT}/{file.url}"
-        resp = FileResponse.model_validate(file_dict)
+        resp = FileResponse.model_validate(file)
         resp.upload_by = self._get_display_name(file)
+        scheme = "https" if self.settings.MINIO_SECURE else "http"
+        resp.url = f"{scheme}://{self.settings.MINIO_ENDPOINT}/{file.url}"
         return resp
 
     async def upload_file_to_storage(
