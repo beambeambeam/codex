@@ -1,17 +1,16 @@
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
-from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event
+from typing import Optional
+from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
+import uuid
 
 from .base import Base
 from .knowledge_graph import validate_knowledge_graph
-import uuid
-
-if TYPE_CHECKING:
-    from .user import User
-    from .file import File
+from .enum import DocumentActionEnum
+from .user import User
+from .file import File
 
 
 class Document(Base):
@@ -46,6 +45,9 @@ class Document(Base):
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="documents")
     file: Mapped["File"] = relationship("File", back_populates="documents")
+    audits: Mapped[list["DocumentAudit"]] = relationship(
+        "DocumentAudit", back_populates="document"
+    )
 
     def validate_knowledge_graph_data(
         self, knowledge_graph_data: Optional[dict]
@@ -65,3 +67,32 @@ class Document(Base):
 def validate_knowledge_graph_on_save(mapper, connection, target):
     """Validate knowledge graph before saving to database."""
     validate_knowledge_graph(target.knowledge_graph)
+
+
+class DocumentAudit(Base):
+    __tablename__ = "document_audit"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="SET NULL"), nullable=True
+    )
+    old_values: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    new_values: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    action_type: Mapped[DocumentActionEnum] = mapped_column(
+        Enum(DocumentActionEnum, name="document_action_enum"), nullable=False
+    )
+    timestamp: Mapped[datetime] = mapped_column(
+        TIMESTAMP, nullable=False, server_default=func.current_timestamp()
+    )
+
+    document: Mapped["Document"] = relationship("Document", back_populates="audits")
+    user: Mapped[Optional["User"]] = relationship(
+        "User", back_populates="document_audits"
+    )
