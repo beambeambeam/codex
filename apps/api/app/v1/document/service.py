@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
 import uuid
+from ..user.schemas import UserInfoSchema
 
 
 class DocumentService:
@@ -66,8 +67,6 @@ class DocumentService:
 
             user_info = None
             if document.user:
-                from ..user.schemas import UserInfoSchema
-
                 user_info = UserInfoSchema(
                     display=document.user.display or document.user.username or "",
                     username=document.user.username or "",
@@ -93,6 +92,32 @@ class DocumentService:
         except IntegrityError as e:
             self.db.rollback()
             raise ValueError(f"Database integrity error: {str(e)}")
+
+    def delete_document(self, document_id: str, user_id: Optional[str] = None) -> None:
+        """Delete a document by ID, audit the deletion, and commit the transaction."""
+
+        document = self.db.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
+
+        # Prepare old values for audit
+        old_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Audit the deletion BEFORE removing the document
+        self.audit.create_audit(
+            document_id=str(document_id),
+            action=DocumentActionEnum.DELETE,
+            user_id=str(user_id) if user_id else None,
+            old_values=old_values,
+            new_values=None,
+        )
+
+        # Now remove the document
+        self.db.delete(document)
+
+        self.db.commit()
 
 
 # DocumentAuditService similar to CollectionAuditService

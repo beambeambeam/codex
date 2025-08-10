@@ -37,7 +37,7 @@ class Document(Base):
     user: Mapped[Optional["User"]] = relationship("User", back_populates="documents")
     file: Mapped["File"] = relationship("File", back_populates="documents")
     audits: Mapped[list["DocumentAudit"]] = relationship(
-        "DocumentAudit", back_populates="document"
+        "DocumentAudit", back_populates="document", passive_deletes=True
     )
     chunks: Mapped[list["Chunk"]] = relationship(
         "Chunk", back_populates="document", cascade="all, delete-orphan"

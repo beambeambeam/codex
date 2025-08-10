@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from typing import Optional
 
+
 from .schemas import DocumentCreateRequest, DocumentResponse
 from .service import DocumentService
 from .dependencies import get_document_service
@@ -49,3 +50,22 @@ async def upload_and_create_document(
         return document
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.delete(
+    "/{document_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_document(
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Delete a document by ID. Only the owner can delete their document."""
+    try:
+        # Optionally, you could check if the document belongs to the user here
+        document_service.delete_document(
+            document_id=document_id, user_id=str(current_user.id)
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
