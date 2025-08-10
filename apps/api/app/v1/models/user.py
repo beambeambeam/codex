@@ -33,6 +33,9 @@ class User(Base):
     sessions: Mapped[list["Session"]] = relationship(
         "Session", back_populates="user", cascade="all, delete-orphan"
     )
+    files_uploaded = relationship(
+        "File", back_populates="uploader", cascade="all, delete-orphan"
+    )
 
 
 class Account(Base):
