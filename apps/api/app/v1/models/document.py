@@ -33,15 +33,6 @@ class Document(Base):
         Boolean, nullable=False, default=False
     )
     knowledge_graph: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, nullable=False, server_default=func.current_timestamp()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP,
-        nullable=False,
-        server_default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
-    )
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="documents")
     file: Mapped["File"] = relationship("File", back_populates="documents")
