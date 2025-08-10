@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
-import io
 from fastapi import HTTPException, status, UploadFile
 from minio import Minio
 from minio.error import S3Error
@@ -92,13 +91,16 @@ class StorageService:
         object_name = object_name or f"{uuid.uuid4()}"
 
         try:
-            file_content = await file.read()
-            file_like = io.BytesIO(file_content)
+            # Get file size by seeking to the end of the file-like object
+            file.file.seek(0, 2)
+            file_size = file.file.tell()
+            file.file.seek(0)  # Rewind to the start for reading
+
             self.client.put_object(
                 bucket_name=bucket_name,
                 object_name=object_name,
-                data=file_like,
-                length=len(file_content),
+                data=file.file,
+                length=file_size,
                 content_type=file.content_type,
             )
         except Exception as e:
@@ -111,7 +113,7 @@ class StorageService:
             upload_by=user_id,
             upload_at=datetime.now(timezone.utc),
             name=file.filename,
-            size=len(file_content),
+            size=file_size,
             type=file.content_type,
             url=f"{bucket_name}/{object_name}",
         )
