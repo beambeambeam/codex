@@ -19,7 +19,7 @@ class Settings:
     MINIO_ACCESS_KEY: str = os.getenv("MINIO_ROOT_USER", "root_admin")
     MINIO_SECRET_KEY: str = os.getenv("MINIO_ROOT_PASSWORD", "root_admin")
     MINIO_SECURE: bool = os.getenv("MINIO_SECURE", "false").lower() == "true"
-    MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME", "documents")
+    MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME", "files")
 
     @property
     def MINIO_POLICY(self):
