@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
@@ -42,9 +43,21 @@ class StorageService:
                 try:
                     policy_json = json.dumps(self.settings.MINIO_POLICY)
                     self.client.set_bucket_policy(bucket_name, policy_json)
-                    print(f"Success: Read-only policy set for bucket '{bucket_name}'.")
+                    logging.info(
+                        f"Success: Read-only policy set for bucket '{bucket_name}'."
+                    )
+                except S3Error as e:
+                    logging.critical(f"Error setting bucket policy: {e}")
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Failed to set bucket policy",
+                    ) from e
                 except Exception as e:
-                    print(f"Error: {e}")
+                    logging.critical(f"Unexpected error setting bucket policy: {e}")
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Unexpected error while setting bucket policy",
+                    ) from e
         except S3Error as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
