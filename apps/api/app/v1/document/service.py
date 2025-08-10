@@ -7,6 +7,7 @@ from .schemas import DocumentCreateRequest, DocumentResponse
 from ..models.document import DocumentAudit
 from ..storage.service import StorageService
 from ..models.enum import DocumentActionEnum
+from ..storage.schemas import FileResponse
 from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
@@ -21,6 +22,20 @@ class DocumentService:
         """Initialize document service."""
         self.db = db
         self.audit = DocumentAuditService(db)
+
+    def _user_to_user_info(self, user: User) -> UserInfoSchema:
+        """Convert a User model instance to UserInfoSchema."""
+        return UserInfoSchema(
+            display=user.display or user.username or "",
+            username=user.username or "",
+            email=user.email or "",
+        )
+
+    def _file_to_file_response(self, file: File) -> Optional[FileResponse]:
+        """Convert a File model instance to FileResponse using StorageService."""
+        if not file:
+            return None
+        return StorageService(self.db)._file_to_response(file)
 
     def create_document(
         self, document_create: DocumentCreateRequest
@@ -65,17 +80,11 @@ class DocumentService:
                 .first()
             )
 
-            user_info = None
-            if document.user:
-                user_info = UserInfoSchema(
-                    display=document.user.display or document.user.username or "",
-                    username=document.user.username or "",
-                    email=document.user.email or "",
-                )
+            user_info = (
+                self._user_to_user_info(document.user) if document.user else None
+            )
 
-            file_response = None
-            if document.file:
-                file_response = StorageService(self.db)._file_to_response(document.file)
+            file_response = self._file_to_file_response(document.file)
 
             return DocumentResponse(
                 id=document.id,
@@ -119,12 +128,38 @@ class DocumentService:
 
         self.db.commit()
 
+    def get_document(self, document_id: str) -> DocumentResponse:
+        """Retrieve a document by ID and return response schema with user display and file info."""
+        document = (
+            self.db.query(Document)
+            .options(joinedload(Document.user), joinedload(Document.file))
+            .filter(Document.id == document_id)
+            .first()
+        )
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
 
-# DocumentAuditService similar to CollectionAuditService
+        user_info = self._user_to_user_info(document.user) if document.user else None
+        file_response = self._file_to_file_response(document.file)
+
+        return DocumentResponse(
+            id=document.id,
+            user=user_info,
+            file=file_response,
+            title=document.title,
+            description=document.description,
+            summary=document.summary,
+            is_vectorized=document.is_vectorized,
+            is_graph_extracted=document.is_graph_extracted,
+            knowledge_graph=document.knowledge_graph,
+        )
+
+
 class DocumentAuditService:
     @staticmethod
     def _stringify_uuids(obj):
         """Recursively convert UUIDs in dicts/lists to strings for JSON serialization."""
+
         if isinstance(obj, dict):
             return {k: DocumentAuditService._stringify_uuids(v) for k, v in obj.items()}
         elif isinstance(obj, list):
