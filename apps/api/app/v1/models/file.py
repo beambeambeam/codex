@@ -1,5 +1,6 @@
 from .base import Base
 from sqlalchemy import Column, Text, TIMESTAMP, Integer, ForeignKey
+from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -12,7 +13,7 @@ class File(Base):
     upload_by = Column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="SET NULL"), nullable=True
     )
-    upload_at = Column(TIMESTAMP, nullable=False)
+    upload_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
     name = Column(Text, nullable=False)
     size = Column(Integer, nullable=False)  # bytes
     type = Column(Text, nullable=False)
