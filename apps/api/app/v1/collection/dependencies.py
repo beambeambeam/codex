@@ -18,7 +18,7 @@ def has_permission(required_permission: CollectionPermissionEnum) -> Callable:
         collection_service: CollectionService = Depends(get_collection_service),
     ) -> None:
         if not collection_service.has_permission(
-            current_user.id, collection_id, required_permission
+            str(current_user.id), collection_id, required_permission
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

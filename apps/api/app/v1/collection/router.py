@@ -36,7 +36,7 @@ def create_collection(
 
     collection = collection_service.create_collection(
         collection_data=collection_data,
-        user_id=current_user.id,
+        user_id=str(current_user.id),
     )
 
     return collection
@@ -53,7 +53,7 @@ def get_collections(
 ) -> List[CollectionResponse]:
     """Get all collections the user has access to."""
 
-    collections = collection_service.get_user_collections(current_user.id)
+    collections = collection_service.get_user_collections(str(current_user.id))
 
     return collections
 
@@ -113,7 +113,7 @@ def update_collection(
     """Update a collection by ID."""
 
     updated = collection_service.update_collection(
-        collection_id, collection_data, user_id=current_user.id
+        collection_id, collection_data, user_id=str(current_user.id)
     )
     if not updated:
         raise HTTPException(
@@ -135,7 +135,7 @@ def delete_collection(
     """Delete a collection by ID."""
 
     deleted = collection_service.delete_collection(
-        collection_id, user_id=current_user.id
+        collection_id, user_id=str(current_user.id)
     )
     if not deleted:
         raise HTTPException(
@@ -178,7 +178,7 @@ def grant_collection_permission(
         collection_id=collection_id,
         user_id=permission_data.user_id,
         permission_level=permission_data.permission_level,
-        granted_by=current_user.id,
+        granted_by=str(current_user.id),
     )
 
 
@@ -201,7 +201,7 @@ def update_collection_permission(
         collection_id=collection_id,
         user_id=user_id,
         permission_level=permission_data.permission_level,
-        updated_by=current_user.id,
+        updated_by=str(current_user.id),
     )
 
     if not updated_permission:
@@ -229,7 +229,7 @@ def revoke_collection_permission(
     revoked = collection_service.revoke_permission(
         collection_id=collection_id,
         user_id=user_id,
-        revoked_by=current_user.id,
+        revoked_by=str(current_user.id),
     )
 
     if not revoked:

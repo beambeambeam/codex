@@ -176,7 +176,7 @@ def edit_user(
     """Edit current user information."""
 
     updated_user = user_service.edit_user(
-        user_id=current_user.id,
+        user_id=str(current_user.id),
         display=user_data.display,
     )
 
