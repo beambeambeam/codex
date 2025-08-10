@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
+import io
 from fastapi import HTTPException, status, UploadFile
 from minio import Minio
 from minio.error import S3Error
@@ -83,16 +84,16 @@ class StorageService:
         self.ensure_bucket_exists(bucket_name)
 
         if object_name is None:
-            object_name = f"{uuid.uuid4()}_{file.filename}"
+            object_name = f"{uuid.uuid4()}"
 
         try:
-            # Upload to MinIO
-            result = await file.read()
+            file_content = await file.read()
+            file_like = io.BytesIO(file_content)
             self.client.put_object(
                 bucket_name=bucket_name,
                 object_name=object_name,
-                data=bytes(result),
-                length=len(result),
+                data=file_like,
+                length=len(file_content),
                 content_type=file.content_type,
             )
         except Exception as e:
@@ -101,19 +102,19 @@ class StorageService:
                 detail=f"Failed to upload file to storage: {e}",
             ) from e
 
+        db_url = f"{bucket_name}/{object_name}"
         new_file = File(
             upload_by=user_id,
             upload_at=datetime.now(timezone.utc),
             name=file.filename,
-            size=len(result),
+            size=len(file_content),
             type=file.content_type,
-            url=f"{self.settings.MINIO_PUBLIC_URL}/{bucket_name}/{object_name}",
+            url=db_url,
         )
         self.db.add(new_file)
         self.db.commit()
         self.db.refresh(new_file)
 
-        # Fetch display name for response
         display_name = None
         if new_file.uploader and new_file.uploader.display:
             display_name = new_file.uploader.display
@@ -122,6 +123,113 @@ class StorageService:
         else:
             display_name = str(new_file.upload_by) if new_file.upload_by else None
 
-        resp = FileResponse.model_validate(new_file)
+        file_dict = new_file.__dict__.copy()
+        file_dict["upload_by"] = str(new_file.upload_by) if new_file.upload_by else None
+        file_dict["url"] = f"{self.settings.MINIO_ENDPOINT}/{db_url}"
+        resp = FileResponse.model_validate(file_dict)
         resp.upload_by = display_name
+
         return resp
+
+    def get_user_files(self, user_id: UUID) -> list[FileResponse]:
+        """Get all files uploaded by a specific user."""
+        try:
+            files = self.db.query(File).filter(File.upload_by == user_id).all()
+
+            file_responses = []
+            for file in files:
+                # Get display name for response
+                display_name = None
+                if file.uploader and file.uploader.display:
+                    display_name = file.uploader.display
+                elif file.uploader and file.uploader.username:
+                    display_name = file.uploader.username
+                else:
+                    display_name = str(file.upload_by) if file.upload_by else None
+
+                file_dict = file.__dict__.copy()
+                # Compose full URL for response
+                file_dict["url"] = f"{self.settings.MINIO_ENDPOINT}/{file.url}"
+                resp = FileResponse.model_validate(file_dict)
+                resp.upload_by = display_name
+                file_responses.append(resp)
+
+            return file_responses
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Database error: {e}",
+            ) from e
+
+    def get_file_by_id(self, file_id: str, user_id: UUID) -> FileResponse:
+        """Get a specific file by ID that belongs to the user."""
+        try:
+            file_uuid = UUID(file_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file ID format"
+            )
+
+        try:
+            file = (
+                self.db.query(File)
+                .filter(File.id == file_uuid, File.upload_by == user_id)
+                .first()
+            )
+
+            if not file:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
+                )
+
+            # Get display name for response
+            display_name = None
+            if file.uploader and file.uploader.display:
+                display_name = file.uploader.display
+            elif file.uploader and file.uploader.username:
+                display_name = file.uploader.username
+            else:
+                display_name = str(file.upload_by) if file.upload_by else None
+
+            file_dict = file.__dict__.copy()
+            file_dict["url"] = f"{self.settings.MINIO_ENDPOINT}/{file.url}"
+            resp = FileResponse.model_validate(file_dict)
+            resp.upload_by = display_name
+            return resp
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Database error: {e}",
+            ) from e
+
+    def delete_file(self, file_id: str, user_id: UUID) -> None:
+        """Delete a file by ID if it belongs to the user."""
+        try:
+            file_uuid = UUID(file_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file ID format"
+            )
+
+        try:
+            file = (
+                self.db.query(File)
+                .filter(File.id == file_uuid, File.upload_by == user_id)
+                .first()
+            )
+
+            if not file:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
+                )
+
+            # TODO: Also delete from MinIO storage
+            # For now, just delete from database
+            self.db.delete(file)
+            self.db.commit()
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Database error: {e}",
+            ) from e
