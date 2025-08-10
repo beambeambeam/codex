@@ -1,9 +1,26 @@
+# All imports at the top, no duplicates
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
+from datetime import datetime
 from ..storage.schemas import FileResponse
 from ..schemas.graph import KnowledgeGraph
 from ..user.schemas import UserInfoSchema
+from ..models.enum import DocumentActionEnum
+
+
+# DocumentAudit schema for audit API responses
+class DocumentAudit(BaseModel):
+    id: UUID
+    document_id: UUID
+    user_id: Optional[UUID] = None
+    old_values: Optional[dict] = None
+    new_values: Optional[dict] = None
+    action_type: DocumentActionEnum
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class DocumentCreateRequest(BaseModel):
