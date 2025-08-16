@@ -1,6 +1,6 @@
 "use client";
 
-import HomeCanvas from "@/app/(protected)/home/canvas";
+import HomeCanvas from "@/app/(protected)/home/_components/canvas";
 import Settings from "@/components/settings";
 import { useUser } from "@/store/user";
 

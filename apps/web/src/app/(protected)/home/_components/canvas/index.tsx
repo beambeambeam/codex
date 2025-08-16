@@ -1,4 +1,4 @@
-import HomeCanvasFlow from "@/app/(protected)/home/canvas/flow";
+import HomeCanvasFlow from "@/app/(protected)/home/_components/canvas/flow";
 import { GraphStoreProvider } from "@/hooks/useGraph";
 import { useQueryFetchClient } from "@/lib/api/client";
 
