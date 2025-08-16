@@ -32,6 +32,7 @@ function CollectionSwitcher() {
   if (isPending) {
     return <Skeleton className="h-12" />;
   }
+
   const collection = data?.find((c) => c.id === params.id);
 
   return (
@@ -39,15 +40,10 @@ function CollectionSwitcher() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <AlbumIcon className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
+            <SidebarMenuButton className="h-fit">
+              <AlbumIcon className="!size-4" />
+              <div className="grid h-fit flex-1 text-left text-sm leading-tight">
+                <span className="text-wrap font-medium">
                   {collection?.title ?? "Untitled Collection"}
                 </span>
               </div>

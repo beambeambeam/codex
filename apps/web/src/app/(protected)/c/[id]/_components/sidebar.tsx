@@ -23,9 +23,7 @@ function CollectionSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <CollectionSwitcher />
       </SidebarHeader>
-      <SidebarContent className="p-2">
-        {isVisible && <CollectionInfo />}
-      </SidebarContent>
+      <SidebarContent>{isVisible && <CollectionInfo />}</SidebarContent>
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
