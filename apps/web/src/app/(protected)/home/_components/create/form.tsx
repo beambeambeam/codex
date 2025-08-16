@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 // label not needed; form uses form field components
 import { Loader } from "@/components/ui/loader";
@@ -116,7 +117,10 @@ export default function CreateCollectionForm(props: CreateCollectionFormProps) {
           )}
         </form.AppField>
 
-        <div className="flex w-full items-center justify-end pt-4">
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="secondary">Cancel</Button>
+          </DialogClose>
           <Button
             type="submit"
             disabled={isPending}
@@ -134,7 +138,7 @@ export default function CreateCollectionForm(props: CreateCollectionFormProps) {
               </>
             )}
           </Button>
-        </div>
+        </DialogFooter>
       </form>
     </form.AppForm>
   );
