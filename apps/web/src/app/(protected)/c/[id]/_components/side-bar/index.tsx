@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 
 import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/info";
 import CollectionLinks from "@/app/(protected)/c/[id]/_components/side-bar/links";
@@ -19,7 +20,9 @@ function CollectionSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props} variant="inset">
       <SidebarHeader className="border-b">
-        <Logo className="pb-2" />
+        <Link href="/home">
+          <Logo className="pb-2" />
+        </Link>
       </SidebarHeader>
       <SidebarContent className="flex h-fit flex-col gap-0 pt-2">
         <CollectionSwitcher />
