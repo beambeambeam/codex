@@ -21,7 +21,7 @@ function CollectionInfo() {
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="px-2">
-            <div className="text-wrap text-xs">
+            <div className="text-wrap font-sans text-sm">
               {collection.description
                 ? collection.description
                 : "No description yet."}
@@ -36,7 +36,7 @@ function CollectionInfo() {
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="px-2">
-            <div className="text-wrap text-xs">
+            <div className="text-wrap font-sans text-sm">
               {collection.summary ? collection.summary : "No summary yet."}
             </div>
           </SidebarMenuItem>
