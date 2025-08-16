@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime
 import uuid
 from ..models.enum import CollectionPermissionEnum
 
@@ -11,6 +12,15 @@ class CollectionCreateRequest(BaseModel):
     description: Optional[str] = Field(None, example="A description of the collection")
 
 
+class ContributorResponse(BaseModel):
+    """Contributor response model"""
+
+    display: str = Field(..., description="Display name of the contributor")
+    imgUrl: Optional[str] = Field(
+        None, description="Profile image URL of the contributor"
+    )
+
+
 class CollectionResponse(BaseModel):
     """Collection response payload"""
 
@@ -18,6 +28,13 @@ class CollectionResponse(BaseModel):
     title: Optional[str]
     description: Optional[str]
     summary: Optional[str]
+    contributor: List[ContributorResponse] = Field(
+        default_factory=list,
+        description="Array of contributors with display name and image",
+    )
+    latest_update: Optional[datetime] = Field(
+        None, description="Latest update timestamp"
+    )
 
     class Config:
         from_attributes = True

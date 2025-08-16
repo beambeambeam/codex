@@ -59,6 +59,25 @@ def get_collections(
 
 
 @router.get(
+    "/search",
+    response_model=List[CollectionResponse],
+    status_code=status.HTTP_200_OK,
+)
+def search_collections(
+    word: str = "",
+    page: int = 1,
+    per_page: int = 5,
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+) -> List[CollectionResponse]:
+    """Search collections by title with optional fuzzy matching and pagination."""
+
+    return collection_service.permission.search_collections(
+        user_id=str(current_user.id), word=word, page=page, per_page=per_page
+    )
+
+
+@router.get(
     "/{collection_id}",
     response_model=CollectionResponse,
     status_code=status.HTTP_200_OK,

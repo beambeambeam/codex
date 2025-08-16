@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useId, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
@@ -29,6 +30,7 @@ export type SignUpFormSchemaType = z.infer<typeof signUpFormSchema>;
 
 function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
   const passwordId = useId();
+  const router = useRouter();
 
   const { mutate, isPending } = useQueryFetchClient.useMutation(
     "post",
@@ -36,6 +38,7 @@ function SignUpForm(props: FormProps<SignUpFormSchemaType>) {
     {
       onSuccess: () => {
         toast.success("Account created successfully!");
+        router.push("/sign-in");
       },
       onError: (error: unknown) => {
         toast.error(

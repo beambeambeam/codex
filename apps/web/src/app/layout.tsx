@@ -2,6 +2,8 @@ import { ThemeProvider } from "@/provider/themes";
 
 import "./globals.css";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+
 import { BreakpointIndicator } from "@/components/dev/breakpoint-indicator";
 import { Toaster } from "@/components/ui/sonner";
 import { LineSeedSans, Sarabun } from "@/fonts";
@@ -36,11 +38,14 @@ export default function RootLayout({
             disableTransitionOnChange
             themes={["light", "dark"]}
           >
-            <UserProvider>
-              {children}
-              <Toaster />
-              <BreakpointIndicator />
-            </UserProvider>
+            <NuqsAdapter>
+              <UserProvider>
+                {children}
+
+                <Toaster />
+                <BreakpointIndicator />
+              </UserProvider>
+            </NuqsAdapter>
           </ThemeProvider>
         </QueryProvider>
       </body>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@xyflow/react/dist/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -252,4 +253,216 @@
   100% {
     opacity: 1;
   }
+}
+
+/* React Flow Styles */
+.react-flow {
+  --xy-background-color: var(--background);
+  /* Custom Variables using existing design tokens */
+  --xy-theme-selected: var(--primary);
+  --xy-theme-hover: var(--muted-foreground);
+  --xy-theme-edge-hover: var(--foreground);
+  --xy-theme-color-focus: var(--ring);
+
+  /* Built-in Variables */
+  --xy-node-border-default: 1px solid var(--border);
+  --xy-node-background-color-default: var(--card);
+  --xy-node-color-default: var(--card-foreground);
+
+  --xy-node-boxshadow-default:
+    0px 3.54px 4.55px 0px #00000005, 0px 3.54px 4.55px 0px #0000000d,
+    0px 0.51px 1.01px 0px #0000001a;
+
+  --xy-node-border-radius-default: var(--radius-md);
+
+  --xy-handle-background-color-default: var(--background);
+  --xy-handle-border-color-default: var(--border);
+
+  --xy-edge-label-color-default: var(--muted-foreground);
+  --xy-controls-button-background-color-hover-default: var(--accent);
+}
+
+.react-flow.dark {
+  --xy-node-boxshadow-default:
+    0px 3.54px 4.55px 0px rgba(255, 255, 255, 0.05),
+    0px 3.54px 4.55px 0px rgba(255, 255, 255, 0.13),
+    0px 0.51px 1.01px 0px rgba(255, 255, 255, 0.2);
+  --xy-theme-color-focus: var(--ring);
+}
+
+.react-flow__edge.selectable:hover .react-flow__edge-path,
+.react-flow__edge.selectable.selected .react-flow__edge-path {
+  stroke: var(--xy-theme-edge-hover);
+}
+
+.react-flow__handle {
+  background-color: var(--xy-handle-background-color-default);
+}
+
+.react-flow__handle.connectionindicator:hover {
+  pointer-events: all;
+  border-color: var(--xy-theme-edge-hover);
+  background-color: var(--background);
+}
+
+.react-flow__handle.connectionindicator:focus,
+.react-flow__handle.connectingfrom,
+.react-flow__handle.connectingto {
+  border-color: var(--xy-theme-edge-hover);
+}
+
+.react-flow__node-resizer {
+  border-radius: 0;
+  border: none;
+}
+
+.react-flow__resize-control.handle {
+  background-color: var(--background);
+  border-color: var(--primary);
+  border-radius: 0;
+  width: 5px;
+  height: 5px;
+}
+
+/* React Flow Theme Components */
+.xy-theme__button-group {
+  display: flex;
+  align-items: center;
+}
+
+.xy-theme__button-group .xy-theme__button:first-child {
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.xy-theme__button-group .xy-theme__button:last-child {
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  margin: 0;
+}
+
+.xy-theme__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding: 0 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--primary);
+  background-color: var(--background);
+  color: var(--primary);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow: var(--xy-node-boxshadow-default);
+  cursor: pointer;
+}
+
+.xy-theme__button.active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+.xy-theme__button.active:hover,
+.xy-theme__button.active:active {
+  background-color: var(--primary);
+  opacity: 0.9;
+}
+
+.xy-theme__button:hover {
+  background-color: var(--accent);
+}
+
+.xy-theme__button:active {
+  background-color: var(--accent);
+}
+
+.xy-theme__button:disabled {
+  color: var(--muted-foreground);
+  opacity: 0.8;
+  cursor: not-allowed;
+  border: 1px solid var(--muted-foreground);
+}
+
+.xy-theme__button > span {
+  margin-right: 0.2rem;
+}
+
+.xy-theme__button + .xy-theme__button {
+  margin-left: 0.3rem;
+}
+
+.xy-theme__input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--background);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.xy-theme__input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.xy-theme__checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--primary);
+  background-color: var(--background);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.xy-theme__checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.xy-theme__checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.xy-theme__select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--background);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  font-size: 1rem;
+  color: var(--foreground);
+  margin-right: 0.5rem;
+  box-shadow: var(--xy-node-boxshadow-default);
+}
+
+.xy-theme__select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.xy-theme__label {
+  margin-top: 10px;
+  margin-bottom: 3px;
+  display: inline-block;
+  color: var(--foreground);
+}
+
+.react-flow__controls-button {
+  color: black;
 }

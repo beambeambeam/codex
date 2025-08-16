@@ -10,10 +10,12 @@ from ..models.collection import (
     CollectionPermission,
     CollectionPermissionAudit,
 )
+from ..models.user import User
 from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
 from uuid import uuid4
 from datetime import datetime, timezone
 from typing import Optional, List
+from sqlalchemy import func
 
 
 class CollectionService:
@@ -60,7 +62,8 @@ class CollectionService:
             self.db.commit()
             self.db.refresh(collection)
 
-            return CollectionResponse.model_validate(collection)
+            # Get the collection with the new fields populated
+            return self.get_collection(collection.id)
         except Exception as e:
             self.db.rollback()
             raise e
@@ -97,7 +100,7 @@ class CollectionService:
         )
         self.db.commit()
         self.db.refresh(collection)
-        return CollectionResponse.model_validate(collection)
+        return self.get_collection(collection.id)
 
     def delete_collection(
         self, collection_id: str, user_id: Optional[str] = None
@@ -127,9 +130,44 @@ class CollectionService:
         collection = (
             self.db.query(Collection).filter(Collection.id == collection_id).first()
         )
-        if collection:
-            return CollectionResponse.model_validate(collection)
-        return None
+        if not collection:
+            return None
+
+        # Get contributors (users with permissions on this collection)
+        contributors = (
+            self.db.query(User.display, User.image)
+            .join(CollectionPermission, User.id == CollectionPermission.user_id)
+            .filter(CollectionPermission.collection_id == collection_id)
+            .filter(User.display.isnot(None))
+            .distinct()
+            .all()
+        )
+        contributor_list = [
+            {"display": display, "imgUrl": image if image else None}
+            for display, image in contributors
+            if display
+        ]
+
+        # Get latest update timestamp from audits
+        latest_audit = (
+            self.db.query(CollectionAudit.performed_at)
+            .filter(CollectionAudit.collection_id == collection_id)
+            .order_by(CollectionAudit.performed_at.desc())
+            .first()
+        )
+        latest_update = latest_audit[0] if latest_audit else None
+
+        # Create response with additional fields
+        collection_dict = {
+            "id": collection.id,
+            "title": collection.title,
+            "description": collection.description,
+            "summary": collection.summary,
+            "contributor": contributor_list,
+            "latest_update": latest_update,
+        }
+
+        return CollectionResponse.model_validate(collection_dict)
 
     # Permission-related methods
     def grant_permission(
@@ -411,7 +449,6 @@ class CollectionPermissionService:
 
     def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
         """Get all collections a user has access to."""
-
         collections = (
             self.db.query(Collection)
             .join(CollectionPermission)
@@ -419,7 +456,123 @@ class CollectionPermissionService:
             .all()
         )
 
-        return [CollectionResponse.model_validate(c) for c in collections]
+        # Delegate enrichment to a helper that batches contributor/latest lookups
+        return self._enrich_collections(collections)
+
+    def search_collections(
+        self, user_id: str, word: str = "", page: int = 1, per_page: int = 5
+    ) -> List[CollectionResponse]:
+        """Search collections a user has access to by title.
+
+        Behavior:
+        - If `word` is empty, return the first `per_page` collections (ordered by title).
+        - If `word` is provided, attempt to use PostgreSQL trigram similarity to rank matches.
+          If similarity is not available, fall back to a case-insensitive substring match (ILIKE).
+        Pagination via page/per_page.
+        """
+
+        page = max(1, page)
+        per_page = max(1, min(per_page, 100))
+        offset = (page - 1) * per_page
+
+        q = (
+            self.db.query(Collection)
+            .join(CollectionPermission)
+            .filter(CollectionPermission.user_id == user_id)
+        )
+
+        if not word or word.strip() == "":
+            collections = (
+                q.order_by(Collection.title.asc()).limit(per_page).offset(offset).all()
+            )
+        else:
+            try:
+                sim = func.similarity(Collection.title, word)
+                collections = (
+                    q.filter(Collection.title.ilike(f"%{word}%"))
+                    .order_by(sim.desc())
+                    .limit(per_page)
+                    .offset(offset)
+                    .all()
+                )
+            except Exception:
+                # If similarity() execution fails (for example pg_trgm extension
+                # not installed) the DB transaction can become aborted. Roll
+                # back the transaction before running the fallback query so
+                # subsequent SELECTs are executed in a clean transaction.
+                try:
+                    self.db.rollback()
+                except Exception:
+                    pass
+
+                collections = (
+                    q.filter(Collection.title.ilike(f"%{word}%"))
+                    .order_by(Collection.title.asc())
+                    .limit(per_page)
+                    .offset(offset)
+                    .all()
+                )
+
+        # Enrich collections in bulk to avoid N+1 queries and duplicate logic
+        return self._enrich_collections(collections)
+
+    def _enrich_collections(
+        self, collections: List[Collection]
+    ) -> List[CollectionResponse]:
+        """Private helper to attach contributors and latest_update to collections.
+
+        This batches the DB queries for contributors and latest audit timestamps to
+        avoid N+1 queries and centralizes the transformation logic.
+        """
+        if not collections:
+            return []
+
+        collection_ids = [c.id for c in collections]
+
+        contributor_rows = (
+            self.db.query(CollectionPermission.collection_id, User.display, User.image)
+            .join(User, User.id == CollectionPermission.user_id)
+            .filter(CollectionPermission.collection_id.in_(collection_ids))
+            .filter(User.display.isnot(None))
+            .distinct()
+            .all()
+        )
+
+        contributors_map = {}
+        for coll_id, display, image in contributor_rows:
+            if not display:
+                continue
+            contributors_map.setdefault(coll_id, []).append(
+                {"display": display, "imgUrl": image if image else None}
+            )
+
+        latest_rows = (
+            self.db.query(
+                CollectionAudit.collection_id, func.max(CollectionAudit.performed_at)
+            )
+            .filter(CollectionAudit.collection_id.in_(collection_ids))
+            .group_by(CollectionAudit.collection_id)
+            .all()
+        )
+        latest_map = {coll_id: performed_at for coll_id, performed_at in latest_rows}
+
+        result: List[CollectionResponse] = []
+        for collection in collections:
+            contributor_list = contributors_map.get(collection.id, [])
+            latest_update = latest_map.get(collection.id)
+
+            collection_dict = {
+                "id": collection.id,
+                "title": collection.title,
+                "description": collection.description,
+                "summary": collection.summary,
+                "contributor": contributor_list,
+                "latest_update": latest_update,
+            }
+
+            result.append(CollectionResponse.model_validate(collection_dict))
+
+        return result
 
     def _create_permission_audit(
         self,

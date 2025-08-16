@@ -136,6 +136,250 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/collections": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Collections
+     * @description Get all collections the user has access to.
+     */
+    get: operations["get_collections_api_v1_collections_get"];
+    put?: never;
+    /**
+     * Create Collection
+     * @description Create a new collection.
+     */
+    post: operations["create_collection_api_v1_collections_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/collections/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Search Collections
+     * @description Search collections by title with optional fuzzy matching and pagination.
+     */
+    get: operations["search_collections_api_v1_collections_search_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/collections/{collection_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Collection
+     * @description Get a collection by ID.
+     */
+    get: operations["get_collection_api_v1_collections__collection_id__get"];
+    /**
+     * Update Collection
+     * @description Update a collection by ID.
+     */
+    put: operations["update_collection_api_v1_collections__collection_id__put"];
+    post?: never;
+    /**
+     * Delete Collection
+     * @description Delete a collection by ID.
+     */
+    delete: operations["delete_collection_api_v1_collections__collection_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/collections/{collection_id}/audits": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Collection Audits
+     * @description Get audits for a collection by ID.
+     */
+    get: operations["get_collection_audits_api_v1_collections__collection_id__audits_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/collections/{collection_id}/permissions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Collection Permissions
+     * @description Get all permissions for a collection.
+     */
+    get: operations["get_collection_permissions_api_v1_collections__collection_id__permissions_get"];
+    put?: never;
+    /**
+     * Grant Collection Permission
+     * @description Grant permission to a user for a collection.
+     */
+    post: operations["grant_collection_permission_api_v1_collections__collection_id__permissions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/collections/{collection_id}/permissions/{user_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update Collection Permission
+     * @description Update permission for a user on a collection.
+     */
+    put: operations["update_collection_permission_api_v1_collections__collection_id__permissions__user_id__put"];
+    post?: never;
+    /**
+     * Revoke Collection Permission
+     * @description Revoke permission for a user on a collection.
+     */
+    delete: operations["revoke_collection_permission_api_v1_collections__collection_id__permissions__user_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/storage/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Upload File
+     * @description Upload a file to storage.
+     */
+    post: operations["upload_file_api_v1_storage_upload_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/storage/files": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get User Files
+     * @description Get all files uploaded by the current user.
+     */
+    get: operations["get_user_files_api_v1_storage_files_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/storage/files/{file_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get File
+     * @description Get a specific file by ID.
+     */
+    get: operations["get_file_api_v1_storage_files__file_id__get"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete File
+     * @description Delete a file by ID.
+     */
+    delete: operations["delete_file_api_v1_storage_files__file_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Upload And Create Document
+     * @description Upload a file and create a document in one step.
+     */
+    post: operations["upload_and_create_document_api_v1_documents_upload_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/{document_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete Document
+     * @description Delete a document by ID. Only the owner can delete their document.
+     */
+    delete: operations["delete_document_api_v1_documents__document_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -151,6 +395,129 @@ export interface components {
        * @example true
        */
       logged_in: boolean;
+    };
+    /** Body_upload_and_create_document_api_v1_documents_upload_post */
+    Body_upload_and_create_document_api_v1_documents_upload_post: {
+      /**
+       * File
+       * Format: binary
+       */
+      file: File;
+    };
+    /** Body_upload_file_api_v1_storage_upload_post */
+    Body_upload_file_api_v1_storage_upload_post: {
+      /**
+       * File
+       * Format: binary
+       */
+      file: File;
+      /** Resource */
+      resource: string;
+    };
+    /**
+     * CollectionAuditResponse
+     * @description Collection audit response payload
+     */
+    CollectionAuditResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Collection Id
+       * Format: uuid
+       */
+      collection_id: string;
+      /** Performed By */
+      performed_by: string | null;
+      /** Performed At */
+      performed_at: string;
+      /** Action */
+      action: string;
+    };
+    /**
+     * CollectionCreateRequest
+     * @description Collection Create request payload
+     */
+    CollectionCreateRequest: {
+      /**
+       * Title
+       * @example My Collection
+       */
+      title: string;
+      /**
+       * Description
+       * @example A description of the collection
+       */
+      description?: string | null;
+    };
+    /**
+     * CollectionPermissionEnum
+     * @enum {string}
+     */
+    CollectionPermissionEnum: "READ" | "EDIT" | "OWNER";
+    /**
+     * CollectionPermissionRequest
+     * @description Collection permission request payload
+     */
+    CollectionPermissionRequest: {
+      /**
+       * User Id
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      user_id: string;
+      /** @example READ */
+      permission_level: components["schemas"]["CollectionPermissionEnum"];
+    };
+    /**
+     * CollectionPermissionResponse
+     * @description Collection permission response payload
+     */
+    CollectionPermissionResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Collection Id
+       * Format: uuid
+       */
+      collection_id: string;
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+      permission_level: components["schemas"]["CollectionPermissionEnum"];
+    };
+    /**
+     * CollectionResponse
+     * @description Collection response payload
+     */
+    CollectionResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Title */
+      title: string | null;
+      /** Description */
+      description: string | null;
+      /** Summary */
+      summary: string | null;
+      /**
+       * Contributor
+       * @description Array of contributors with display name and image
+       */
+      contributor?: components["schemas"]["ContributorResponse"][];
+      /**
+       * Latest Update
+       * @description Latest update timestamp
+       */
+      latest_update?: string | null;
     };
     /** CommonResponse[AuthStatusResponse] */
     CommonResponse_AuthStatusResponse_: {
@@ -185,10 +552,105 @@ export interface components {
         [key: string]: unknown;
       } | null;
     };
+    /**
+     * ContributorResponse
+     * @description Contributor response model
+     */
+    ContributorResponse: {
+      /**
+       * Display
+       * @description Display name of the contributor
+       */
+      display: string;
+      /**
+       * Imgurl
+       * @description Profile image URL of the contributor
+       */
+      imgUrl?: string | null;
+    };
+    /** DocumentResponse */
+    DocumentResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      user?: components["schemas"]["UserInfoSchema"] | null;
+      file?: components["schemas"]["FileResponse"] | null;
+      /** Title */
+      title: string | null;
+      /** Description */
+      description: string | null;
+      /** Summary */
+      summary: string | null;
+      /** Is Vectorized */
+      is_vectorized: boolean;
+      /** Is Graph Extracted */
+      is_graph_extracted: boolean;
+      knowledge_graph: components["schemas"]["KnowledgeGraph"] | null;
+    };
+    /** EdgeDataSchema */
+    EdgeDataSchema: {
+      /** Label */
+      label: string;
+    };
+    /** EdgeSchema */
+    EdgeSchema: {
+      /** Id */
+      id: string;
+      data: components["schemas"]["EdgeDataSchema"];
+      /** Source */
+      source: string;
+      /** Target */
+      target: string;
+    };
+    /** FileResponse */
+    FileResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Upload By */
+      upload_by?: string | null;
+      /**
+       * Upload At
+       * Format: date-time
+       */
+      upload_at: string;
+      /** Name */
+      name: string;
+      /** Size */
+      size: number;
+      /** Type */
+      type: string;
+      /** Resource */
+      resource: string;
+      /** Url */
+      url: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** KnowledgeGraph */
+    KnowledgeGraph: {
+      /** Nodes */
+      nodes: components["schemas"]["NodeSchema"][];
+      /** Edges */
+      edges: components["schemas"]["EdgeSchema"][];
+    };
+    /** NodeDataSchema */
+    NodeDataSchema: {
+      /** Label */
+      label: string;
+    };
+    /** NodeSchema */
+    NodeSchema: {
+      /** Id */
+      id: string;
+      data: components["schemas"]["NodeDataSchema"];
     };
     /**
      * UserEditRequest
@@ -212,16 +674,36 @@ export interface components {
        */
       display: string;
     };
+    /** UserInfoSchema */
+    UserInfoSchema: {
+      /**
+       * Display
+       * @example John Doe
+       */
+      display: string;
+      /**
+       * Username
+       * @example john_doe
+       */
+      username: string;
+      /**
+       * Email
+       * Format: email
+       * @example john@example.com
+       */
+      email: string;
+    };
     /**
      * UserLoginRequest
      * @description User login request payload.
      */
     UserLoginRequest: {
       /**
-       * Username Or Email
-       * @example john_doe
+       * Email
+       * Format: email
+       * @example john@example.com
        */
-      username_or_email: string;
+      email: string;
       /**
        * Password
        * @example strongpassword123
@@ -485,6 +967,529 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["CommonResponse_UserEditResponse_"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_collections_api_v1_collections_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"][];
+        };
+      };
+    };
+  };
+  create_collection_api_v1_collections_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CollectionCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  search_collections_api_v1_collections_search_get: {
+    parameters: {
+      query?: {
+        word?: string;
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_collection_api_v1_collections__collection_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_collection_api_v1_collections__collection_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CollectionCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_collection_api_v1_collections__collection_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_collection_audits_api_v1_collections__collection_id__audits_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionAuditResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_collection_permissions_api_v1_collections__collection_id__permissions_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionPermissionResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  grant_collection_permission_api_v1_collections__collection_id__permissions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CollectionPermissionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionPermissionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_collection_permission_api_v1_collections__collection_id__permissions__user_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+        user_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CollectionPermissionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionPermissionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  revoke_collection_permission_api_v1_collections__collection_id__permissions__user_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+        user_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  upload_file_api_v1_storage_upload_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["Body_upload_file_api_v1_storage_upload_post"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FileResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_user_files_api_v1_storage_files_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FileResponse"][];
+        };
+      };
+    };
+  };
+  get_file_api_v1_storage_files__file_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        file_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FileResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_file_api_v1_storage_files__file_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        file_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  upload_and_create_document_api_v1_documents_upload_post: {
+    parameters: {
+      query?: {
+        title?: string | null;
+        description?: string | null;
+        summary?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["Body_upload_and_create_document_api_v1_documents_upload_post"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_document_api_v1_documents__document_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

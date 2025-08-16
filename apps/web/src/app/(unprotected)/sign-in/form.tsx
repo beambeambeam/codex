@@ -64,7 +64,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
     onSubmit: ({ value }) =>
       mutate({
         body: {
-          username_or_email: value.username,
+          email: value.username,
           password: value.password,
           remember_me: value.remeber_me,
         },
@@ -94,7 +94,7 @@ function SignInForm(props: FormProps<SignInFormSchemaType>) {
               <field.FormControl>
                 <Input
                   id="username"
-                  placeholder="Enter your username"
+                  placeholder="Enter your email"
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
