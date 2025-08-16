@@ -16,7 +16,12 @@ import { Input } from "@/components/ui/input";
 function HomeSearch() {
   const [query, setQuery] = useQueryState(
     "collection",
-    parseAsString.withOptions({}).withDefault(""),
+    parseAsString.withDefault(""),
+  );
+
+  const [search, setSearch] = useQueryState(
+    "search",
+    parseAsString.withDefault(""),
   );
 
   return (
@@ -29,7 +34,11 @@ function HomeSearch() {
         open={query === "search"}
         onOpenChange={(value) => setQuery(value ? "search" : "")}
       >
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput
+          placeholder="Type a command or search..."
+          value={search}
+          onValueChange={setSearch}
+        />
         <CommandList>
           <CommandEmpty>No collection found.</CommandEmpty>
           <CommandGroup heading="Collection Suggestions">
