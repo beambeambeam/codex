@@ -53,7 +53,10 @@ export default function CreateCollectionForm(props: CreateCollectionFormProps) {
     onSubmit: async ({ value }) => {
       mutate({
         body: {
-          title: value.title === "" ? "Untitled Collection" : value.title,
+          title:
+            value.title === ""
+              ? `Untitled Collection ${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+              : value.title,
           description: value.description === "" ? null : value.description,
         },
       });
