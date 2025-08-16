@@ -5,9 +5,15 @@ const elk = new ELK();
 
 const elkOptions = {
   "elk.algorithm": "org.eclipse.elk.force",
-  "org.eclipse.elk.force.model": "FRUCHTERMAN_REINGOLD",
-  "org.eclipse.elk.spacing.nodeSpacing": "50",
-  "org.eclipse.elk.aspectRatio": "1.1",
+  "elk.force.model": "FRUCHTERMAN_REINGOLD", // Fixed: removed org.eclipse.elk prefix
+  "elk.force.iterations": "1000",
+  "elk.force.repulsion": "10",
+  "elk.force.temperature": "0.001",
+  "elk.spacing.nodeNode": "45",
+  "elk.spacing.edgeEdge": "15",
+  "elk.spacing.edgeNode": "20",
+  "elk.aspectRatio": "1.6",
+  "elk.separateConnectedComponents": "true",
 };
 
 export const getLayoutedElements = (
