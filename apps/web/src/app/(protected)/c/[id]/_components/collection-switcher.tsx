@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AlbumIcon, ChevronsUpDown } from "lucide-react";
 
@@ -73,9 +74,11 @@ function CollectionSwitcher() {
                     new Date(a.latest_update ?? 0).getTime(),
                 )
                 .map((collection) => (
-                  <DropdownMenuItem key={collection.id} className="gap-2 p-2">
-                    {collection.title ?? "Untitled Collection"}
-                  </DropdownMenuItem>
+                  <Link href={`${collection.id}`} key={collection.id}>
+                    <DropdownMenuItem className="gap-2 p-2">
+                      {collection.title ?? "Untitled Collection"}
+                    </DropdownMenuItem>
+                  </Link>
                 ))}
             </Scroller>
           </DropdownMenuContent>
