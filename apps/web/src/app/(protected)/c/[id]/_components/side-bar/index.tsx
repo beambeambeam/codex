@@ -2,9 +2,9 @@
 
 import * as React from "react";
 
-import CollectionInfo from "@/app/(protected)/c/[id]/_components/info";
-import { NavUser } from "@/app/(protected)/c/[id]/_components/nav-user";
-import CollectionSwitcher from "@/app/(protected)/c/[id]/_components/switcher";
+import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/info";
+import { NavUser } from "@/app/(protected)/c/[id]/_components/side-bar/nav-user";
+import CollectionSwitcher from "@/app/(protected)/c/[id]/_components/side-bar/switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +23,13 @@ function CollectionSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <CollectionSwitcher />
       </SidebarHeader>
-      <SidebarContent>{isVisible && <CollectionInfo />}</SidebarContent>
+      <SidebarContent>
+        {isVisible && (
+          <>
+            <CollectionInfo />
+          </>
+        )}
+      </SidebarContent>
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
