@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/provider/themes";
 
 import "./globals.css";
+import "@xyflow/react/dist/style.css";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
