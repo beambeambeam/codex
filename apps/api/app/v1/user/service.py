@@ -96,7 +96,7 @@ class UserService:
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username or email already exists",
+                detail="Registration failed. Please try again with different information.",
             )
 
         clean_username = "".join(
@@ -190,7 +190,7 @@ class UserService:
             if existing_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Email already exists",
+                    detail="Update failed. Please try again with different information.",
                 )
 
         # Check if username is already taken by another user
@@ -207,7 +207,7 @@ class UserService:
             if existing_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Username already exists",
+                    detail="Update failed. Please try again with different information.",
                 )
             username = clean_username
 
