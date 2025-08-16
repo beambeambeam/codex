@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ReactFlow, useNodesInitialized } from "@xyflow/react";
+import { ReactFlow, useNodesInitialized, useReactFlow } from "@xyflow/react";
 
 import CenterNode from "@/app/(protected)/home/_components/canvas/node/center-node";
 import { CollectionNode } from "@/app/(protected)/home/_components/canvas/node/collection-node";
@@ -17,6 +17,7 @@ function HomeCanvasFlow() {
     useGraphActions();
   const nodesInitialized = useNodesInitialized({ includeHiddenNodes: false });
   const layoutAppliedRef = useRef(false);
+  const reactFlow = useReactFlow();
 
   useEffect(() => {
     if (nodesInitialized && !layoutAppliedRef.current && nodes.length > 0) {
@@ -29,11 +30,12 @@ function HomeCanvasFlow() {
         setNodes(layoutedNodes);
         setEdges(layoutedEdges);
         layoutAppliedRef.current = true;
+        reactFlow.fitView();
       };
 
       applyLayout();
     }
-  }, [nodesInitialized, nodes, edges, setNodes, setEdges]);
+  }, [nodesInitialized, nodes, edges, setNodes, setEdges, reactFlow]);
 
   return (
     <div className="h-full w-full">
