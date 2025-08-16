@@ -185,7 +185,7 @@ export const LogoCompact = forwardRef<
   {
     className?: string;
     iconSize?: number;
-    textSize?: "sm" | "base" | "lg";
+    textSize?: "sm" | "base" | "lg" | "none";
     orientation?: "horizontal" | "vertical";
     "aria-label"?: string;
     "aria-describedby"?: string;
@@ -217,6 +217,7 @@ export const LogoCompact = forwardRef<
       sm: "text-sm",
       base: "text-base",
       lg: "text-lg",
+      none: "text-transparent",
     };
 
     const orientationClasses = {
