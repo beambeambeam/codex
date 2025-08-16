@@ -2,20 +2,22 @@
   "name": "codex",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "dotenv -e ./.env -- turbo run dev",
+    "build": "dotenv -e ./.env -- turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "commitlint": "commitlint --edit",
     "prepare": "husky",
-    "api:gen": "tsx ./apps/web/src/lib/api/generate.ts"
+    "api:gen": "tsx ./apps/web/src/lib/api/generate.ts",
+    "with-env": "dotenv -e ./.env --"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.5.1",
+    "dotenv-cli": "^10.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.4",
     "prettier": "^3.6.2",
