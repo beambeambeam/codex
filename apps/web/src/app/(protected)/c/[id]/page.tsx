@@ -1,4 +1,4 @@
-import CollectionSidebar from "@/app/(protected)/c/[id]/_components/app-sidebar";
+import CollectionSidebar from "@/app/(protected)/c/[id]/_components/sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,

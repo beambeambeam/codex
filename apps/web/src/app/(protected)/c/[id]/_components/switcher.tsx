@@ -17,13 +17,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryFetchClient } from "@/lib/api/client";
 
 function CollectionSwitcher() {
-  const { isMobile } = useSidebar();
   const params = useParams<{ id: string }>();
 
   const { data, isPending } = useQueryFetchClient.useQuery(
@@ -57,9 +55,8 @@ function CollectionSwitcher() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg py-2"
             align="start"
-            side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
