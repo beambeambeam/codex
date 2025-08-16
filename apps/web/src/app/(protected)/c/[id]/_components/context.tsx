@@ -53,13 +53,13 @@ export const useCollectionStore = <T,>(
 };
 
 export const useCollectionState = () => {
-  const collection = useCollectionStore((s) => {
-    const { actions: _actions, ...rest } = s;
-    void _actions;
-    return rest;
-  });
+  const storeState = useCollectionStore((s) => s);
 
-  return React.useMemo(() => ({ collection }), [collection]);
+  return React.useMemo(() => {
+    const { actions: _actions, ...rest } = storeState;
+    void _actions;
+    return { collection: rest };
+  }, [storeState]);
 };
 
 export const useCollectionActions = () => useCollectionStore((s) => s.actions);

@@ -2,11 +2,17 @@
 
 import Settings from "@/components/settings";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import {
+  SidebarMenu,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { useUser } from "@/store/user";
 
 export function NavUser() {
   const { user } = useUser();
+  const { state, isMobile, openMobile } = useSidebar();
+  const isVisible = isMobile ? openMobile : state === "expanded";
 
   if (!user) {
     return null;
@@ -24,7 +30,7 @@ export function NavUser() {
           <span className="truncate font-medium">{user.display}</span>
           <span className="truncate text-xs">{user.email}</span>
         </div>
-        <Settings />
+        {isVisible && <Settings />}
       </SidebarMenuItem>
     </SidebarMenu>
   );

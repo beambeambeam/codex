@@ -37,7 +37,9 @@ const LINKS = [
 function CollectionLinks() {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Collections.</SidebarGroupLabel>
+      <SidebarGroupLabel className="flex gap-0.5">
+        <BookMarkedIcon /> Links.
+      </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {LINKS.map(({ id, Icon, label, tooltip }) => (
