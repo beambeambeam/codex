@@ -96,7 +96,7 @@ class UserService:
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username or email already exists",
+                detail="Registration failed. Please try again with different information.",
             )
 
         clean_username = "".join(
@@ -119,32 +119,29 @@ class UserService:
         return user
 
     def authenticate_user(
-        self, username_or_email: str, password: str, remember_me: bool = False
+        self, email: str, password: str, remember_me: bool = False
     ) -> tuple[User, str]:
         """Authenticate the user and return user with session ID"""
 
         user = (
             self.db.query(User)
             .options(joinedload(User.account))
-            .filter(
-                (User.username == username_or_email) | (User.email == username_or_email)
-            )
+            .filter(User.email == email)
             .first()
         )
 
         if not user or not user.account:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid username/email or password",
+                detail="Invalid email or password",
             )
 
         if not self.verify_password(password, user.account.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid username/email or password",
+                detail="Invalid email or password",
             )
 
-        # Creating a session is a single atomic operation so no need for extra transaction block here
         session_id = self.create_session(user.id, remember_me)
 
         return user, session_id
@@ -193,7 +190,7 @@ class UserService:
             if existing_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Email already exists",
+                    detail="Update failed. Please try again with different information.",
                 )
 
         # Check if username is already taken by another user
@@ -210,7 +207,7 @@ class UserService:
             if existing_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Username already exists",
+                    detail="Update failed. Please try again with different information.",
                 )
             username = clean_username
 

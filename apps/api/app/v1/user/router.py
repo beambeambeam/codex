@@ -57,7 +57,7 @@ def login(
     """Login a user to system"""
 
     user, session_id = user_service.authenticate_user(
-        username_or_email=login_data.username_or_email,
+        email=login_data.email,
         password=login_data.password,
         remember_me=login_data.remember_me or False,
     )
