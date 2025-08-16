@@ -1,5 +1,6 @@
 "use client";
 
+import HomeCanvas from "@/app/(protected)/home/canvas";
 import Settings from "@/components/settings";
 import { useUser } from "@/store/user";
 
@@ -12,7 +13,9 @@ function HomePage() {
         <div className="text-xl font-bold">Welcome back, {user?.display}.</div>
         <Settings />
       </div>
-      <div className="h-full rounded-lg border-2"></div>
+      <div className="h-full rounded-lg border-2">
+        <HomeCanvas />
+      </div>
     </div>
   );
 }
