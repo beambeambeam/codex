@@ -496,6 +496,15 @@ class CollectionPermissionService:
                     .all()
                 )
             except Exception:
+                # If similarity() execution fails (for example pg_trgm extension
+                # not installed) the DB transaction can become aborted. Roll
+                # back the transaction before running the fallback query so
+                # subsequent SELECTs are executed in a clean transaction.
+                try:
+                    self.db.rollback()
+                except Exception:
+                    pass
+
                 collections = (
                     q.filter(Collection.title.ilike(f"%{word}%"))
                     .order_by(Collection.title.asc())

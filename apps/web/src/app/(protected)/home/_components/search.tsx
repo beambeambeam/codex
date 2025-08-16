@@ -1,6 +1,6 @@
 "use client";
 
-import { SquarePenIcon } from "lucide-react";
+import { AlbumIcon, SquarePenIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
 import {
@@ -25,14 +25,14 @@ function HomeSearch() {
   const { inputValue, localInputValue, handleInputChange, isSearching } =
     useDebouncedSearch();
 
-  const { data, isPending } = useQueryFetchClient.useQuery(
+  const { data, isPending, isError } = useQueryFetchClient.useQuery(
     "get",
     "/api/v1/collections/search",
     {
       params: {
         query: {
           word: inputValue,
-          per_page: 3,
+          per_page: 4,
         },
       },
     },
@@ -60,7 +60,9 @@ function HomeSearch() {
         />
         <CommandList className="h-fit">
           <CommandEmpty className="flex flex-col gap-2 px-4 py-6">
-            {isPending || isSearching ? (
+            {isError ? (
+              "error something went wrong"
+            ) : isPending || isSearching ? (
               <>
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
@@ -77,11 +79,16 @@ function HomeSearch() {
               {data && (
                 <>
                   <CommandGroup heading="Collection Suggestions">
-                    {data.map((collection) => (
-                      <CommandItem key={collection.id}>
-                        {collection.title}
-                      </CommandItem>
-                    ))}
+                    {data.length === 0 ? (
+                      <CommandItem disabled>No collection found.</CommandItem>
+                    ) : (
+                      data.map((collection) => (
+                        <CommandItem key={collection.id}>
+                          <AlbumIcon />
+                          {collection.title}
+                        </CommandItem>
+                      ))
+                    )}
                   </CommandGroup>
                   <CommandGroup heading="Command Suggestions">
                     <CommandItem onSelect={() => setOpen("create")}>
