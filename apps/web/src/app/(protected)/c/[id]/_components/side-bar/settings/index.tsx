@@ -1,6 +1,6 @@
 "use client";
 
-import { ArchiveIcon } from "lucide-react";
+import { ArchiveIcon, UsersIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
 import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/settings/info";
@@ -27,7 +27,7 @@ function CollectionSettings() {
   const onTabChange = (value: string) => setTab(value);
 
   const TABS_TRIGGER_CLASSNAME =
-    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none";
+    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none py-6";
 
   return (
     <Dialog
@@ -60,6 +60,17 @@ function CollectionSettings() {
                   aria-hidden="true"
                 />
                 Project
+              </TabsTrigger>
+              <TabsTrigger
+                value="contribualtor"
+                className={TABS_TRIGGER_CLASSNAME}
+              >
+                <UsersIcon
+                  className="-ms-0.5 me-1.5 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Contribualtor
               </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
