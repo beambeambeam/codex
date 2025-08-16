@@ -15,6 +15,7 @@ import {
 import { Scroller } from "@/components/ui/scroller";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleThemeButton } from "@/components/ui/toggle-theme";
 import { useUser } from "@/store/user";
 
 function Settings() {
@@ -83,6 +84,9 @@ function Settings() {
                 </div>
                 <div className="">
                   <SignOutButton />
+                </div>
+                <div className="flex">
+                  <ToggleThemeButton />
                 </div>
               </Scroller>
             </TabsContent>
