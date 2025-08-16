@@ -9,6 +9,7 @@ from ..user.dependencies import get_current_user
 from ..models.user import User
 from ..storage.service import StorageService
 from ..storage.dependencies import get_storage_service
+from ..models import FileResouceEnum
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -35,7 +36,7 @@ async def upload_and_create_document(
 
     # Upload file to storage
     file_response = await storage_service.upload_file_to_storage(
-        file=file, user_id=current_user.id
+        file=file, user_id=current_user.id, resource=FileResouceEnum.DOCUMENT
     )
 
     try:

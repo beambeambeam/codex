@@ -5,7 +5,7 @@ from .user import User, Account, Session
 from .collection import Collection, CollectionAudit
 from .file import File
 from .document import Document, DocumentAudit
-from .enum import CollectionActionEnum, DocumentActionEnum
+from .enum import CollectionActionEnum, DocumentActionEnum, FileResouceEnum
 from . import knowledge_graph
 
 
@@ -22,4 +22,5 @@ __all__ = [
     "DocumentAudit",
     "DocumentActionEnum",
     "knowledge_graph",
+    "FileResouceEnum",
 ]

@@ -18,3 +18,8 @@ class CollectionPermissionEnum(str, Enum):
     READ = "READ"
     EDIT = "EDIT"
     OWNER = "OWNER"
+
+
+class FileResouceEnum(str, Enum):
+    DOCUMENT = "DOCUMENT"
+    PROFILE_IMAGE = "PROFILE_IMAGE"

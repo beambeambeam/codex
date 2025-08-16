@@ -95,6 +95,7 @@ class StorageService:
         self,
         file: UploadFile,
         user_id: UUID,
+        resource: str,
         object_name: Optional[str] = None,
         bucket_name: Optional[str] = None,
     ) -> FileResponse:
@@ -128,6 +129,7 @@ class StorageService:
             size=file_size,
             type=file.content_type,
             url=f"{bucket_name}/{object_name}",
+            resource=resource,
         )
         self.db.add(new_file)
         self.db.commit()
