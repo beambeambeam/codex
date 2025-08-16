@@ -33,7 +33,7 @@ export default function CreateCollectionForm(props: CreateCollectionFormProps) {
     {
       onSuccess() {
         toast.success("Collection created");
-        cacheUtils.invalidateAndRefetch(["get", "/api/v1/collections"]);
+        cacheUtils.invalidateQueries(["get", "/api/v1/collections"]);
         if (props?.close) {
           props.close();
         }
