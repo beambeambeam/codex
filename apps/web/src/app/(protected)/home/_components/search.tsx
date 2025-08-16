@@ -12,6 +12,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryFetchClient } from "@/lib/api/client";
 
 function HomeSearch() {
   const [query, setQuery] = useQueryState(
@@ -24,6 +26,22 @@ function HomeSearch() {
     parseAsString.withDefault(""),
   );
 
+  const { data, isPending } = useQueryFetchClient.useQuery(
+    "get",
+    "/api/v1/collections/search",
+    {
+      params: {
+        query: {
+          word: search,
+          per_page: 5,
+        },
+      },
+    },
+    {
+      retry: 0,
+    },
+  );
+
   return (
     <>
       <Input
@@ -33,6 +51,7 @@ function HomeSearch() {
       <CommandDialog
         open={query === "search"}
         onOpenChange={(value) => setQuery(value ? "search" : "")}
+        shouldFilter={false}
       >
         <CommandInput
           placeholder="Type a command or search..."
@@ -40,18 +59,40 @@ function HomeSearch() {
           onValueChange={setSearch}
         />
         <CommandList>
-          <CommandEmpty>No collection found.</CommandEmpty>
-          <CommandGroup heading="Collection Suggestions">
-            <CommandItem>Calendar</CommandItem>
-            <CommandItem>Search Emoji</CommandItem>
-            <CommandItem>Calculator</CommandItem>
-          </CommandGroup>
-          <CommandGroup heading="Command Suggestions">
-            <CommandItem>
-              <SquarePenIcon />
-              New Collection
-            </CommandItem>
-          </CommandGroup>
+          <CommandEmpty className="flex flex-col gap-2 px-4 py-6">
+            {isPending ? (
+              <>
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </>
+            ) : (
+              "No collection found."
+            )}
+          </CommandEmpty>
+          {!isPending && (
+            <>
+              {data && (
+                <>
+                  <CommandGroup heading="Collection Suggestions">
+                    {data.map((collection) => (
+                      <CommandItem key={collection.id}>
+                        {collection.title}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <CommandGroup heading="Command Suggestions">
+                    <CommandItem>
+                      <SquarePenIcon />
+                      New Collection
+                    </CommandItem>
+                  </CommandGroup>
+                </>
+              )}
+            </>
+          )}
         </CommandList>
       </CommandDialog>
     </>

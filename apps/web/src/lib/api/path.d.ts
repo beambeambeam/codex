@@ -160,6 +160,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/collections/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Search Collections
+     * @description Search collections by title with optional fuzzy matching and pagination.
+     */
+    get: operations["search_collections_api_v1_collections_search_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/collections/{collection_id}": {
     parameters: {
       query?: never;
@@ -973,6 +993,39 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CollectionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  search_collections_api_v1_collections_search_get: {
+    parameters: {
+      query?: {
+        word?: string;
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionResponse"][];
         };
       };
       /** @description Validation Error */
