@@ -6,37 +6,25 @@ import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/info";
 import CollectionLinks from "@/app/(protected)/c/[id]/_components/side-bar/links";
 import { NavUser } from "@/app/(protected)/c/[id]/_components/side-bar/nav-user";
 import CollectionSwitcher from "@/app/(protected)/c/[id]/_components/side-bar/switcher";
-import { Logo, LogoCompact } from "@/components/ui/logo";
+import { Logo } from "@/components/ui/logo";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 function CollectionSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { state, isMobile, openMobile } = useSidebar();
-  const isVisible = isMobile ? openMobile : state === "expanded";
-
   return (
-    <Sidebar collapsible="icon" {...props} variant="inset">
+    <Sidebar {...props} variant="inset">
       <SidebarHeader className="border-b">
-        {isVisible ? (
-          <Logo className="pb-2" />
-        ) : (
-          <LogoCompact textSize="none" />
-        )}
+        <Logo className="pb-2" />
       </SidebarHeader>
       <SidebarContent className="flex h-fit flex-col gap-0 pt-2">
         <CollectionSwitcher />
-        {isVisible && (
-          <>
-            <CollectionInfo />
-            <CollectionLinks />
-          </>
-        )}
+        <CollectionInfo />
+        <CollectionLinks />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
