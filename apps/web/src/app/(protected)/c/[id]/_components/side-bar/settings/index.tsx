@@ -3,6 +3,7 @@
 import { ArchiveIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
+import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/settings/info";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,9 @@ function CollectionSettings() {
               </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
+            <TabsContent value="project" className="p-2">
+              <CollectionInfo />
+            </TabsContent>
             <TabsContent value="contribualtor" className="p-2"></TabsContent>
           </Tabs>
         </div>
