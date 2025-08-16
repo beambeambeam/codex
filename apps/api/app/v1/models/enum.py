@@ -8,7 +8,18 @@ class CollectionActionEnum(str, Enum):
     DELETE = "DELETE"
 
 
+class DocumentActionEnum(str, Enum):
+    CREATE = "CREATE"
+    UPDATE = "UPDATE"
+    DELETE = "DELETE"
+
+
 class CollectionPermissionEnum(str, Enum):
     READ = "READ"
     EDIT = "EDIT"
     OWNER = "OWNER"
+
+
+class FileResouceEnum(str, Enum):
+    DOCUMENT = "DOCUMENT"
+    PROFILE_IMAGE = "PROFILE_IMAGE"

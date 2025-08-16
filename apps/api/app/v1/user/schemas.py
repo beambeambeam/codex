@@ -4,6 +4,12 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
+class UserInfoSchema(BaseModel):
+    display: str = Field(..., example="John Doe")
+    username: str = Field(..., example="john_doe")
+    email: EmailStr = Field(..., example="john@example.com")
+
+
 class UserRegisterRequest(BaseModel):
     """User registration request payload."""
 
@@ -20,20 +26,12 @@ class UserLoginRequest(BaseModel):
     remember_me: Optional[bool] = Field(False, example=True)
 
 
-class UserRegisterResponse(BaseModel):
+class UserRegisterResponse(UserInfoSchema):
     """User Register response payload"""
 
-    display: str = Field(..., example="John Doe")
-    username: str = Field(..., example="john_doe")
-    email: EmailStr = Field(..., example="john@example.com")
 
-
-class UserLoginResponse(BaseModel):
+class UserLoginResponse(UserInfoSchema):
     """User Login response payload"""
-
-    display: str = Field(..., example="John Doe")
-    username: str = Field(..., example="john_doe")
-    email: EmailStr = Field(..., example="john@example.com")
 
 
 class AuthStatusResponse(BaseModel):

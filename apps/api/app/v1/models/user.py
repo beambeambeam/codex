@@ -34,6 +34,8 @@ class User(Base):
         "Session", back_populates="user", cascade="all, delete-orphan"
     )
     files_uploaded = relationship("File", back_populates="uploader")
+    documents = relationship("Document", back_populates="user")
+    document_audits = relationship("DocumentAudit", back_populates="user")
 
 
 class Account(Base):

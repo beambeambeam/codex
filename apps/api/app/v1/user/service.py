@@ -103,19 +103,18 @@ class UserService:
             c.lower() if c.isalnum() or c == " " else "" for c in username
         ).replace(" ", "_")
 
-        # Use transaction block to ensure atomic creation of user + account
-        with self.db.begin():
-            user = User(
-                id=str(uuid4()), username=clean_username, email=email, display=username
-            )
-            self.db.add(user)
-            self.db.flush()  # get user.id
+        user = User(
+            id=str(uuid4()), username=clean_username, email=email, display=username
+        )
+        self.db.add(user)
+        self.db.flush()  # get user.id
 
-            account = Account(
-                id=str(uuid4()), password=self.hash_password(password), user_id=user.id
-            )
-            self.db.add(account)
+        account = Account(
+            id=str(uuid4()), password=self.hash_password(password), user_id=user.id
+        )
+        self.db.add(account)
 
+        self.db.commit()
         self.db.refresh(user)
         return user
 

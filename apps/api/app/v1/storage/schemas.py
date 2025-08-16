@@ -13,4 +13,5 @@ class FileResponse(BaseModel):
     name: str
     size: int
     type: str
+    resource: str
     url: str

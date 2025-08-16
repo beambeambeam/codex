@@ -18,6 +18,7 @@ router = APIRouter(prefix="/storage", tags=["storage"])
 )
 async def upload_file(
     file: UploadFile = File(...),
+    resource: str = File(...),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
 ) -> FileResponse:
@@ -31,6 +32,7 @@ async def upload_file(
     return await storage_service.upload_file_to_storage(
         file=file,
         user_id=current_user.id,
+        resource=resource,
     )
 
 
