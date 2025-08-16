@@ -14,7 +14,7 @@ function HomePage() {
         <Settings />
       </div>
       <div className="h-full rounded-lg border-2">
-        <HomeCanvas />
+        <HomeCanvas display={user?.display ?? ""} />
       </div>
     </div>
   );
