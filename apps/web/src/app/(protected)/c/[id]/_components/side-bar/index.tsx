@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/info";
+import CollectionLinks from "@/app/(protected)/c/[id]/_components/side-bar/links";
 import { NavUser } from "@/app/(protected)/c/[id]/_components/side-bar/nav-user";
 import CollectionSwitcher from "@/app/(protected)/c/[id]/_components/side-bar/switcher";
 import {
@@ -26,7 +26,7 @@ function CollectionSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {isVisible && (
           <>
-            <CollectionInfo />
+            <CollectionLinks />
           </>
         )}
       </SidebarContent>

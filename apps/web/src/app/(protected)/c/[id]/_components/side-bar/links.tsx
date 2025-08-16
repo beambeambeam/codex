@@ -34,7 +34,7 @@ const LINKS = [
   },
 ];
 
-function CollectionInfo() {
+function CollectionLinks() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Collections.</SidebarGroupLabel>
@@ -53,4 +53,4 @@ function CollectionInfo() {
     </SidebarGroup>
   );
 }
-export default CollectionInfo;
+export default CollectionLinks;
