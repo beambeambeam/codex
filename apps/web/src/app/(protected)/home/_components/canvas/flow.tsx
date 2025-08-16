@@ -44,6 +44,9 @@ function HomeCanvasFlow() {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         fitView
+        defaultEdgeOptions={{
+          type: "straight",
+        }}
       />
     </div>
   );

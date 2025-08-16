@@ -18,7 +18,7 @@ function CenterNode({ data }: CenterNodeProps) {
   const { name, imageUrl } = data;
 
   return (
-    <div className="rounded-full border">
+    <div className="size-12 rounded-full border">
       <Handle
         type="target"
         position={Position.Left}

@@ -40,6 +40,8 @@ function HomeCanvas(props: HomeCanvasProps) {
                 description: item.description,
                 summary: item.summary,
               },
+              width: 50,
+              height: 200,
               type: "collectionNode",
             }))
           : []),
