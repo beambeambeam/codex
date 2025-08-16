@@ -14,6 +14,7 @@ from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
 from uuid import uuid4
 from datetime import datetime, timezone
 from typing import Optional, List
+from sqlalchemy import func
 
 
 class CollectionService:
@@ -420,6 +421,51 @@ class CollectionPermissionService:
         )
 
         return [CollectionResponse.model_validate(c) for c in collections]
+
+    def search_collections(
+        self, user_id: str, word: str = "", page: int = 1, per_page: int = 5
+    ) -> List[CollectionResponse]:
+        """Search collections a user has access to by title.
+
+        Behavior:
+        - If `word` is empty, return the first `per_page` collections (ordered by title).
+        - If `word` is provided, attempt to use PostgreSQL trigram similarity to rank matches.
+          If similarity is not available, fall back to a case-insensitive substring match (ILIKE).
+        Pagination via page/per_page.
+        """
+
+        page = max(1, page)
+        per_page = max(1, min(per_page, 100))
+        offset = (page - 1) * per_page
+
+        q = (
+            self.db.query(Collection)
+            .join(CollectionPermission)
+            .filter(CollectionPermission.user_id == user_id)
+        )
+
+        if not word or word.strip() == "":
+            q = q.order_by(Collection.title.asc()).limit(per_page).offset(offset)
+            return [CollectionResponse.model_validate(c) for c in q.all()]
+
+        try:
+            sim = func.similarity(Collection.title, word)
+            q_sim = (
+                q.filter(Collection.title.ilike(f"%{word}%"))
+                .order_by(sim.desc())
+                .limit(per_page)
+                .offset(offset)
+            )
+            results = q_sim.all()
+            return [CollectionResponse.model_validate(c) for c in results]
+        except Exception:
+            q_fallback = (
+                q.filter(Collection.title.ilike(f"%{word}%"))
+                .order_by(Collection.title.asc())
+                .limit(per_page)
+                .offset(offset)
+            )
+            return [CollectionResponse.model_validate(c) for c in q_fallback.all()]
 
     def _create_permission_audit(
         self,

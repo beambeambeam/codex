@@ -17,6 +17,7 @@ from ..user.dependencies import get_current_user
 from ..models.user import User
 from ..models.enum import CollectionPermissionEnum
 from fastapi import Body
+import difflib
 
 
 router = APIRouter(prefix="/collections", tags=["collections"])
@@ -56,6 +57,50 @@ def get_collections(
     collections = collection_service.get_user_collections(str(current_user.id))
 
     return collections
+
+
+@router.get(
+    "/search",
+    response_model=List[CollectionResponse],
+    status_code=status.HTTP_200_OK,
+)
+def search_collections(
+    word: str = "",
+    page: int = 1,
+    per_page: int = 5,
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+) -> List[CollectionResponse]:
+    """Search collections by title with optional fuzzy matching and pagination."""
+
+    collections = collection_service.get_user_collections(str(current_user.id))
+
+    page = max(1, page)
+    per_page = max(1, min(per_page, 100))
+    offset = (page - 1) * per_page
+
+    if not word or word.strip() == "":
+        return sorted(collections, key=lambda c: (c.title or ""))[
+            offset : offset + per_page
+        ]
+
+    q = word.strip()
+
+    scored = []
+    for c in collections:
+        title = c.title or ""
+        if not title:
+            score = 0.0
+        elif q.lower() in title.lower():
+            score = 1.0
+        else:
+            score = difflib.SequenceMatcher(None, q.lower(), title.lower()).ratio()
+        scored.append((score, c))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+    results = [c for (_s, c) in scored][offset : offset + per_page]
+
+    return results
 
 
 @router.get(
