@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { Book } from "@/app/(protected)/home/_components/book/book";
+import AvatarGroup from "@/components/ui/avatar-group";
 import { Loader } from "@/components/ui/loader";
 import { Scroller } from "@/components/ui/scroller";
 import { useQueryFetchClient } from "@/lib/api/client";
@@ -44,6 +45,21 @@ function CollectionBooks() {
                   <h1 className="text-base font-semibold">{item.title}</h1>
                 </div>
                 <p className="text-xs">{item.description}</p>
+                <div className="flex">
+                  <AvatarGroup
+                    size="sm"
+                    items={
+                      item.contributor
+                        ? item.contributor.map((c, idx) => ({
+                            id: idx,
+                            name: c.display,
+                            image: c.imgUrl ?? "",
+                          }))
+                        : []
+                    }
+                    maxVisible={5}
+                  />
+                </div>
               </div>
             </Book>
           </div>

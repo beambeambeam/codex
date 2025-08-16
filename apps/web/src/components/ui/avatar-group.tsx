@@ -69,7 +69,7 @@ const Avatar = ({
               },
             }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute -top-16 z-50 flex min-w-max flex-col items-center justify-center whitespace-nowrap rounded-xl border bg-white px-4 py-2 text-xs shadow-lg"
+            className="absolute -top-12 z-50 flex min-w-max flex-col items-center justify-center whitespace-nowrap rounded-xl border bg-white px-4 py-2 text-xs shadow-lg"
           >
             <div className="relative z-30 text-center text-base font-bold text-gray-900">
               {item.name}
