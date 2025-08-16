@@ -1,5 +1,4 @@
 import CollectionSidebar from "@/app/(protected)/c/[id]/_components/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
@@ -16,7 +15,7 @@ function CollectionPage() {
             <SidebarTrigger className="-ml-1" />
           </div>
         </header>
-        <Separator />
+
         <section className="flex h-full gap-2 px-4 pt-2">d</section>
       </SidebarInset>
     </SidebarProvider>
