@@ -1,3 +1,5 @@
+import { ReactFlowProvider } from "@xyflow/react";
+
 import HomeCanvasFlow from "@/app/(protected)/home/_components/canvas/flow";
 import { GraphStoreProvider } from "@/hooks/useGraph";
 import { useQueryFetchClient } from "@/lib/api/client";
@@ -19,7 +21,15 @@ function HomeCanvas(props: HomeCanvasProps) {
 
   return (
     <GraphStoreProvider
-      initialEdges={[]}
+      initialEdges={
+        data
+          ? data.map((item) => ({
+              id: `e-${item.id}-center-node`,
+              source: item.id,
+              target: "center-node",
+            }))
+          : []
+      }
       initialNodes={[
         ...(data
           ? data.map((item) => ({
@@ -44,7 +54,9 @@ function HomeCanvas(props: HomeCanvasProps) {
         },
       ]}
     >
-      <HomeCanvasFlow />
+      <ReactFlowProvider>
+        <HomeCanvasFlow />
+      </ReactFlowProvider>
     </GraphStoreProvider>
   );
 }
