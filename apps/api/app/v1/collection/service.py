@@ -449,7 +449,6 @@ class CollectionPermissionService:
 
     def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
         """Get all collections a user has access to."""
-
         collections = (
             self.db.query(Collection)
             .join(CollectionPermission)
@@ -457,33 +456,43 @@ class CollectionPermissionService:
             .all()
         )
 
+        if not collections:
+            return []
+
+        collection_ids = [c.id for c in collections]
+
+        contributor_rows = (
+            self.db.query(CollectionPermission.collection_id, User.display, User.image)
+            .join(User, User.id == CollectionPermission.user_id)
+            .filter(CollectionPermission.collection_id.in_(collection_ids))
+            .filter(User.display.isnot(None))
+            .distinct()
+            .all()
+        )
+
+        contributors_map = {}
+        for coll_id, display, image in contributor_rows:
+            if not display:
+                continue
+            contributors_map.setdefault(coll_id, []).append(
+                {"display": display, "imgUrl": image if image else None}
+            )
+
+        latest_rows = (
+            self.db.query(
+                CollectionAudit.collection_id, func.max(CollectionAudit.performed_at)
+            )
+            .filter(CollectionAudit.collection_id.in_(collection_ids))
+            .group_by(CollectionAudit.collection_id)
+            .all()
+        )
+        latest_map = {coll_id: performed_at for coll_id, performed_at in latest_rows}
+
         result = []
         for collection in collections:
-            # Get contributors (users with permissions on this collection)
-            contributors = (
-                self.db.query(User.display, User.image)
-                .join(CollectionPermission, User.id == CollectionPermission.user_id)
-                .filter(CollectionPermission.collection_id == collection.id)
-                .filter(User.display.isnot(None))
-                .distinct()
-                .all()
-            )
-            contributor_list = [
-                {"display": display, "imgUrl": image if image else None}
-                for display, image in contributors
-                if display
-            ]
+            contributor_list = contributors_map.get(collection.id, [])
+            latest_update = latest_map.get(collection.id)
 
-            # Get latest update timestamp from audits
-            latest_audit = (
-                self.db.query(CollectionAudit.performed_at)
-                .filter(CollectionAudit.collection_id == collection.id)
-                .order_by(CollectionAudit.performed_at.desc())
-                .first()
-            )
-            latest_update = latest_audit[0] if latest_audit else None
-
-            # Create response with additional fields
             collection_dict = {
                 "id": collection.id,
                 "title": collection.title,
@@ -495,6 +504,7 @@ class CollectionPermissionService:
 
             result.append(CollectionResponse.model_validate(collection_dict))
 
+        return result
         return result
 
     def search_collections(
