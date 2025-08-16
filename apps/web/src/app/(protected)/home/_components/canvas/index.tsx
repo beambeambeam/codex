@@ -36,11 +36,9 @@ function HomeCanvas(props: HomeCanvasProps) {
               id: item.id,
               position: { x: 0, y: 0 },
               data: {
-                title: item.title,
-                description: item.description,
-                summary: item.summary,
+                ...item,
               },
-              width: 50,
+              width: 80,
               height: 200,
               type: "collectionNode",
             }))

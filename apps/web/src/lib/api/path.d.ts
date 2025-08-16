@@ -508,6 +508,16 @@ export interface components {
       description: string | null;
       /** Summary */
       summary: string | null;
+      /**
+       * Contributor
+       * @description Array of contributors with display name and image
+       */
+      contributor?: components["schemas"]["ContributorResponse"][];
+      /**
+       * Latest Update
+       * @description Latest update timestamp
+       */
+      latest_update?: string | null;
     };
     /** CommonResponse[AuthStatusResponse] */
     CommonResponse_AuthStatusResponse_: {
@@ -541,6 +551,22 @@ export interface components {
       detail: {
         [key: string]: unknown;
       } | null;
+    };
+    /**
+     * ContributorResponse
+     * @description Contributor response model
+     */
+    ContributorResponse: {
+      /**
+       * Display
+       * @description Display name of the contributor
+       */
+      display: string;
+      /**
+       * Imgurl
+       * @description Profile image URL of the contributor
+       */
+      imgUrl?: string | null;
     };
     /** DocumentResponse */
     DocumentResponse: {

@@ -25,8 +25,6 @@ function HomeCanvasFlow() {
         const { nodes: layoutedNodes, edges: layoutedEdges } =
           await getLayoutedElements(nodes, edges);
 
-        console.log(layoutedNodes);
-
         setNodes(layoutedNodes);
         setEdges(layoutedEdges);
         layoutAppliedRef.current = true;

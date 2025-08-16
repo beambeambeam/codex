@@ -21,7 +21,7 @@ interface CollectionNodeProps {
 
 export const CollectionNode = memo((props: CollectionNodeProps) => {
   return (
-    <BaseNode className="w-60">
+    <BaseNode className="w-72">
       <Handle
         type="source"
         position={Position.Right}
@@ -41,9 +41,9 @@ export const CollectionNode = memo((props: CollectionNodeProps) => {
               description
             </Badge>
             {props.data.description ? (
-              <p className="text-xs">{props.data.description}</p>
+              <p className="pl-2 text-xs">{props.data.description}</p>
             ) : (
-              <p className="text-xs">
+              <p className="pl-2 text-xs">
                 No description available for this collection.
               </p>
             )}
