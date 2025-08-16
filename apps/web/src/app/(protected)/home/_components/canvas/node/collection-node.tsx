@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Handle, Position } from "@xyflow/react";
 import { Rocket } from "lucide-react";
 
 import {
@@ -20,6 +21,11 @@ interface CollectionNodeProps {
 export const CollectionNode = memo((props: CollectionNodeProps) => {
   return (
     <BaseNode className="w-96">
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="invisible !bottom-auto !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 !-translate-y-1/2"
+      />
       <BaseNodeHeader className="border-b">
         <Rocket className="size-4" />
         <BaseNodeHeaderTitle>
