@@ -12,7 +12,7 @@ function HomeCanvasFlow() {
   const { onNodesChange, onEdgesChange } = useGraphActions();
 
   return (
-    <div className="h-[80vh] w-full">
+    <div className="h-full w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
