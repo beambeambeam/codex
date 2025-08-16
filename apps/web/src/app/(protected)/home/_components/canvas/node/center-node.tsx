@@ -5,7 +5,7 @@ import { UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CenterNodeData {
-  name: string;
+  title: string;
   imageUrl?: string;
 }
 
@@ -15,7 +15,7 @@ interface CenterNodeProps {
 }
 
 function CenterNode({ data }: CenterNodeProps) {
-  const { name, imageUrl } = data;
+  const { title, imageUrl } = data;
 
   return (
     <div className="size-12 rounded-full border">
@@ -33,7 +33,7 @@ function CenterNode({ data }: CenterNodeProps) {
 
       <div className="flex flex-col items-center gap-2">
         <Avatar className="size-20">
-          <AvatarImage src={imageUrl} alt={name} />
+          <AvatarImage src={imageUrl} alt={title} />
           <AvatarFallback>
             <UserIcon />
           </AvatarFallback>
