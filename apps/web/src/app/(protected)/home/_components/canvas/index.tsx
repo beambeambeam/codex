@@ -1,6 +1,7 @@
 import { ReactFlowProvider } from "@xyflow/react";
 
 import HomeCanvasFlow from "@/app/(protected)/home/_components/canvas/flow";
+import { Loader } from "@/components/ui/loader";
 import { GraphStoreProvider } from "@/hooks/useGraph";
 import { useQueryFetchClient } from "@/lib/api/client";
 
@@ -16,7 +17,15 @@ function HomeCanvas(props: HomeCanvasProps) {
   );
 
   if (isPending) {
-    return "loading";
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader
+          size="lg"
+          text="Please wait. Summoning your collections..."
+          variant="text-shimmer"
+        />
+      </div>
+    );
   }
 
   return (
