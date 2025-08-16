@@ -20,7 +20,7 @@ interface CollectionNodeProps {
 
 export const CollectionNode = memo((props: CollectionNodeProps) => {
   return (
-    <BaseNode className="w-50">
+    <BaseNode className="w-60">
       <Handle
         type="source"
         position={Position.Right}
