@@ -32,7 +32,7 @@ function HomeSearch() {
       params: {
         query: {
           word: inputValue,
-          per_page: 5,
+          per_page: 3,
         },
       },
     },
@@ -51,13 +51,14 @@ function HomeSearch() {
         open={open === "search"}
         onOpenChange={(isOpen) => setOpen(isOpen ? "search" : "")}
         shouldFilter={false}
+        className="h-fit"
       >
         <CommandInput
           placeholder="Type a command or search..."
           value={localInputValue}
           onValueChange={handleInputChange}
         />
-        <CommandList>
+        <CommandList className="h-fit">
           <CommandEmpty className="flex flex-col gap-2 px-4 py-6">
             {isPending || isSearching ? (
               <>
@@ -83,7 +84,7 @@ function HomeSearch() {
                     ))}
                   </CommandGroup>
                   <CommandGroup heading="Command Suggestions">
-                    <CommandItem>
+                    <CommandItem onSelect={() => setOpen("create")}>
                       <SquarePenIcon />
                       New Collection
                     </CommandItem>
