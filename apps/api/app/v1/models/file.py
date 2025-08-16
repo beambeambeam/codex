@@ -18,6 +18,7 @@ class File(Base):
     size = Column(Integer, nullable=False)  # bytes
     type = Column(Text, nullable=False)
     url = Column(Text, nullable=False)  # file path in db, return as file preview
+    resource = Column(Text, nullable=False)
 
     uploader = relationship("User", back_populates="files_uploaded")
     documents = relationship("Document", back_populates="file")
