@@ -14,17 +14,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryFetchClient } from "@/lib/api/client";
+import { useDebouncedSearch } from "@/lib/hooks/useDebouncedSearch";
 
 function HomeSearch() {
-  const [query, setQuery] = useQueryState(
+  const [open, setOpen] = useQueryState(
     "collection",
     parseAsString.withDefault(""),
   );
 
-  const [search, setSearch] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
+  const { inputValue, localInputValue, handleInputChange, isSearching } =
+    useDebouncedSearch();
 
   const { data, isPending } = useQueryFetchClient.useQuery(
     "get",
@@ -32,7 +31,7 @@ function HomeSearch() {
     {
       params: {
         query: {
-          word: search,
+          word: inputValue,
           per_page: 5,
         },
       },
@@ -46,21 +45,21 @@ function HomeSearch() {
     <>
       <Input
         placeholder="Search Collections."
-        onClick={() => setQuery("search")}
+        onClick={() => setOpen("search")}
       />
       <CommandDialog
-        open={query === "search"}
-        onOpenChange={(value) => setQuery(value ? "search" : "")}
+        open={open === "search"}
+        onOpenChange={(isOpen) => setOpen(isOpen ? "search" : "")}
         shouldFilter={false}
       >
         <CommandInput
           placeholder="Type a command or search..."
-          value={search}
-          onValueChange={setSearch}
+          value={localInputValue}
+          onValueChange={handleInputChange}
         />
         <CommandList>
           <CommandEmpty className="flex flex-col gap-2 px-4 py-6">
-            {isPending ? (
+            {isPending || isSearching ? (
               <>
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
