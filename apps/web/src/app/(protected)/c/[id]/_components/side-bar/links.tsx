@@ -1,7 +1,9 @@
+import { useRouter } from "next/navigation";
 import {
   BookMarkedIcon,
   GitGraphIcon,
   MessageCircleDashedIcon,
+  Settings2Icon,
 } from "lucide-react";
 
 import {
@@ -35,6 +37,7 @@ const LINKS = [
 ];
 
 function CollectionLinks() {
+  const router = useRouter();
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex gap-0.5">
@@ -50,6 +53,15 @@ function CollectionLinks() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <SidebarMenuItem key="settings">
+            <SidebarMenuButton
+              tooltip="Settings"
+              onClick={() => router.push("?collection=settings")}
+            >
+              <Settings2Icon />
+              Collection&apos;s Settings
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

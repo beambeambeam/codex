@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { SparklesIcon } from "lucide-react";
 
 import { CollectionStoreProvider } from "@/app/(protected)/c/[id]/_components/context";
+import CollectionSettings from "@/app/(protected)/c/[id]/_components/side-bar/settings";
 import { Loader } from "@/components/ui/loader";
 import { useQueryFetchClient } from "@/lib/api/client";
 
@@ -51,6 +52,7 @@ function CollectionLayout(props: CollectionLayoutProps) {
       }}
     >
       {props.children}
+      <CollectionSettings />
     </CollectionStoreProvider>
   );
 }
