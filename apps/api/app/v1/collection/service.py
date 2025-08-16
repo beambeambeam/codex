@@ -10,6 +10,7 @@ from ..models.collection import (
     CollectionPermission,
     CollectionPermissionAudit,
 )
+from ..models.user import User
 from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
 from uuid import uuid4
 from datetime import datetime, timezone
@@ -61,7 +62,8 @@ class CollectionService:
             self.db.commit()
             self.db.refresh(collection)
 
-            return CollectionResponse.model_validate(collection)
+            # Get the collection with the new fields populated
+            return self.get_collection(collection.id)
         except Exception as e:
             self.db.rollback()
             raise e
@@ -98,7 +100,7 @@ class CollectionService:
         )
         self.db.commit()
         self.db.refresh(collection)
-        return CollectionResponse.model_validate(collection)
+        return self.get_collection(collection.id)
 
     def delete_collection(
         self, collection_id: str, user_id: Optional[str] = None
@@ -128,9 +130,44 @@ class CollectionService:
         collection = (
             self.db.query(Collection).filter(Collection.id == collection_id).first()
         )
-        if collection:
-            return CollectionResponse.model_validate(collection)
-        return None
+        if not collection:
+            return None
+
+        # Get contributors (users with permissions on this collection)
+        contributors = (
+            self.db.query(User.display, User.image)
+            .join(CollectionPermission, User.id == CollectionPermission.user_id)
+            .filter(CollectionPermission.collection_id == collection_id)
+            .filter(User.display.isnot(None))
+            .distinct()
+            .all()
+        )
+        contributor_list = [
+            {"display": display, "imgUrl": image if image else None}
+            for display, image in contributors
+            if display
+        ]
+
+        # Get latest update timestamp from audits
+        latest_audit = (
+            self.db.query(CollectionAudit.performed_at)
+            .filter(CollectionAudit.collection_id == collection_id)
+            .order_by(CollectionAudit.performed_at.desc())
+            .first()
+        )
+        latest_update = latest_audit[0] if latest_audit else None
+
+        # Create response with additional fields
+        collection_dict = {
+            "id": collection.id,
+            "title": collection.title,
+            "description": collection.description,
+            "summary": collection.summary,
+            "contributor": contributor_list,
+            "latest_update": latest_update,
+        }
+
+        return CollectionResponse.model_validate(collection_dict)
 
     # Permission-related methods
     def grant_permission(
@@ -420,7 +457,45 @@ class CollectionPermissionService:
             .all()
         )
 
-        return [CollectionResponse.model_validate(c) for c in collections]
+        result = []
+        for collection in collections:
+            # Get contributors (users with permissions on this collection)
+            contributors = (
+                self.db.query(User.display, User.image)
+                .join(CollectionPermission, User.id == CollectionPermission.user_id)
+                .filter(CollectionPermission.collection_id == collection.id)
+                .filter(User.display.isnot(None))
+                .distinct()
+                .all()
+            )
+            contributor_list = [
+                {"display": display, "imgUrl": image if image else None}
+                for display, image in contributors
+                if display
+            ]
+
+            # Get latest update timestamp from audits
+            latest_audit = (
+                self.db.query(CollectionAudit.performed_at)
+                .filter(CollectionAudit.collection_id == collection.id)
+                .order_by(CollectionAudit.performed_at.desc())
+                .first()
+            )
+            latest_update = latest_audit[0] if latest_audit else None
+
+            # Create response with additional fields
+            collection_dict = {
+                "id": collection.id,
+                "title": collection.title,
+                "description": collection.description,
+                "summary": collection.summary,
+                "contributor": contributor_list,
+                "latest_update": latest_update,
+            }
+
+            result.append(CollectionResponse.model_validate(collection_dict))
+
+        return result
 
     def search_collections(
         self, user_id: str, word: str = "", page: int = 1, per_page: int = 5
@@ -445,27 +520,67 @@ class CollectionPermissionService:
         )
 
         if not word or word.strip() == "":
-            q = q.order_by(Collection.title.asc()).limit(per_page).offset(offset)
-            return [CollectionResponse.model_validate(c) for c in q.all()]
+            collections = (
+                q.order_by(Collection.title.asc()).limit(per_page).offset(offset).all()
+            )
+        else:
+            try:
+                sim = func.similarity(Collection.title, word)
+                collections = (
+                    q.filter(Collection.title.ilike(f"%{word}%"))
+                    .order_by(sim.desc())
+                    .limit(per_page)
+                    .offset(offset)
+                    .all()
+                )
+            except Exception:
+                collections = (
+                    q.filter(Collection.title.ilike(f"%{word}%"))
+                    .order_by(Collection.title.asc())
+                    .limit(per_page)
+                    .offset(offset)
+                    .all()
+                )
 
-        try:
-            sim = func.similarity(Collection.title, word)
-            q_sim = (
-                q.filter(Collection.title.ilike(f"%{word}%"))
-                .order_by(sim.desc())
-                .limit(per_page)
-                .offset(offset)
+        result = []
+        for collection in collections:
+            # Get contributors (users with permissions on this collection)
+            contributors = (
+                self.db.query(User.display, User.image)
+                .join(CollectionPermission, User.id == CollectionPermission.user_id)
+                .filter(CollectionPermission.collection_id == collection.id)
+                .filter(User.display.isnot(None))
+                .distinct()
+                .all()
             )
-            results = q_sim.all()
-            return [CollectionResponse.model_validate(c) for c in results]
-        except Exception:
-            q_fallback = (
-                q.filter(Collection.title.ilike(f"%{word}%"))
-                .order_by(Collection.title.asc())
-                .limit(per_page)
-                .offset(offset)
+            contributor_list = [
+                {"display": display, "imgUrl": image if image else None}
+                for display, image in contributors
+                if display
+            ]
+
+            # Get latest update timestamp from audits
+            latest_audit = (
+                self.db.query(CollectionAudit.performed_at)
+                .filter(CollectionAudit.collection_id == collection.id)
+                .order_by(CollectionAudit.performed_at.desc())
+                .first()
             )
-            return [CollectionResponse.model_validate(c) for c in q_fallback.all()]
+            latest_update = latest_audit[0] if latest_audit else None
+
+            # Create response with additional fields
+            collection_dict = {
+                "id": collection.id,
+                "title": collection.title,
+                "description": collection.description,
+                "summary": collection.summary,
+                "contributor": contributor_list,
+                "latest_update": latest_update,
+            }
+
+            result.append(CollectionResponse.model_validate(collection_dict))
+
+        return result
 
     def _create_permission_audit(
         self,
