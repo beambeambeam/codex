@@ -1,6 +1,7 @@
 "use client";
 
 import HomeCanvas from "@/app/(protected)/home/_components/canvas";
+import CreateCollectionDialog from "@/app/(protected)/home/_components/create";
 import HomeSearch from "@/app/(protected)/home/_components/search";
 import Settings from "@/components/settings";
 import { useUser } from "@/store/user";
@@ -14,6 +15,7 @@ function HomePage() {
         <div className="text-xl font-bold">Welcome back, {user?.display}.</div>
         <div className="flex gap-2">
           <HomeSearch />
+          <CreateCollectionDialog />
           <Settings />
         </div>
       </div>
