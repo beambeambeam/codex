@@ -8,7 +8,7 @@ function DocsPage() {
           <BookMarkedIcon className="size-5" />
           All Documents
         </h1>
-        <p className="text-muted-foreground/60 text-base">
+        <p className="text-muted-foreground/60 font-sans text-base">
           Welcome to your document lair—where data mix with magic
         </p>
       </div>
@@ -17,7 +17,7 @@ function DocsPage() {
           <FolderUpIcon className="size-5" />
           Upload New Documents
         </h1>
-        <p className="text-muted-foreground/60 text-base">
+        <p className="text-muted-foreground/60 font-sans text-base">
           Ready to unleash your docs? Drag, drop, and let the magic happend.
           begin!
         </p>
@@ -27,7 +27,7 @@ function DocsPage() {
           <Table2Icon className="size-5" />
           Docuemts Table
         </h1>
-        <p className="text-muted-foreground/60 text-base">
+        <p className="text-muted-foreground/60 font-sans text-base">
           Here is your documents table. View, sort, and manage your files with
           ease.
         </p>
