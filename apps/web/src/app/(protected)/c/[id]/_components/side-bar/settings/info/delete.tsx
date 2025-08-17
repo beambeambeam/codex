@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   DialogDescription,
   DialogTitle,
@@ -29,6 +29,8 @@ function CollectionDelete() {
   const params = useParams() as { id?: string };
   const collectionId = params?.id;
 
+  const router = useRouter();
+
   const { user } = useUser();
   const display = user?.display || "";
 
@@ -46,6 +48,7 @@ function CollectionDelete() {
       onSuccess() {
         toast.success("Collection deleted");
         cacheUtils.invalidateQueries(["get", "/api/v1/collections"]);
+        router.replace("/home");
       },
       onError(err: unknown) {
         toast.error(parseErrorDetail(err) || "Failed to delete collection");
