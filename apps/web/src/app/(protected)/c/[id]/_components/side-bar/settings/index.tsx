@@ -62,7 +62,7 @@ function CollectionSettings() {
                 Project
               </TabsTrigger>
               <TabsTrigger
-                value="contribualtor"
+                value="contributor"
                 className={TABS_TRIGGER_CLASSNAME}
               >
                 <UsersIcon
@@ -70,14 +70,14 @@ function CollectionSettings() {
                   size={16}
                   aria-hidden="true"
                 />
-                Contribualtor
+                Contributor
               </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
             <TabsContent value="project" className="p-2">
               <CollectionInfo />
             </TabsContent>
-            <TabsContent value="contribualtor" className="p-2"></TabsContent>
+            <TabsContent value="contributor" className="p-2"></TabsContent>
           </Tabs>
         </div>
       </DialogContent>
