@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { AlbumIcon, ChevronsUpDown } from "lucide-react";
+import { AlbumIcon, BookXIcon, ChevronsUpDown } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Loader } from "@/components/ui/loader";
 import { Scroller } from "@/components/ui/scroller";
 import {
   SidebarGroup,
@@ -77,6 +78,16 @@ function CollectionSwitcher() {
                         </DropdownMenuItem>
                       </Link>
                     ))}
+                  {data && data.length - 1 === 0 && (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4">
+                      <BookXIcon />
+                      <Loader
+                        className="text-center"
+                        text="Just one collection? It's lonely in here. Go make more!"
+                        variant="text-blink"
+                      />
+                    </div>
+                  )}
                 </Scroller>
               </DropdownMenuContent>
             </DropdownMenu>
