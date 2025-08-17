@@ -5,8 +5,10 @@ import { useParams } from "next/navigation";
 import { SparklesIcon } from "lucide-react";
 
 import { CollectionStoreProvider } from "@/app/(protected)/c/[id]/_components/context";
+import CollectionSidebar from "@/app/(protected)/c/[id]/_components/side-bar";
 import CollectionSettings from "@/app/(protected)/c/[id]/_components/side-bar/settings";
 import { Loader } from "@/components/ui/loader";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useQueryFetchClient } from "@/lib/api/client";
 
 interface CollectionLayoutProps {
@@ -51,7 +53,10 @@ function CollectionLayout(props: CollectionLayoutProps) {
         ...data,
       }}
     >
-      {props.children}
+      <SidebarProvider>
+        <CollectionSidebar />
+        <SidebarInset>{props.children}</SidebarInset>
+      </SidebarProvider>
       <CollectionSettings />
     </CollectionStoreProvider>
   );

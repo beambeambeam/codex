@@ -1,6 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
-function CollectionPage() {
+function DocsPage() {
   return (
     <>
       <header className="group-has-data-[collapsible=offcanvas]/sidebar-wrapper:h-12 h-16.5 flex shrink-0 items-center gap-2 transition-[width,height] ease-linear">
@@ -12,4 +12,4 @@ function CollectionPage() {
     </>
   );
 }
-export default CollectionPage;
+export default DocsPage;
