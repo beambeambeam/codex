@@ -57,23 +57,25 @@ function CollectionBreadcrums() {
             {collection.title}
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
         {selectedIndex !== -1 && (
-          <BreadcrumbItem>
-            <Select defaultValue={String(selectedIndex)}>
-              <SelectTrigger id="select-database">
-                <SelectValue placeholder="Select database" />
-              </SelectTrigger>
-              <SelectContent>
-                {TABS.map((tab, idx) => (
-                  <SelectItem key={idx} value={String(idx)}>
-                    <tab.icon className="size-4" />
-                    {tab.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </BreadcrumbItem>
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <Select defaultValue={String(selectedIndex)}>
+                <SelectTrigger id="select-database">
+                  <SelectValue placeholder="Select database" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TABS.map((tab, idx) => (
+                    <SelectItem key={idx} value={String(idx)}>
+                      <tab.icon className="size-4" />
+                      {tab.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </BreadcrumbItem>
+          </>
         )}
       </BreadcrumbList>
     </Breadcrumb>
