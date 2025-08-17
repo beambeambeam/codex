@@ -1,4 +1,38 @@
+import { BookMarkedIcon, FolderUpIcon, Table2Icon } from "lucide-react";
+
 function DocsPage() {
-  return <section className="flex h-full gap-2 border-t-2 px-4 pt-2"></section>;
+  return (
+    <section className="flex h-full flex-col gap-3 border-t-2 p-4">
+      <div className="flex flex-col gap-1">
+        <h1 className="inline-flex items-center gap-0.5 text-xl font-bold">
+          <BookMarkedIcon className="size-5" />
+          All Documents
+        </h1>
+        <p className="text-muted-foreground/60 text-base">
+          Welcome to your document lair—where data mix with magic
+        </p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <h1 className="inline-flex items-center gap-0.5 text-xl font-bold">
+          <FolderUpIcon className="size-5" />
+          Upload New Documents
+        </h1>
+        <p className="text-muted-foreground/60 text-base">
+          Ready to unleash your docs? Drag, drop, and let the magic happend.
+          begin!
+        </p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <h1 className="inline-flex items-center gap-0.5 text-xl font-bold">
+          <Table2Icon className="size-5" />
+          Docuemts Table
+        </h1>
+        <p className="text-muted-foreground/60 text-base">
+          Here is your documents table. View, sort, and manage your files with
+          ease.
+        </p>
+      </div>
+    </section>
+  );
 }
 export default DocsPage;
