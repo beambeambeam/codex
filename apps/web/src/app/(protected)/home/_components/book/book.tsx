@@ -63,7 +63,7 @@ export function Book(props: BookProps) {
           {texture && (
             <div
               aria-hidden={true}
-              className="bg-ali absolute inset-0 bg-cover bg-no-repeat opacity-60 mix-blend-hard-light"
+              className="absolute inset-0 bg-cover bg-no-repeat opacity-60 mix-blend-hard-light"
             />
           )}
         </Stack>
