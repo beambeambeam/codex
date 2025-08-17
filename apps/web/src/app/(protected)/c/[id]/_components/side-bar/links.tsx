@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   BookMarkedIcon,
   GitGraphIcon,
@@ -14,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const LINKS = [
   {
@@ -21,23 +22,59 @@ const LINKS = [
     Icon: GitGraphIcon,
     label: "Collection Graph",
     tooltip: "knowledge graph.",
+    href: "/",
+    pattern: "/*",
   },
   {
     id: "docs",
     Icon: BookMarkedIcon,
     label: "Documents",
     tooltip: "Documents",
+    pattern: "/docs/*",
+    href: "/docs",
   },
   {
     id: "chats",
     Icon: MessageCircleDashedIcon,
     label: "Chats",
     tooltip: "Chats.",
+    pattern: "/chats/*",
+    href: "/chats",
   },
 ];
 
 function CollectionLinks() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const pathname = usePathname() ?? "";
+
+  const collectionBase = `/c/${params.id}`;
+  const relativePath = pathname.startsWith(collectionBase)
+    ? pathname.slice(collectionBase.length) || "/"
+    : pathname;
+
+  // Build info for each link: base (pattern without /*) and whether it matches
+  const linkInfos = LINKS.map((link) => {
+    const pattern = link.pattern;
+    const base = pattern
+      ? pattern.endsWith("/*")
+        ? pattern.slice(0, -2)
+        : pattern
+      : undefined;
+    const matched = pattern
+      ? pattern.endsWith("/*")
+        ? relativePath.startsWith(base ?? "")
+        : relativePath === base
+      : false;
+    return { ...link, base, matched };
+  });
+
+  // Prefer the most specific (longest) matching base. This prevents a catch-all like "/*" from shadowing specific routes.
+  const bestMatch = linkInfos
+    .filter((l) => l.matched)
+    .sort((a, b) => (b.base?.length ?? 0) - (a.base?.length ?? 0))[0];
+  const activeId = bestMatch?.id;
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex gap-0.5">
@@ -45,14 +82,26 @@ function CollectionLinks() {
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {LINKS.map(({ id, Icon, label, tooltip }) => (
-            <SidebarMenuItem key={id}>
-              <SidebarMenuButton tooltip={tooltip}>
-                <Icon />
-                {label}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {LINKS.map(({ id, Icon, label, tooltip, href }) => {
+            const isActive = id === activeId;
+            return (
+              <SidebarMenuItem key={id}>
+                <SidebarMenuButton
+                  tooltip={tooltip}
+                  className={cn(
+                    isActive &&
+                      "bg-sidebar-accent hover:bg-sidebar-accent-foreground/20",
+                  )}
+                  onClick={() =>
+                    href && router.push(`${collectionBase}${href}`)
+                  }
+                >
+                  <Icon />
+                  {label}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
           <SidebarMenuItem key="settings">
             <SidebarMenuButton
               tooltip="Settings"
