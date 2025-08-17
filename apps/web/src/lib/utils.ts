@@ -10,3 +10,77 @@ export function parseErrorDetail(error: unknown): string | undefined {
     ? (error as { detail?: string }).detail
     : undefined;
 }
+
+const MIME_TYPE_DISPLAY: Record<string, string> = {
+  // Documents
+  "application/pdf": "PDF",
+  "application/msword": "Word (.doc)",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "Word (.docx)",
+  "application/vnd.ms-excel": "Excel (.xls)",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+    "Excel (.xlsx)",
+  "application/vnd.ms-powerpoint": "PowerPoint (.ppt)",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "PowerPoint (.pptx)",
+  "text/plain": "Text",
+  "text/markdown": "Markdown",
+  "text/csv": "CSV",
+
+  // Archives
+  "application/zip": "ZIP archive",
+  "application/x-tar": "TAR archive",
+  "application/gzip": "GZIP",
+
+  // Images
+  "image/jpeg": "JPEG image",
+  "image/png": "PNG image",
+  "image/gif": "GIF image",
+  "image/svg+xml": "SVG image",
+  "image/webp": "WebP image",
+  "image/avif": "AVIF image",
+
+  // Audio / Video
+  "audio/mpeg": "MP3 audio",
+  "audio/wav": "WAV audio",
+  "video/mp4": "MP4 video",
+  "video/x-msvideo": "AVI video",
+
+  // Data
+  "application/json": "JSON",
+  "application/octet-stream": "Binary",
+  "application/octetstream": "Binary",
+};
+
+/**
+ * Convert a MIME type into a human-friendly display name.
+ * - Strips any parameters ("; charset=...")
+ * - Uses a hard-coded map for common types
+ * - Falls back to readable heuristics for image/audio/video/text/application types
+ */
+export function mimeTypeToName(mime?: string): string {
+  const cleaned = ((mime ?? "").split(";")[0] ?? "").trim().toLowerCase();
+  if (!cleaned) return "Unknown";
+  if (MIME_TYPE_DISPLAY[cleaned]) return MIME_TYPE_DISPLAY[cleaned];
+
+  const parts = cleaned.split("/");
+  const main = parts[0] ?? "";
+  const sub = parts[1] ?? "";
+
+  if (main === "image") return `${sub.toUpperCase() || "Image"} image`;
+  if (main === "audio") return `${sub.toUpperCase() || "Audio"} audio`;
+  if (main === "video") return `${sub.toUpperCase() || "Video"} video`;
+  if (main === "text") return `${sub.toUpperCase() || "Text"} text`;
+
+  if (sub) {
+    const subtype = sub
+      .replace(/[.+-]/g, " ")
+      .split(" ")
+      .map((s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : ""))
+      .filter(Boolean)
+      .join(" ");
+    return subtype || cleaned;
+  }
+
+  return cleaned;
+}
