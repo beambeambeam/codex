@@ -1,9 +1,9 @@
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
+  BookAlertIcon,
+  BookIcon,
   BookMarkedIcon,
-  GitGraphIcon,
-  MessageCircleDashedIcon,
-  Settings2Icon,
+  BookTextIcon,
 } from "lucide-react";
 
 import {
@@ -18,10 +18,10 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   {
-    id: "knowledge-graph",
-    Icon: GitGraphIcon,
-    label: "Collection Graph",
-    tooltip: "knowledge graph.",
+    id: "home",
+    Icon: BookIcon,
+    label: "Home",
+    tooltip: "Home",
     href: "/",
     pattern: "/*",
   },
@@ -35,7 +35,7 @@ const LINKS = [
   },
   {
     id: "chats",
-    Icon: MessageCircleDashedIcon,
+    Icon: BookTextIcon,
     label: "Chats",
     tooltip: "Chats.",
     pattern: "/chats/*",
@@ -107,7 +107,7 @@ function CollectionLinks() {
               tooltip="Settings"
               onClick={() => router.push("?collection=settings")}
             >
-              <Settings2Icon />
+              <BookAlertIcon />
               Collection&apos;s Settings
             </SidebarMenuButton>
           </SidebarMenuItem>
