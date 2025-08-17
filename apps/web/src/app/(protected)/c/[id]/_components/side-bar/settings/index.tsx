@@ -70,7 +70,7 @@ function CollectionSettings() {
                   size={16}
                   aria-hidden="true"
                 />
-                contributor
+                Contributor
               </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
