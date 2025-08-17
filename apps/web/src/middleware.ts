@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { env } from "@/env";
 
-const protectedRoutes = ["home/*"];
+const protectedRoutes = ["home/*", "c/*"];
 const unprotectedRoutes = ["sign-in", "sign-up"];
 
 function matchesRoute(pathname: string, routes: string[]): boolean {

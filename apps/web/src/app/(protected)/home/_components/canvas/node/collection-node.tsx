@@ -1,6 +1,8 @@
 import { memo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Handle, Position } from "@xyflow/react";
-import { AlbumIcon, BadgeInfoIcon } from "lucide-react";
+import { AlbumIcon, BadgeInfoIcon, SquareArrowOutUpRight } from "lucide-react";
 
 import {
   BaseNode,
@@ -10,6 +12,15 @@ import {
 } from "@/components/base-node";
 import AvatarGroup from "@/components/ui/avatar-group";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CollectionNodeProps {
   data: {
@@ -25,18 +36,45 @@ interface CollectionNodeProps {
 }
 
 export const CollectionNode = memo((props: CollectionNodeProps) => {
+  const router = useRouter();
+
+  const HREF = `c/${props.data.id}`;
+
   return (
-    <BaseNode className="w-72">
+    <BaseNode className="w-72" onDoubleClick={() => router.push(HREF)}>
       <Handle
         type="source"
         position={Position.Right}
         className="invisible !bottom-auto !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 !-translate-y-1/2"
       />
-      <BaseNodeHeader className="flex items-start border-b">
-        <AlbumIcon className="mt-0.5 size-6" />
+      <BaseNodeHeader className="flex items-center justify-between border-b">
+        <AlbumIcon className="mt-0.5" />
         <BaseNodeHeaderTitle className="flex flex-col">
           {props.data.title ? props.data.title : "Untitled Collection"}
         </BaseNodeHeaderTitle>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="4" cy="10" r="1.5" fill="currentColor" />
+                <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+                <circle cx="16" cy="10" r="1.5" fill="currentColor" />
+              </svg>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel className="w-40 truncate text-center">
+              {props.data.title}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Link href={HREF}>
+              <DropdownMenuItem>
+                <SquareArrowOutUpRight />
+                Checkout.
+              </DropdownMenuItem>
+            </Link>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </BaseNodeHeader>
       <BaseNodeContent>
         <div className="flex flex-col gap-y-3">

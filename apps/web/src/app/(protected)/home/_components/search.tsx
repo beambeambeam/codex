@@ -46,6 +46,7 @@ function HomeSearch() {
       <Input
         placeholder="Search Collections."
         onClick={() => setOpen("search")}
+        className="lg:w-100"
       />
       <CommandDialog
         open={open === "search"}

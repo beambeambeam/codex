@@ -105,20 +105,43 @@ class CollectionService:
     def delete_collection(
         self, collection_id: str, user_id: Optional[str] = None
     ) -> bool:
-        """Delete a collection by ID and audit the action."""
+        """Delete a collection by ID and clean up related records."""
         collection = (
             self.db.query(Collection).filter(Collection.id == collection_id).first()
         )
         if not collection:
             return False
-        self.db.delete(collection)
-        self.audit.create_audit(
-            collection_id=collection_id,
-            action=CollectionActionEnum.DELETE,
-            user_id=user_id,
-        )
-        self.db.commit()
-        return True
+
+        try:
+            self.db.query(CollectionAudit).filter(
+                CollectionAudit.collection_id == collection_id
+            ).delete(synchronize_session=False)
+
+            permission_ids = (
+                self.db.query(CollectionPermission.id)
+                .filter(CollectionPermission.collection_id == collection_id)
+                .subquery()
+            )
+
+            self.db.query(CollectionPermissionAudit).filter(
+                CollectionPermissionAudit.collection_permission_id.in_(
+                    self.db.query(permission_ids.c.id)
+                )
+            ).delete(synchronize_session=False)
+
+            self.db.query(CollectionPermission).filter(
+                CollectionPermission.collection_id == collection_id
+            ).delete(synchronize_session=False)
+
+            self.db.query(Collection).filter(Collection.id == collection_id).delete(
+                synchronize_session=False
+            )
+
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def get_collection_audits(self, collection_id: str):
         """Get audits for a collection by ID."""
