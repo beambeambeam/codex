@@ -102,9 +102,7 @@ class CollectionService:
         self.db.refresh(collection)
         return self.get_collection(collection.id)
 
-    def delete_collection(
-        self, collection_id: str, user_id: Optional[str] = None
-    ) -> bool:
+    def delete_collection(self, collection_id: str) -> bool:
         """Delete a collection by ID and clean up related records."""
         collection = (
             self.db.query(Collection).filter(Collection.id == collection_id).first()
