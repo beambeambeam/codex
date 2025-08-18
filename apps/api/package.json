@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.py",
   "scripts": {
-    "dev": "uv run python -m app.main serve --reload",
+    "dev": "uv run python -m app.main --reload",
     "lint": "uv run ruff check --fix",
     "check-types": "uv run ty check ."
   },

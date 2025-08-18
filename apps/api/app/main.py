@@ -29,7 +29,6 @@ def main():
     import uvicorn
 
     parser = argparse.ArgumentParser(description="Agentic RAG API and Flows")
-    parser.add_argument("command", choices=["serve"], help="Command to run.")
     parser.add_argument(
         "--host", type=str, default="127.0.0.1", help="Host for the API server."
     )
@@ -45,10 +44,8 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "serve":
-        print(f"Starting API server on {args.host}:{args.port}")
-
-        uvicorn.run("app.main:app", host=args.host, port=args.port, reload=args.reload)
+    uvicorn.run("app.main:app", host=args.host, port=args.port, reload=args.reload)
+    print(f"Starting API server on {args.host}:{args.port}")
 
 
 if __name__ == "__main__":
