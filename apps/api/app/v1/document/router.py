@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from typing import Optional, List
+from typing import List
 from uuid import UUID
 
 
@@ -24,7 +24,7 @@ async def bulk_upload_documents(
     files: List[UploadFile] = File(...),
     titles: List[str] = Form([]),
     descriptions: List[str] = Form([]),
-    collection_id: Optional[str] = Form(default=None),
+    collection_id: UUID = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
@@ -34,17 +34,6 @@ async def bulk_upload_documents(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided"
         )
-
-    # Validate collection exists if provided
-    collection_uuid = None
-    if collection_id:
-        try:
-            collection_uuid = UUID(collection_id)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid collection ID format",
-            )
 
     created_documents = []
     failed_uploads = []
@@ -64,16 +53,14 @@ async def bulk_upload_documents(
                 resource=FileResouceEnum.DOCUMENT,
             )
 
-            # Use provided title or filename as fallback
-            title = titles[i] if i < len(titles) and titles[i] else file.filename
+            title = titles[i] if i < len(titles) and titles[i] else None
             description = (
                 descriptions[i] if i < len(descriptions) and descriptions[i] else None
             )
 
-            # Create document with individual title and description
             document_data = DocumentCreateRequest(
                 user_id=current_user.id,
-                collection_id=collection_uuid,
+                collection_id=collection_id,
                 file_id=file_response.id,
                 title=title,
                 description=description,

@@ -56,7 +56,6 @@ class DocumentService:
             if not user_exists:
                 raise ValueError(f"User with id {document_create.user_id} not found")
 
-        # Validate collection exists if collection_id is provided
         if hasattr(document_create, "collection_id") and document_create.collection_id:
             collection_exists = (
                 self.db.query(Collection)

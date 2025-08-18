@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -30,6 +31,7 @@ const documentUploadSchema = z.object({
 export type DocumentUploadSchemaType = z.infer<typeof documentUploadSchema>;
 
 function DocumentUploadForm() {
+  const params = useParams<{ id: string }>();
   const form = useAppForm({
     validators: { onChange: documentUploadSchema },
     defaultValues: {
@@ -39,6 +41,7 @@ function DocumentUploadForm() {
       mutate({
         body: {
           items: value.files,
+          collection_id: params.id,
         },
         bodySerializer: JsonToFormData,
       });
