@@ -31,7 +31,6 @@ function DocumentTable() {
     columns: documentColumns,
     pageCount: 10,
     getRowId: (row) => row.id,
-    enableAdvancedFilter: true,
     manualFiltering: true,
     manualExpanding: false,
     manualGrouping: false,
