@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from typing import Optional, List
 from uuid import UUID
-from pydantic import BaseModel
 
 
 from .schemas import DocumentCreateRequest, DocumentResponse
@@ -16,28 +15,24 @@ from ..models import FileResouceEnum
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
-class DocumentUploadItem(BaseModel):
-    file: UploadFile = File(...)
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-
 @router.post(
     "/uploads",
     response_model=List[DocumentResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def bulk_upload_documents(
-    items: List[DocumentUploadItem] = Form(..., media_type="multipart/form-data"),
+    files: List[UploadFile] = File(...),
+    titles: List[str] = Form([]),
+    descriptions: List[str] = Form([]),
     collection_id: Optional[str] = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
 ):
     """Bulk upload multiple files to the same collection. Each file can have its own title and description."""
-    if not items:
+    if not files:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No items provided"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided"
         )
 
     # Validate collection exists if provided
@@ -54,9 +49,9 @@ async def bulk_upload_documents(
     created_documents = []
     failed_uploads = []
 
-    for i, item in enumerate(items):
+    for i, file in enumerate(files):
         try:
-            if not item.file.filename:
+            if not file.filename:
                 failed_uploads.append(
                     {"index": i, "filename": "unknown", "error": "No filename provided"}
                 )
@@ -64,14 +59,16 @@ async def bulk_upload_documents(
 
             # Upload file to storage
             file_response = await storage_service.upload_file_to_storage(
-                file=item.file,
+                file=file,
                 user_id=current_user.id,
                 resource=FileResouceEnum.DOCUMENT,
             )
 
             # Use provided title or filename as fallback
-            title = item.title if item.title else item.file.filename
-            description = item.description
+            title = titles[i] if i < len(titles) and titles[i] else file.filename
+            description = (
+                descriptions[i] if i < len(descriptions) and descriptions[i] else None
+            )
 
             # Create document with individual title and description
             document_data = DocumentCreateRequest(
@@ -90,7 +87,7 @@ async def bulk_upload_documents(
             failed_uploads.append(
                 {
                     "index": i,
-                    "filename": item.file.filename or "unknown",
+                    "filename": file.filename or "unknown",
                     "error": str(e),
                 }
             )

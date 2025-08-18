@@ -4,7 +4,10 @@ import { useCallback } from "react";
 import z from "zod";
 
 import DocumentUploader from "@/app/(protected)/c/[id]/docs/upload/uploader";
+import { Button } from "@/components/ui/button";
 import { useAppForm } from "@/components/ui/tanstack-form";
+import { JsonToFormData } from "@/lib/api/body-serializer";
+import { useQueryFetchClient } from "@/lib/api/client";
 
 const MIN_FILES = 1;
 const MAX_FILES = 10;
@@ -12,7 +15,7 @@ const MAX_FILES = 10;
 const documentUploadSchema = z.object({
   files: z
     .object({
-      file: z.array(z.instanceof(File)),
+      file: z.instanceof(File),
       title: z.string(),
       description: z.string(),
     })
@@ -24,9 +27,24 @@ const documentUploadSchema = z.object({
 export type DocumentUploadSchemaType = z.infer<typeof documentUploadSchema>;
 
 function DocumentUploadForm() {
+  const { mutate } = useQueryFetchClient.useMutation(
+    "post",
+    "/api/v1/documents/uploads",
+  );
+
   const form = useAppForm({
     validators: { onChange: documentUploadSchema },
-    onSubmit: ({ value }) => console.log(value),
+    defaultValues: {
+      files: [] as DocumentUploadSchemaType["files"],
+    },
+    onSubmit({ value }) {
+      mutate({
+        body: {
+          items: value.files,
+        },
+        bodySerializer: JsonToFormData,
+      });
+    },
   });
 
   const handleSubmit = useCallback(
@@ -44,17 +62,14 @@ function DocumentUploadForm() {
         <form.AppField name="files">
           {(field) => (
             <DocumentUploader
-              value={
-                field.state.value as {
-                  file: File;
-                  title: string;
-                  description: string;
-                }[]
-              }
+              value={field.state.value}
               onValueChange={(e) => field.handleChange(e)}
             />
           )}
         </form.AppField>
+        <div>
+          <Button type="submit">Upload!</Button>
+        </div>
       </form>
     </form.AppForm>
   );
