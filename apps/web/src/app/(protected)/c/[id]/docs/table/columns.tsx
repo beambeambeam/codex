@@ -1,6 +1,7 @@
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, Row } from "@tanstack/react-table";
 import { Text } from "lucide-react";
 
+import DocumentAcions from "@/app/(protected)/c/[id]/docs/table/actions";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { components } from "@/lib/api/path";
 
@@ -47,5 +48,15 @@ export const documentColumns = [
       icon: Text,
     },
     enableColumnFilter: true,
+  }),
+  columnHelper.display({
+    id: "actions",
+    header: () => <span className="sr-only">Actions</span>,
+    cell: ({ row }: { row: Row<DocumentsType> }) => (
+      <DocumentAcions row={row} />
+    ),
+    meta: { label: "Actions" },
+    enableColumnFilter: false,
+    enableSorting: false,
   }),
 ];
