@@ -3,7 +3,7 @@ import { ReactFlow, useNodesInitialized, useReactFlow } from "@xyflow/react";
 
 import CenterNode from "@/app/(protected)/home/_components/canvas/node/center-node";
 import { CollectionNode } from "@/app/(protected)/home/_components/canvas/node/collection-node";
-import { useGraphActions, useGraphState } from "@/hooks/useGraph";
+import { useGraphActions, useGraphState } from "@/hooks/use-graph";
 import { getLayoutedElements } from "@/lib/graph/elk";
 
 const nodeTypes = {

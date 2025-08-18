@@ -2,7 +2,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 
 import HomeCanvasFlow from "@/app/(protected)/home/_components/canvas/flow";
 import { Loader } from "@/components/ui/loader";
-import { GraphStoreProvider } from "@/hooks/useGraph";
+import { GraphStoreProvider } from "@/hooks/use-graph";
 import { useQueryFetchClient } from "@/lib/api/client";
 
 interface HomeCanvasProps {
