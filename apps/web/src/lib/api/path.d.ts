@@ -360,6 +360,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/documents/{collection_id}/table": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Documents Table
+     * @description Get all documents in a collection with pagination for table display.
+     */
+    get: operations["get_documents_table_api_v1_documents__collection_id__table_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/documents/{document_id}": {
     parameters: {
       query?: never;
@@ -398,10 +418,23 @@ export interface components {
     };
     /** Body_bulk_upload_documents_api_v1_documents_uploads_post */
     Body_bulk_upload_documents_api_v1_documents_uploads_post: {
-      /** Items */
-      items: components["schemas"]["DocumentUploadItem"][];
-      /** Collection Id */
-      collection_id?: string | null;
+      /** Files */
+      files: File[];
+      /**
+       * Titles
+       * @default []
+       */
+      titles: string[];
+      /**
+       * Descriptions
+       * @default []
+       */
+      descriptions: string[];
+      /**
+       * Collection Id
+       * Format: uuid
+       */
+      collection_id?: string;
     };
     /** Body_upload_file_api_v1_storage_upload_post */
     Body_upload_file_api_v1_storage_upload_post: {
@@ -596,18 +629,6 @@ export interface components {
       is_graph_extracted: boolean;
       knowledge_graph: components["schemas"]["KnowledgeGraph"] | null;
     };
-    /** DocumentUploadItem */
-    DocumentUploadItem: {
-      /**
-       * File
-       * Format: binary
-       */
-      file: File;
-      /** Title */
-      title?: string | null;
-      /** Description */
-      description?: string | null;
-    };
     /** EdgeDataSchema */
     EdgeDataSchema: {
       /** Label */
@@ -670,6 +691,19 @@ export interface components {
       /** Id */
       id: string;
       data: components["schemas"]["NodeDataSchema"];
+    };
+    /** PaginatedDocumentResponse */
+    PaginatedDocumentResponse: {
+      /** Documents */
+      documents: components["schemas"]["DocumentResponse"][];
+      /** Total */
+      total: number;
+      /** Page */
+      page: number;
+      /** Per Page */
+      per_page: number;
+      /** Total Pages */
+      total_pages: number;
     };
     /**
      * UserEditRequest
@@ -1464,7 +1498,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/x-www-form-urlencoded": components["schemas"]["Body_bulk_upload_documents_api_v1_documents_uploads_post"];
+        "multipart/form-data": components["schemas"]["Body_bulk_upload_documents_api_v1_documents_uploads_post"];
       };
     };
     responses: {
@@ -1475,6 +1509,40 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["DocumentResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_documents_table_api_v1_documents__collection_id__table_get: {
+    parameters: {
+      query?: {
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedDocumentResponse"];
         };
       };
       /** @description Validation Error */

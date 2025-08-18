@@ -40,7 +40,9 @@ function DocumentUploadForm() {
     onSubmit({ value }) {
       mutate({
         body: {
-          items: value.files,
+          files: value.files.map((item) => item.file),
+          titles: value.files.map((item) => item.title),
+          descriptions: value.files.map((item) => item.description),
           collection_id: params.id,
         },
         bodySerializer: JsonToFormData,
