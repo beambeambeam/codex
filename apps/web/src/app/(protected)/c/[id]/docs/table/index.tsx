@@ -29,13 +29,13 @@ function DocumentTable() {
   const { table } = useDataTable({
     data: useMemo(() => data?.documents ?? [], [data]),
     columns: documentColumns,
-    pageCount: 10,
     getRowId: (row) => row.id,
-    manualFiltering: true,
+    manualFiltering: false,
     manualExpanding: false,
     manualGrouping: false,
-    manualSorting: true,
-    manualPagination: true,
+    manualSorting: false,
+    manualPagination: false,
+    pageCount: 0,
   });
 
   if (isPending) {
