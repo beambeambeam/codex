@@ -33,6 +33,15 @@ function CollectionBooks() {
       <h1 className="px-4 text-xl">All Collections.</h1>
       <div className="border-t-2"></div>
       <Scroller className="flex h-full cursor-pointer flex-col flex-wrap gap-x-2 gap-y-4 p-2 px-4 pr-12">
+        {data?.length == 0 && (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1">
+            <Loader
+              text="There's nothing here's try to create new one!"
+              variant="text-blink"
+              className="text-xl"
+            />
+          </div>
+        )}
         {data?.map((item, idx) => (
           <div
             key={item.id ?? idx}
@@ -44,7 +53,9 @@ function CollectionBooks() {
                 <div className="flex">
                   <h1 className="text-base font-semibold">{item.title}</h1>
                 </div>
-                <p className="text-xs">{item.description}</p>
+                <p className="text-xs">
+                  {item.description || "No description. Mysterious, huh?"}
+                </p>
                 <div className="flex">
                   <AvatarGroup
                     size="sm"
