@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from ..models.document import Document
 from ..models.file import File
 from ..models.user import User
+from ..models.collection import Collection
 from .schemas import DocumentCreateRequest, DocumentResponse
 from ..models.document import DocumentAudit
 from ..storage.service import StorageService
@@ -55,6 +56,18 @@ class DocumentService:
             if not user_exists:
                 raise ValueError(f"User with id {document_create.user_id} not found")
 
+        # Validate collection exists if collection_id is provided
+        if hasattr(document_create, "collection_id") and document_create.collection_id:
+            collection_exists = (
+                self.db.query(Collection)
+                .filter(Collection.id == document_create.collection_id)
+                .first()
+            )
+            if not collection_exists:
+                raise ValueError(
+                    f"Collection with id {document_create.collection_id} not found"
+                )
+
         try:
             doc_data = document_create.model_dump(exclude_unset=True)
             document = Document(**doc_data)
@@ -75,7 +88,11 @@ class DocumentService:
 
             document = (
                 self.db.query(Document)
-                .options(joinedload(Document.user), joinedload(Document.file))
+                .options(
+                    joinedload(Document.user),
+                    joinedload(Document.file),
+                    joinedload(Document.collection),
+                )
                 .filter(Document.id == document.id)
                 .first()
             )
@@ -88,6 +105,7 @@ class DocumentService:
 
             return DocumentResponse(
                 id=document.id,
+                collection_id=document.collection_id,
                 user=user_info,
                 file=file_response,
                 title=document.title,
@@ -132,7 +150,11 @@ class DocumentService:
         """Retrieve a document by ID and return response schema with user display and file info."""
         document = (
             self.db.query(Document)
-            .options(joinedload(Document.user), joinedload(Document.file))
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
             .filter(Document.id == document_id)
             .first()
         )
@@ -144,6 +166,7 @@ class DocumentService:
 
         return DocumentResponse(
             id=document.id,
+            collection_id=document.collection_id,
             user=user_info,
             file=file_response,
             title=document.title,
@@ -153,6 +176,137 @@ class DocumentService:
             is_graph_extracted=document.is_graph_extracted,
             knowledge_graph=document.knowledge_graph,
         )
+
+    def get_documents_by_collection(self, collection_id: str) -> List[DocumentResponse]:
+        """Retrieve all documents for a specific collection."""
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id == collection_id)
+            .all()
+        )
+
+        result = []
+        for document in documents:
+            user_info = (
+                self._user_to_user_info(document.user) if document.user else None
+            )
+            file_response = self._file_to_file_response(document.file)
+
+            result.append(
+                DocumentResponse(
+                    id=document.id,
+                    collection_id=document.collection_id,
+                    user=user_info,
+                    file=file_response,
+                    title=document.title,
+                    description=document.description,
+                    summary=document.summary,
+                    is_vectorized=document.is_vectorized,
+                    is_graph_extracted=document.is_graph_extracted,
+                    knowledge_graph=document.knowledge_graph,
+                )
+            )
+
+        return result
+
+    def update_document_collection(
+        self,
+        document_id: str,
+        collection_id: Optional[str],
+        user_id: Optional[str] = None,
+    ) -> DocumentResponse:
+        """Update the collection assignment for a document."""
+        document = self.db.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
+
+        # Validate collection exists if collection_id is provided
+        if collection_id:
+            collection_exists = (
+                self.db.query(Collection).filter(Collection.id == collection_id).first()
+            )
+            if not collection_exists:
+                raise ValueError(f"Collection with id {collection_id} not found")
+
+        # Prepare old values for audit
+        old_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Update the collection
+        document.collection_id = collection_id
+
+        # Prepare new values for audit
+        new_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Audit the update
+        self.audit.create_audit(
+            document_id=str(document_id),
+            action=DocumentActionEnum.UPDATE,
+            user_id=str(user_id) if user_id else None,
+            old_values=old_values,
+            new_values=new_values,
+        )
+
+        self.db.commit()
+
+        return self.get_document(document_id)
+
+    def remove_from_collection(
+        self, document_id: str, user_id: Optional[str] = None
+    ) -> DocumentResponse:
+        """Remove a document from its collection (set collection_id to None)."""
+        return self.update_document_collection(document_id, None, user_id)
+
+    def move_to_collection(
+        self, document_id: str, collection_id: str, user_id: Optional[str] = None
+    ) -> DocumentResponse:
+        """Move a document to a different collection."""
+        return self.update_document_collection(document_id, collection_id, user_id)
+
+    def get_documents_without_collection(self) -> List[DocumentResponse]:
+        """Retrieve all documents that are not assigned to any collection."""
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id.is_(None))
+            .all()
+        )
+
+        result = []
+        for document in documents:
+            user_info = (
+                self._user_to_user_info(document.user) if document.user else None
+            )
+            file_response = self._file_to_file_response(document.file)
+
+            result.append(
+                DocumentResponse(
+                    id=document.id,
+                    collection_id=document.collection_id,
+                    user=user_info,
+                    file=file_response,
+                    title=document.title,
+                    description=document.description,
+                    summary=document.summary,
+                    is_vectorized=document.is_vectorized,
+                    is_graph_extracted=document.is_graph_extracted,
+                    knowledge_graph=document.knowledge_graph,
+                )
+            )
+
+        return result
 
 
 class DocumentAuditService:

@@ -11,6 +11,7 @@ from ..models.collection import (
     CollectionPermissionAudit,
 )
 from ..models.user import User
+from ..models.document import Document
 from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
 from uuid import uuid4
 from datetime import datetime, timezone
@@ -103,7 +104,7 @@ class CollectionService:
         return self.get_collection(collection.id)
 
     def delete_collection(self, collection_id: str) -> bool:
-        """Delete a collection by ID and clean up related records."""
+        """Delete a collection by ID and clean up related records. Documents are automatically deleted due to CASCADE."""
         collection = (
             self.db.query(Collection).filter(Collection.id == collection_id).first()
         )
@@ -111,10 +112,14 @@ class CollectionService:
             return False
 
         try:
-            self.db.query(CollectionAudit).filter(
-                CollectionAudit.collection_id == collection_id
-            ).delete(synchronize_session=False)
+            # First audit the deletion
+            self.audit.create_audit(
+                collection_id=collection_id,
+                action=CollectionActionEnum.DELETE,
+                user_id=None,  # Could be passed as parameter if needed
+            )
 
+            # Clean up audit records for collection permissions
             permission_ids = (
                 self.db.query(CollectionPermission.id)
                 .filter(CollectionPermission.collection_id == collection_id)
@@ -127,10 +132,17 @@ class CollectionService:
                 )
             ).delete(synchronize_session=False)
 
+            # Clean up collection permissions
             self.db.query(CollectionPermission).filter(
                 CollectionPermission.collection_id == collection_id
             ).delete(synchronize_session=False)
 
+            # Clean up collection audits
+            self.db.query(CollectionAudit).filter(
+                CollectionAudit.collection_id == collection_id
+            ).delete(synchronize_session=False)
+
+            # Delete the collection (documents will be deleted automatically due to CASCADE)
             self.db.query(Collection).filter(Collection.id == collection_id).delete(
                 synchronize_session=False
             )
@@ -140,6 +152,14 @@ class CollectionService:
         except Exception as e:
             self.db.rollback()
             raise e
+
+    def get_collection_document_count(self, collection_id: str) -> int:
+        """Get the number of documents in a collection."""
+        return (
+            self.db.query(Document)
+            .filter(Document.collection_id == collection_id)
+            .count()
+        )
 
     def get_collection_audits(self, collection_id: str):
         """Get audits for a collection by ID."""
@@ -178,6 +198,9 @@ class CollectionService:
         )
         latest_update = latest_audit[0] if latest_audit else None
 
+        # Get document count for this collection
+        document_count = self.get_collection_document_count(collection_id)
+
         # Create response with additional fields
         collection_dict = {
             "id": collection.id,
@@ -186,6 +209,7 @@ class CollectionService:
             "summary": collection.summary,
             "contributor": contributor_list,
             "latest_update": latest_update,
+            "document_count": document_count,
         }
 
         return CollectionResponse.model_validate(collection_dict)
@@ -540,9 +564,9 @@ class CollectionPermissionService:
     def _enrich_collections(
         self, collections: List[Collection]
     ) -> List[CollectionResponse]:
-        """Private helper to attach contributors and latest_update to collections.
+        """Private helper to attach contributors, latest_update, and document_count to collections.
 
-        This batches the DB queries for contributors and latest audit timestamps to
+        This batches the DB queries for contributors, latest audit timestamps, and document counts to
         avoid N+1 queries and centralizes the transformation logic.
         """
         if not collections:
@@ -550,6 +574,7 @@ class CollectionPermissionService:
 
         collection_ids = [c.id for c in collections]
 
+        # Get contributors
         contributor_rows = (
             self.db.query(CollectionPermission.collection_id, User.display, User.image)
             .join(User, User.id == CollectionPermission.user_id)
@@ -567,6 +592,7 @@ class CollectionPermissionService:
                 {"display": display, "imgUrl": image if image else None}
             )
 
+        # Get latest audit timestamps
         latest_rows = (
             self.db.query(
                 CollectionAudit.collection_id, func.max(CollectionAudit.performed_at)
@@ -577,10 +603,20 @@ class CollectionPermissionService:
         )
         latest_map = {coll_id: performed_at for coll_id, performed_at in latest_rows}
 
+        # Get document counts
+        document_count_rows = (
+            self.db.query(Document.collection_id, func.count(Document.id))
+            .filter(Document.collection_id.in_(collection_ids))
+            .group_by(Document.collection_id)
+            .all()
+        )
+        document_count_map = {coll_id: count for coll_id, count in document_count_rows}
+
         result: List[CollectionResponse] = []
         for collection in collections:
             contributor_list = contributors_map.get(collection.id, [])
             latest_update = latest_map.get(collection.id)
+            document_count = document_count_map.get(collection.id, 0)
 
             collection_dict = {
                 "id": collection.id,
@@ -589,6 +625,7 @@ class CollectionPermissionService:
                 "summary": collection.summary,
                 "contributor": contributor_list,
                 "latest_update": latest_update,
+                "document_count": document_count,
             }
 
             result.append(CollectionResponse.model_validate(collection_dict))

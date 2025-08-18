@@ -27,6 +27,9 @@ class DocumentCreateRequest(BaseModel):
     user_id: Optional[UUID] = Field(
         None, description="ID of the user who owns the document"
     )
+    collection_id: Optional[UUID] = Field(
+        None, description="ID of the collection that contains the document"
+    )
     file_id: UUID = Field(
         ..., description="ID of the file associated with the document"
     )
@@ -37,6 +40,7 @@ class DocumentCreateRequest(BaseModel):
 
 class DocumentResponse(BaseModel):
     id: UUID
+    collection_id: Optional[UUID] = None
     user: Optional[UserInfoSchema] = None
     file: Optional[FileResponse] = None
     title: Optional[str]

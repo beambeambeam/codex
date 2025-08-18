@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from typing import Optional
+from uuid import UUID
 
 
 from .schemas import DocumentCreateRequest, DocumentResponse
@@ -24,11 +25,12 @@ async def upload_and_create_document(
     title: Optional[str] = None,
     description: Optional[str] = None,
     summary: Optional[str] = None,
+    collection_id: Optional[str] = None,
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
 ):
-    """Upload a file and create a document in one step."""
+    """Upload a file and create a document in one step. Optionally assign to a collection."""
     if not file.filename:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided"
@@ -40,8 +42,12 @@ async def upload_and_create_document(
     )
 
     try:
+        # Convert collection_id string to UUID if provided
+        collection_uuid = UUID(collection_id) if collection_id else None
+
         document_data = DocumentCreateRequest(
             user_id=current_user.id,
+            collection_id=collection_uuid,
             file_id=file_response.id,
             title=title,
             description=description,
