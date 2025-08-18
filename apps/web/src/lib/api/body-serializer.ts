@@ -18,11 +18,23 @@ export function JsonToFormData(body: {
     }
 
     if (Array.isArray(value)) {
-      if (value.every((item) => item instanceof File)) {
-        value.forEach((file) =>
-          formData.append(key, file, encodeURIComponent(file.name)),
-        );
-      }
+      value.forEach((item, idx) => {
+        if (item instanceof File) {
+          formData.append(
+            `${key}[${idx}]`,
+            item,
+            encodeURIComponent(item.name),
+          );
+        } else if (item instanceof Blob) {
+          formData.append(`${key}[${idx}]`, item);
+        } else if (typeof item === "boolean" || typeof item === "object") {
+          formData.append(`${key}[${idx}]`, JSON.stringify(item));
+        } else if (typeof item === "number") {
+          formData.append(`${key}[${idx}]`, item.toString());
+        } else if (typeof item === "string") {
+          formData.append(`${key}[${idx}]`, item);
+        }
+      });
       continue;
     }
 

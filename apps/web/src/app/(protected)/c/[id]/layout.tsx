@@ -4,9 +4,16 @@ import { ReactNode } from "react";
 import { useParams } from "next/navigation";
 import { SparklesIcon } from "lucide-react";
 
+import CollectionBreadcrums from "@/app/(protected)/c/[id]/_components/breadcrums";
 import { CollectionStoreProvider } from "@/app/(protected)/c/[id]/_components/context";
+import CollectionSidebar from "@/app/(protected)/c/[id]/_components/side-bar";
 import CollectionSettings from "@/app/(protected)/c/[id]/_components/side-bar/settings";
 import { Loader } from "@/components/ui/loader";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { useQueryFetchClient } from "@/lib/api/client";
 
 interface CollectionLayoutProps {
@@ -51,7 +58,18 @@ function CollectionLayout(props: CollectionLayoutProps) {
         ...data,
       }}
     >
-      {props.children}
+      <SidebarProvider>
+        <CollectionSidebar />
+        <SidebarInset>
+          <header className="group-has-data-[collapsible=offcanvas]/sidebar-wrapper:h-12 h-16.5 flex shrink-0 items-center gap-2 transition-[width,height] ease-linear">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <CollectionBreadcrums />
+            </div>
+          </header>
+          {props.children}
+        </SidebarInset>
+      </SidebarProvider>
       <CollectionSettings />
     </CollectionStoreProvider>
   );

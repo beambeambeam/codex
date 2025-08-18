@@ -1,8 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from typing import Optional
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+    Form,
+    Request,
+)
+from typing import List
+from uuid import UUID
 
 
-from .schemas import DocumentCreateRequest, DocumentResponse
+from .schemas import DocumentCreateRequest, DocumentResponse, PaginatedDocumentResponse
 from .service import DocumentService
 from .dependencies import get_document_service
 from ..user.dependencies import get_current_user
@@ -15,42 +25,114 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 
 @router.post(
-    "/upload",
-    response_model=DocumentResponse,
+    "/uploads",
+    response_model=List[DocumentResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def upload_and_create_document(
-    file: UploadFile = File(...),
-    title: Optional[str] = None,
-    description: Optional[str] = None,
-    summary: Optional[str] = None,
+async def bulk_upload_documents(
+    request: Request,
+    files: List[UploadFile] = File(...),
+    collection_id: UUID = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
 ):
-    """Upload a file and create a document in one step."""
-    if not file.filename:
+    """Bulk upload multiple files to the same collection. Each file can have its own title and description."""
+    if not files:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided"
         )
 
-    # Upload file to storage
-    file_response = await storage_service.upload_file_to_storage(
-        file=file, user_id=current_user.id, resource=FileResouceEnum.DOCUMENT
-    )
+    # Parse form data to get titles and descriptions
+    form_data = await request.form()
 
+    # Extract titles and descriptions from indexed form fields
+    titles = []
+    descriptions = []
+
+    # Get all title fields (titles.0, titles.1, etc.)
+    i = 0
+    while f"titles.{i}" in form_data:
+        titles.append(form_data[f"titles.{i}"])
+        i += 1
+
+    # Get all description fields (descriptions.0, descriptions.1, etc.)
+    i = 0
+    while f"descriptions.{i}" in form_data:
+        descriptions.append(form_data[f"descriptions.{i}"])
+        i += 1
+
+    created_documents = []
+    failed_uploads = []
+
+    for i, file in enumerate(files):
+        try:
+            if not file.filename:
+                failed_uploads.append(
+                    {"index": i, "filename": "unknown", "error": "No filename provided"}
+                )
+                continue
+
+            # Upload file to storage
+            file_response = await storage_service.upload_file_to_storage(
+                file=file,
+                user_id=current_user.id,
+                resource=FileResouceEnum.DOCUMENT,
+            )
+
+            title = titles[i] if i < len(titles) and titles[i] else None
+            description = (
+                descriptions[i] if i < len(descriptions) and descriptions[i] else None
+            )
+
+            document_data = DocumentCreateRequest(
+                user_id=current_user.id,
+                collection_id=collection_id,
+                file_id=file_response.id,
+                title=title,
+                description=description,
+                summary=None,
+            )
+
+            document = document_service.create_document(document_data)
+            created_documents.append(document)
+
+        except Exception as e:
+            failed_uploads.append(
+                {
+                    "index": i,
+                    "filename": file.filename or "unknown",
+                    "error": str(e),
+                }
+            )
+
+    if not created_documents:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="All file uploads failed"
+        )
+
+    return created_documents
+
+
+@router.get(
+    "/{collection_id}/table",
+    response_model=PaginatedDocumentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_documents_table(
+    collection_id: str,
+    page: int = 1,
+    per_page: int = 10,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Get all documents in a collection with pagination for table display."""
     try:
-        document_data = DocumentCreateRequest(
-            user_id=current_user.id,
-            file_id=file_response.id,
-            title=title,
-            description=description,
-            summary=summary,
+        return document_service.get_documents_by_collection_paginated(
+            collection_id=collection_id, page=page, per_page=per_page
         )
-        document = document_service.create_document(document_data)
-        return document
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 @router.delete(

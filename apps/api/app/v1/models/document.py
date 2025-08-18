@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event, Enum, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,12 +12,20 @@ from .user import User
 from .file import File
 from pgvector.sqlalchemy import Vector
 
+if TYPE_CHECKING:
+    from .collection import Collection
+
 
 class Document(Base):
     __tablename__ = "document"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    collection_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("collection.id", ondelete="CASCADE"),
+        nullable=True,
     )
     user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="SET NULL"), nullable=True
@@ -35,6 +43,9 @@ class Document(Base):
     knowledge_graph: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="documents")
+    collection: Mapped[Optional["Collection"]] = relationship(
+        "Collection", back_populates="documents"
+    )
     file: Mapped["File"] = relationship("File", back_populates="documents")
     audits: Mapped[list["DocumentAudit"]] = relationship(
         "DocumentAudit", back_populates="document", passive_deletes=True

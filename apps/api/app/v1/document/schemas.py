@@ -1,5 +1,5 @@
 # All imports at the top, no duplicates
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -27,6 +27,9 @@ class DocumentCreateRequest(BaseModel):
     user_id: Optional[UUID] = Field(
         None, description="ID of the user who owns the document"
     )
+    collection_id: Optional[UUID] = Field(
+        None, description="ID of the collection that contains the document"
+    )
     file_id: UUID = Field(
         ..., description="ID of the file associated with the document"
     )
@@ -37,6 +40,7 @@ class DocumentCreateRequest(BaseModel):
 
 class DocumentResponse(BaseModel):
     id: UUID
+    collection_id: Optional[UUID] = None
     user: Optional[UserInfoSchema] = None
     file: Optional[FileResponse] = None
     title: Optional[str]
@@ -45,6 +49,17 @@ class DocumentResponse(BaseModel):
     is_vectorized: bool
     is_graph_extracted: bool
     knowledge_graph: Optional[KnowledgeGraph]
+
+    class Config:
+        from_attributes = True
+
+
+class PaginatedDocumentResponse(BaseModel):
+    documents: List[DocumentResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
 
     class Config:
         from_attributes = True

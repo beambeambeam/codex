@@ -35,6 +35,9 @@ class CollectionResponse(BaseModel):
     latest_update: Optional[datetime] = Field(
         None, description="Latest update timestamp"
     )
+    document_count: int = Field(
+        default=0, description="Number of documents in the collection"
+    )
 
     class Config:
         from_attributes = True

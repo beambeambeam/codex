@@ -340,7 +340,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/documents/upload": {
+  "/api/v1/documents/uploads": {
     parameters: {
       query?: never;
       header?: never;
@@ -350,10 +350,30 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Upload And Create Document
-     * @description Upload a file and create a document in one step.
+     * Bulk Upload Documents
+     * @description Bulk upload multiple files to the same collection. Each file can have its own title and description.
      */
-    post: operations["upload_and_create_document_api_v1_documents_upload_post"];
+    post: operations["bulk_upload_documents_api_v1_documents_uploads_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/{collection_id}/table": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Documents Table
+     * @description Get all documents in a collection with pagination for table display.
+     */
+    get: operations["get_documents_table_api_v1_documents__collection_id__table_get"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -396,13 +416,25 @@ export interface components {
        */
       logged_in: boolean;
     };
-    /** Body_upload_and_create_document_api_v1_documents_upload_post */
-    Body_upload_and_create_document_api_v1_documents_upload_post: {
+    /** Body_bulk_upload_documents_api_v1_documents_uploads_post */
+    Body_bulk_upload_documents_api_v1_documents_uploads_post: {
+      /** Files */
+      files: File[];
       /**
-       * File
-       * Format: binary
+       * Titles
+       * @default []
        */
-      file: File;
+      titles: string[];
+      /**
+       * Descriptions
+       * @default []
+       */
+      descriptions: string[];
+      /**
+       * Collection Id
+       * Format: uuid
+       */
+      collection_id?: string;
     };
     /** Body_upload_file_api_v1_storage_upload_post */
     Body_upload_file_api_v1_storage_upload_post: {
@@ -518,6 +550,12 @@ export interface components {
        * @description Latest update timestamp
        */
       latest_update?: string | null;
+      /**
+       * Document Count
+       * @description Number of documents in the collection
+       * @default 0
+       */
+      document_count: number;
     };
     /** CommonResponse[AuthStatusResponse] */
     CommonResponse_AuthStatusResponse_: {
@@ -575,6 +613,8 @@ export interface components {
        * Format: uuid
        */
       id: string;
+      /** Collection Id */
+      collection_id?: string | null;
       user?: components["schemas"]["UserInfoSchema"] | null;
       file?: components["schemas"]["FileResponse"] | null;
       /** Title */
@@ -651,6 +691,19 @@ export interface components {
       /** Id */
       id: string;
       data: components["schemas"]["NodeDataSchema"];
+    };
+    /** PaginatedDocumentResponse */
+    PaginatedDocumentResponse: {
+      /** Documents */
+      documents: components["schemas"]["DocumentResponse"][];
+      /** Total */
+      total: number;
+      /** Page */
+      page: number;
+      /** Per Page */
+      per_page: number;
+      /** Total Pages */
+      total_pages: number;
     };
     /**
      * UserEditRequest
@@ -1436,20 +1489,16 @@ export interface operations {
       };
     };
   };
-  upload_and_create_document_api_v1_documents_upload_post: {
+  bulk_upload_documents_api_v1_documents_uploads_post: {
     parameters: {
-      query?: {
-        title?: string | null;
-        description?: string | null;
-        summary?: string | null;
-      };
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody: {
       content: {
-        "multipart/form-data": components["schemas"]["Body_upload_and_create_document_api_v1_documents_upload_post"];
+        "multipart/form-data": components["schemas"]["Body_bulk_upload_documents_api_v1_documents_uploads_post"];
       };
     };
     responses: {
@@ -1459,7 +1508,41 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["DocumentResponse"];
+          "application/json": components["schemas"]["DocumentResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_documents_table_api_v1_documents__collection_id__table_get: {
+    parameters: {
+      query?: {
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedDocumentResponse"];
         };
       };
       /** @description Validation Error */

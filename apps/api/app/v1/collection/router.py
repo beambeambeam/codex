@@ -153,9 +153,7 @@ def delete_collection(
 ):
     """Delete a collection by ID."""
 
-    deleted = collection_service.delete_collection(
-        collection_id, user_id=str(current_user.id)
-    )
+    deleted = collection_service.delete_collection(collection_id)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"

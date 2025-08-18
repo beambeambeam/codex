@@ -3,7 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from ..models.document import Document
 from ..models.file import File
 from ..models.user import User
-from .schemas import DocumentCreateRequest, DocumentResponse
+from ..models.collection import Collection
+from .schemas import DocumentCreateRequest, DocumentResponse, PaginatedDocumentResponse
 from ..models.document import DocumentAudit
 from ..storage.service import StorageService
 from ..models.enum import DocumentActionEnum
@@ -13,6 +14,8 @@ from typing import Optional, List
 from uuid import UUID
 import uuid
 from ..user.schemas import UserInfoSchema
+from ..schemas.graph import KnowledgeGraph
+import math
 
 
 class DocumentService:
@@ -37,6 +40,46 @@ class DocumentService:
             return None
         return StorageService(self.db)._file_to_response(file)
 
+    def _document_to_response(self, document: Document) -> DocumentResponse:
+        """Convert a Document model instance to a DocumentResponse schema."""
+
+        user_info = self._user_to_user_info(document.user) if document.user else None
+        file_response = self._file_to_file_response(document.file)
+
+        kg = None
+        if getattr(document, "knowledge_graph", None):
+            if isinstance(document.knowledge_graph, dict):
+                if (
+                    "nodes" in document.knowledge_graph
+                    and "edges" in document.knowledge_graph
+                ):
+                    try:
+                        if hasattr(KnowledgeGraph, "model_validate"):
+                            kg = KnowledgeGraph.model_validate(document.knowledge_graph)
+                        else:
+                            kg = KnowledgeGraph.parse_obj(document.knowledge_graph)
+                    except Exception:
+                        kg = None
+                else:
+                    kg = None
+            elif isinstance(document.knowledge_graph, KnowledgeGraph):
+                kg = document.knowledge_graph
+            else:
+                kg = None
+
+        return DocumentResponse(
+            id=document.id,
+            collection_id=document.collection_id,
+            user=user_info,
+            file=file_response,
+            title=document.title,
+            description=document.description,
+            summary=document.summary,
+            is_vectorized=document.is_vectorized,
+            is_graph_extracted=document.is_graph_extracted,
+            knowledge_graph=kg,
+        )
+
     def create_document(
         self, document_create: DocumentCreateRequest
     ) -> DocumentResponse:
@@ -54,6 +97,17 @@ class DocumentService:
             )
             if not user_exists:
                 raise ValueError(f"User with id {document_create.user_id} not found")
+
+        if hasattr(document_create, "collection_id") and document_create.collection_id:
+            collection_exists = (
+                self.db.query(Collection)
+                .filter(Collection.id == document_create.collection_id)
+                .first()
+            )
+            if not collection_exists:
+                raise ValueError(
+                    f"Collection with id {document_create.collection_id} not found"
+                )
 
         try:
             doc_data = document_create.model_dump(exclude_unset=True)
@@ -75,28 +129,16 @@ class DocumentService:
 
             document = (
                 self.db.query(Document)
-                .options(joinedload(Document.user), joinedload(Document.file))
+                .options(
+                    joinedload(Document.user),
+                    joinedload(Document.file),
+                    joinedload(Document.collection),
+                )
                 .filter(Document.id == document.id)
                 .first()
             )
 
-            user_info = (
-                self._user_to_user_info(document.user) if document.user else None
-            )
-
-            file_response = self._file_to_file_response(document.file)
-
-            return DocumentResponse(
-                id=document.id,
-                user=user_info,
-                file=file_response,
-                title=document.title,
-                description=document.description,
-                summary=document.summary,
-                is_vectorized=document.is_vectorized,
-                is_graph_extracted=document.is_graph_extracted,
-                knowledge_graph=document.knowledge_graph,
-            )
+            return self._document_to_response(document)
 
         except IntegrityError as e:
             self.db.rollback()
@@ -132,7 +174,11 @@ class DocumentService:
         """Retrieve a document by ID and return response schema with user display and file info."""
         document = (
             self.db.query(Document)
-            .options(joinedload(Document.user), joinedload(Document.file))
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
             .filter(Document.id == document_id)
             .first()
         )
@@ -144,6 +190,7 @@ class DocumentService:
 
         return DocumentResponse(
             id=document.id,
+            collection_id=document.collection_id,
             user=user_info,
             file=file_response,
             title=document.title,
@@ -153,6 +200,156 @@ class DocumentService:
             is_graph_extracted=document.is_graph_extracted,
             knowledge_graph=document.knowledge_graph,
         )
+
+    def get_documents_by_collection(self, collection_id: str) -> List[DocumentResponse]:
+        """Retrieve all documents for a specific collection."""
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id == collection_id)
+            .all()
+        )
+
+        result = []
+        for document in documents:
+            result.append(self._document_to_response(document))
+
+        return result
+
+    def get_documents_by_collection_paginated(
+        self, collection_id: str, page: int = 1, per_page: int = 10
+    ) -> PaginatedDocumentResponse:
+        """Retrieve documents for a specific collection with pagination support."""
+
+        # Validate page and per_page parameters
+        page = max(1, page)
+        per_page = max(1, min(per_page, 100))  # Limit max per_page to 100
+        offset = (page - 1) * per_page
+
+        # Verify collection exists
+        collection_exists = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection_exists:
+            raise ValueError(f"Collection with id {collection_id} not found")
+
+        # Get total count for pagination metadata
+        total_count = (
+            self.db.query(Document)
+            .filter(Document.collection_id == collection_id)
+            .count()
+        )
+
+        # Get paginated documents
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id == collection_id)
+            .order_by(Document.title.asc())  # Default ordering by title
+            .limit(per_page)
+            .offset(offset)
+            .all()
+        )
+
+        # Convert to response schemas
+        document_responses = []
+        for document in documents:
+            document_responses.append(self._document_to_response(document))
+
+        # Calculate total pages
+        total_pages = math.ceil(total_count / per_page) if total_count > 0 else 0
+
+        return PaginatedDocumentResponse(
+            documents=document_responses,
+            total=total_count,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages,
+        )
+
+    def update_document_collection(
+        self,
+        document_id: str,
+        collection_id: Optional[str],
+        user_id: Optional[str] = None,
+    ) -> DocumentResponse:
+        """Update the collection assignment for a document."""
+        document = self.db.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
+
+        # Validate collection exists if collection_id is provided
+        if collection_id:
+            collection_exists = (
+                self.db.query(Collection).filter(Collection.id == collection_id).first()
+            )
+            if not collection_exists:
+                raise ValueError(f"Collection with id {collection_id} not found")
+
+        # Prepare old values for audit
+        old_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Update the collection
+        document.collection_id = collection_id
+
+        # Prepare new values for audit
+        new_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Audit the update
+        self.audit.create_audit(
+            document_id=str(document_id),
+            action=DocumentActionEnum.UPDATE,
+            user_id=str(user_id) if user_id else None,
+            old_values=old_values,
+            new_values=new_values,
+        )
+
+        self.db.commit()
+
+        return self.get_document(document_id)
+
+    def remove_from_collection(
+        self, document_id: str, user_id: Optional[str] = None
+    ) -> DocumentResponse:
+        """Remove a document from its collection (set collection_id to None)."""
+        return self.update_document_collection(document_id, None, user_id)
+
+    def move_to_collection(
+        self, document_id: str, collection_id: str, user_id: Optional[str] = None
+    ) -> DocumentResponse:
+        """Move a document to a different collection."""
+        return self.update_document_collection(document_id, collection_id, user_id)
+
+    def get_documents_without_collection(self) -> List[DocumentResponse]:
+        """Retrieve all documents that are not assigned to any collection."""
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id.is_(None))
+            .all()
+        )
+
+        result = []
+        for document in documents:
+            result.append(self._document_to_response(document))
+
+        return result
 
 
 class DocumentAuditService:
