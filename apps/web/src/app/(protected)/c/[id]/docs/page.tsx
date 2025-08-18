@@ -1,5 +1,6 @@
 import { BookMarkedIcon, FolderUpIcon, Table2Icon } from "lucide-react";
 
+import DocumentTable from "@/app/(protected)/c/[id]/docs/table";
 import DocumentUploadForm from "@/app/(protected)/c/[id]/docs/upload/form";
 
 function DocsPage() {
@@ -34,6 +35,7 @@ function DocsPage() {
           Here is your documents table. View, sort, and manage your files with
           ease.
         </p>
+        <DocumentTable />
       </div>
     </section>
   );
