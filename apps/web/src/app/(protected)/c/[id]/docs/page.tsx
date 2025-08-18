@@ -1,5 +1,7 @@
 import { BookMarkedIcon, FolderUpIcon, Table2Icon } from "lucide-react";
 
+import DocumentUploadForm from "@/app/(protected)/c/[id]/docs/upload/form";
+
 function DocsPage() {
   return (
     <section className="flex h-full flex-col gap-3 border-t-2 p-4">
@@ -21,6 +23,7 @@ function DocsPage() {
           Ready to unleash your docs? Drag, drop, and let the magic happend.
           begin!
         </p>
+        <DocumentUploadForm />
       </div>
       <div className="flex flex-col gap-1">
         <h1 className="inline-flex items-center gap-0.5 text-xl font-bold">
