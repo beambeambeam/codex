@@ -521,6 +521,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       store,
       isControlled,
@@ -1092,6 +1093,7 @@ function FileUploadItemPreview(props: FileUploadItemPreviewProps) {
         }
 
         return (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt={file.name} className="size-full object-cover" />
         );
       }
