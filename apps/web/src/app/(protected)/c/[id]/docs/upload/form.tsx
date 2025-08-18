@@ -51,6 +51,7 @@ function DocumentUploadForm() {
                   description: string;
                 }[]
               }
+              onValueChange={(e) => field.handleChange(e)}
             />
           )}
         </form.AppField>
