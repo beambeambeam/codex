@@ -22,4 +22,30 @@ export const documentColumns = [
     },
     enableColumnFilter: true,
   }),
+  columnHelper.accessor("title", {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Title" />
+    ),
+    cell: (info) => info.getValue() ?? "",
+    meta: {
+      label: "Title",
+      placeholder: "Search titles...",
+      variant: "text",
+      icon: Text,
+    },
+    enableColumnFilter: true,
+  }),
+  columnHelper.accessor("description", {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+    cell: (info) => info.getValue() ?? "",
+    meta: {
+      label: "Description",
+      placeholder: "Search descriptions...",
+      variant: "text",
+      icon: Text,
+    },
+    enableColumnFilter: true,
+  }),
 ];
