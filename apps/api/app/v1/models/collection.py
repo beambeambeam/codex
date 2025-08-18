@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import TIMESTAMP, ForeignKey, Text, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,6 +9,9 @@ from .base import Base
 from .user import User
 from .enum import CollectionActionEnum, CollectionPermissionEnum
 import uuid
+
+if TYPE_CHECKING:
+    from .document import Document
 
 
 class Collection(Base):
@@ -20,6 +23,10 @@ class Collection(Base):
     title: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    documents: Mapped[list["Document"]] = relationship(
+        "Document", back_populates="collection", cascade="all, delete-orphan"
+    )
 
 
 class CollectionAudit(Base):
