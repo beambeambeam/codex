@@ -7,6 +7,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 
+import { useRemoveDocuments } from "@/app/(protected)/c/[id]/docs/_lib/use-remove-documents";
 import { DocumentsType } from "@/app/(protected)/c/[id]/docs/table/columns";
 import {
   AlertDialog,
@@ -33,6 +34,12 @@ interface DocumentAcionsProps {
 }
 
 function DocumentAcions(props: DocumentAcionsProps) {
+  const { removeDocument, isPending } = useRemoveDocuments();
+
+  const handleDelete = () => {
+    removeDocument(props.row.original.id);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -52,9 +59,10 @@ function DocumentAcions(props: DocumentAcionsProps) {
             <DropdownMenuItem
               variant="destructive"
               onSelect={(e) => e.preventDefault()}
+              disabled={isPending}
             >
               <TrashIcon />
-              Delete
+              {isPending ? "Deleting..." : "Delete"}
             </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -67,7 +75,9 @@ function DocumentAcions(props: DocumentAcionsProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
+              <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+                {isPending ? "Deleting..." : "Continue"}
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
