@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from typing import Optional, List
 from uuid import UUID
+from pydantic import BaseModel
 
 
 from .schemas import DocumentCreateRequest, DocumentResponse
@@ -15,48 +16,91 @@ from ..models import FileResouceEnum
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
+class DocumentUploadItem(BaseModel):
+    file: UploadFile = File(...)
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
 @router.post(
-    "/upload",
-    response_model=DocumentResponse,
+    "/uploads",
+    response_model=List[DocumentResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def upload_and_create_document(
-    file: UploadFile = File(...),
-    title: Optional[str] = None,
-    description: Optional[str] = None,
-    summary: Optional[str] = None,
-    collection_id: Optional[str] = None,
+async def bulk_upload_documents(
+    items: List[DocumentUploadItem] = Form(..., media_type="multipart/form-data"),
+    collection_id: Optional[str] = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
 ):
-    """Upload a file and create a document in one step. Optionally assign to a collection."""
-    if not file.filename:
+    """Bulk upload multiple files to the same collection. Each file can have its own title and description."""
+    if not items:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No items provided"
         )
 
-    # Upload file to storage
-    file_response = await storage_service.upload_file_to_storage(
-        file=file, user_id=current_user.id, resource=FileResouceEnum.DOCUMENT
-    )
+    # Validate collection exists if provided
+    collection_uuid = None
+    if collection_id:
+        try:
+            collection_uuid = UUID(collection_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid collection ID format",
+            )
 
-    try:
-        # Convert collection_id string to UUID if provided
-        collection_uuid = UUID(collection_id) if collection_id else None
+    created_documents = []
+    failed_uploads = []
 
-        document_data = DocumentCreateRequest(
-            user_id=current_user.id,
-            collection_id=collection_uuid,
-            file_id=file_response.id,
-            title=title,
-            description=description,
-            summary=summary,
+    for i, item in enumerate(items):
+        try:
+            if not item.file.filename:
+                failed_uploads.append(
+                    {"index": i, "filename": "unknown", "error": "No filename provided"}
+                )
+                continue
+
+            # Upload file to storage
+            file_response = await storage_service.upload_file_to_storage(
+                file=item.file,
+                user_id=current_user.id,
+                resource=FileResouceEnum.DOCUMENT,
+            )
+
+            # Use provided title or filename as fallback
+            title = item.title if item.title else item.file.filename
+            description = item.description
+
+            # Create document with individual title and description
+            document_data = DocumentCreateRequest(
+                user_id=current_user.id,
+                collection_id=collection_uuid,
+                file_id=file_response.id,
+                title=title,
+                description=description,
+                summary=None,
+            )
+
+            document = document_service.create_document(document_data)
+            created_documents.append(document)
+
+        except Exception as e:
+            failed_uploads.append(
+                {
+                    "index": i,
+                    "filename": item.file.filename or "unknown",
+                    "error": str(e),
+                }
+            )
+
+    if not created_documents:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="All file uploads failed"
         )
-        document = document_service.create_document(document_data)
-        return document
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return created_documents
 
 
 @router.delete(
