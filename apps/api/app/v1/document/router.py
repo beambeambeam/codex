@@ -1,4 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+    Form,
+    Request,
+)
 from typing import List
 from uuid import UUID
 
@@ -21,9 +30,8 @@ router = APIRouter(prefix="/documents", tags=["documents"])
     status_code=status.HTTP_201_CREATED,
 )
 async def bulk_upload_documents(
+    request: Request,
     files: List[UploadFile] = File(...),
-    titles: List[str] = Form([]),
-    descriptions: List[str] = Form([]),
     collection_id: UUID = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
@@ -34,6 +42,25 @@ async def bulk_upload_documents(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided"
         )
+
+    # Parse form data to get titles and descriptions
+    form_data = await request.form()
+
+    # Extract titles and descriptions from indexed form fields
+    titles = []
+    descriptions = []
+
+    # Get all title fields (titles.0, titles.1, etc.)
+    i = 0
+    while f"titles.{i}" in form_data:
+        titles.append(form_data[f"titles.{i}"])
+        i += 1
+
+    # Get all description fields (descriptions.0, descriptions.1, etc.)
+    i = 0
+    while f"descriptions.{i}" in form_data:
+        descriptions.append(form_data[f"descriptions.{i}"])
+        i += 1
 
     created_documents = []
     failed_uploads = []
