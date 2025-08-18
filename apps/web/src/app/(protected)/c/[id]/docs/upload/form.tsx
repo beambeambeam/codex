@@ -11,6 +11,7 @@ import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { JsonToFormData } from "@/lib/api/body-serializer";
 import { useQueryFetchClient } from "@/lib/api/client";
+import { cacheUtils } from "@/lib/query/cache";
 import { parseErrorDetail } from "@/lib/utils";
 
 const MIN_FILES = 1;
@@ -68,6 +69,10 @@ function DocumentUploadForm() {
         form.reset({
           files: [],
         });
+        cacheUtils.invalidateQueries([
+          "get",
+          "/api/v1/documents/{collection_id}/table",
+        ]);
       },
       onError: (error: unknown) => {
         toast.error(
