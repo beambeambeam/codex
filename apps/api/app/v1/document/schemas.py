@@ -1,5 +1,5 @@
 # All imports at the top, no duplicates
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -49,6 +49,17 @@ class DocumentResponse(BaseModel):
     is_vectorized: bool
     is_graph_extracted: bool
     knowledge_graph: Optional[KnowledgeGraph]
+
+    class Config:
+        from_attributes = True
+
+
+class PaginatedDocumentResponse(BaseModel):
+    documents: List[DocumentResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
 
     class Config:
         from_attributes = True

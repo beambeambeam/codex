@@ -4,7 +4,7 @@ from ..models.document import Document
 from ..models.file import File
 from ..models.user import User
 from ..models.collection import Collection
-from .schemas import DocumentCreateRequest, DocumentResponse
+from .schemas import DocumentCreateRequest, DocumentResponse, PaginatedDocumentResponse
 from ..models.document import DocumentAudit
 from ..storage.service import StorageService
 from ..models.enum import DocumentActionEnum
@@ -213,6 +213,80 @@ class DocumentService:
             )
 
         return result
+
+    def get_documents_by_collection_paginated(
+        self, collection_id: str, page: int = 1, per_page: int = 10
+    ) -> PaginatedDocumentResponse:
+        """Retrieve documents for a specific collection with pagination support."""
+        import math
+
+        # Validate page and per_page parameters
+        page = max(1, page)
+        per_page = max(1, min(per_page, 100))  # Limit max per_page to 100
+        offset = (page - 1) * per_page
+
+        # Verify collection exists
+        collection_exists = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection_exists:
+            raise ValueError(f"Collection with id {collection_id} not found")
+
+        # Get total count for pagination metadata
+        total_count = (
+            self.db.query(Document)
+            .filter(Document.collection_id == collection_id)
+            .count()
+        )
+
+        # Get paginated documents
+        documents = (
+            self.db.query(Document)
+            .options(
+                joinedload(Document.user),
+                joinedload(Document.file),
+                joinedload(Document.collection),
+            )
+            .filter(Document.collection_id == collection_id)
+            .order_by(Document.title.asc())  # Default ordering by title
+            .limit(per_page)
+            .offset(offset)
+            .all()
+        )
+
+        # Convert to response schemas
+        document_responses = []
+        for document in documents:
+            user_info = (
+                self._user_to_user_info(document.user) if document.user else None
+            )
+            file_response = self._file_to_file_response(document.file)
+
+            document_responses.append(
+                DocumentResponse(
+                    id=document.id,
+                    collection_id=document.collection_id,
+                    user=user_info,
+                    file=file_response,
+                    title=document.title,
+                    description=document.description,
+                    summary=document.summary,
+                    is_vectorized=document.is_vectorized,
+                    is_graph_extracted=document.is_graph_extracted,
+                    knowledge_graph=document.knowledge_graph,
+                )
+            )
+
+        # Calculate total pages
+        total_pages = math.ceil(total_count / per_page) if total_count > 0 else 0
+
+        return PaginatedDocumentResponse(
+            documents=document_responses,
+            total=total_count,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages,
+        )
 
     def update_document_collection(
         self,

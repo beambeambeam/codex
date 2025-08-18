@@ -3,7 +3,7 @@ from typing import Optional, List
 from uuid import UUID
 
 
-from .schemas import DocumentCreateRequest, DocumentResponse
+from .schemas import DocumentCreateRequest, DocumentResponse, PaginatedDocumentResponse
 from .service import DocumentService
 from .dependencies import get_document_service
 from ..user.dependencies import get_current_user
@@ -98,6 +98,27 @@ async def bulk_upload_documents(
         )
 
     return created_documents
+
+
+@router.get(
+    "/{collection_id}/table",
+    response_model=PaginatedDocumentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_documents_table(
+    collection_id: str,
+    page: int = 1,
+    per_page: int = 10,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Get all documents in a collection with pagination for table display."""
+    try:
+        return document_service.get_documents_by_collection_paginated(
+            collection_id=collection_id, page=page, per_page=per_page
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 @router.delete(
