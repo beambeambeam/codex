@@ -116,7 +116,7 @@ class CollectionService:
             self.audit.create_audit(
                 collection_id=collection_id,
                 action=CollectionActionEnum.DELETE,
-                user_id=None,  # Could be passed as parameter if needed
+                user_id=None,
             )
 
             # Clean up audit records for collection permissions

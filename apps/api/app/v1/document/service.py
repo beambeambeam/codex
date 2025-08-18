@@ -14,6 +14,8 @@ from typing import Optional, List
 from uuid import UUID
 import uuid
 from ..user.schemas import UserInfoSchema
+from ..schemas.graph import KnowledgeGraph
+import math
 
 
 class DocumentService:
@@ -37,6 +39,46 @@ class DocumentService:
         if not file:
             return None
         return StorageService(self.db)._file_to_response(file)
+
+    def _document_to_response(self, document: Document) -> DocumentResponse:
+        """Convert a Document model instance to a DocumentResponse schema."""
+
+        user_info = self._user_to_user_info(document.user) if document.user else None
+        file_response = self._file_to_file_response(document.file)
+
+        kg = None
+        if getattr(document, "knowledge_graph", None):
+            if isinstance(document.knowledge_graph, dict):
+                if (
+                    "nodes" in document.knowledge_graph
+                    and "edges" in document.knowledge_graph
+                ):
+                    try:
+                        if hasattr(KnowledgeGraph, "model_validate"):
+                            kg = KnowledgeGraph.model_validate(document.knowledge_graph)
+                        else:
+                            kg = KnowledgeGraph.parse_obj(document.knowledge_graph)
+                    except Exception:
+                        kg = None
+                else:
+                    kg = None
+            elif isinstance(document.knowledge_graph, KnowledgeGraph):
+                kg = document.knowledge_graph
+            else:
+                kg = None
+
+        return DocumentResponse(
+            id=document.id,
+            collection_id=document.collection_id,
+            user=user_info,
+            file=file_response,
+            title=document.title,
+            description=document.description,
+            summary=document.summary,
+            is_vectorized=document.is_vectorized,
+            is_graph_extracted=document.is_graph_extracted,
+            knowledge_graph=kg,
+        )
 
     def create_document(
         self, document_create: DocumentCreateRequest
@@ -96,24 +138,7 @@ class DocumentService:
                 .first()
             )
 
-            user_info = (
-                self._user_to_user_info(document.user) if document.user else None
-            )
-
-            file_response = self._file_to_file_response(document.file)
-
-            return DocumentResponse(
-                id=document.id,
-                collection_id=document.collection_id,
-                user=user_info,
-                file=file_response,
-                title=document.title,
-                description=document.description,
-                summary=document.summary,
-                is_vectorized=document.is_vectorized,
-                is_graph_extracted=document.is_graph_extracted,
-                knowledge_graph=document.knowledge_graph,
-            )
+            return self._document_to_response(document)
 
         except IntegrityError as e:
             self.db.rollback()
@@ -191,25 +216,7 @@ class DocumentService:
 
         result = []
         for document in documents:
-            user_info = (
-                self._user_to_user_info(document.user) if document.user else None
-            )
-            file_response = self._file_to_file_response(document.file)
-
-            result.append(
-                DocumentResponse(
-                    id=document.id,
-                    collection_id=document.collection_id,
-                    user=user_info,
-                    file=file_response,
-                    title=document.title,
-                    description=document.description,
-                    summary=document.summary,
-                    is_vectorized=document.is_vectorized,
-                    is_graph_extracted=document.is_graph_extracted,
-                    knowledge_graph=document.knowledge_graph,
-                )
-            )
+            result.append(self._document_to_response(document))
 
         return result
 
@@ -217,7 +224,6 @@ class DocumentService:
         self, collection_id: str, page: int = 1, per_page: int = 10
     ) -> PaginatedDocumentResponse:
         """Retrieve documents for a specific collection with pagination support."""
-        import math
 
         # Validate page and per_page parameters
         page = max(1, page)
@@ -256,25 +262,7 @@ class DocumentService:
         # Convert to response schemas
         document_responses = []
         for document in documents:
-            user_info = (
-                self._user_to_user_info(document.user) if document.user else None
-            )
-            file_response = self._file_to_file_response(document.file)
-
-            document_responses.append(
-                DocumentResponse(
-                    id=document.id,
-                    collection_id=document.collection_id,
-                    user=user_info,
-                    file=file_response,
-                    title=document.title,
-                    description=document.description,
-                    summary=document.summary,
-                    is_vectorized=document.is_vectorized,
-                    is_graph_extracted=document.is_graph_extracted,
-                    knowledge_graph=document.knowledge_graph,
-                )
-            )
+            document_responses.append(self._document_to_response(document))
 
         # Calculate total pages
         total_pages = math.ceil(total_count / per_page) if total_count > 0 else 0
@@ -359,25 +347,7 @@ class DocumentService:
 
         result = []
         for document in documents:
-            user_info = (
-                self._user_to_user_info(document.user) if document.user else None
-            )
-            file_response = self._file_to_file_response(document.file)
-
-            result.append(
-                DocumentResponse(
-                    id=document.id,
-                    collection_id=document.collection_id,
-                    user=user_info,
-                    file=file_response,
-                    title=document.title,
-                    description=document.description,
-                    summary=document.summary,
-                    is_vectorized=document.is_vectorized,
-                    is_graph_extracted=document.is_graph_extracted,
-                    knowledge_graph=document.knowledge_graph,
-                )
-            )
+            result.append(self._document_to_response(document))
 
         return result
 
