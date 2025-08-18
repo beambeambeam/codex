@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useQueryState } from "nuqs";
+import { useDebouncedCallback } from "use-debounce";
 
 import { DataTableRangeFilter } from "@/components/data-table/range-filter";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getDefaultFilterOperator, getFilterOperators } from "@/lib/data-table";
 import { formatDate } from "@/lib/format";
 import { generateId } from "@/lib/id";
