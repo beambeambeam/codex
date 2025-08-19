@@ -6,7 +6,6 @@ from fastapi import (
     UploadFile,
     File,
     Form,
-    Request,
 )
 from typing import List
 from uuid import UUID
@@ -35,37 +34,17 @@ router = APIRouter(prefix="/documents", tags=["documents"])
     status_code=status.HTTP_201_CREATED,
 )
 async def bulk_upload_documents(
-    request: Request,
     files: List[UploadFile] = File(...),
     collection_id: UUID = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
     document_service: DocumentService = Depends(get_document_service),
 ):
-    """Bulk upload multiple files to the same collection. Each file can have its own title and description."""
+    """Bulk upload multiple files to the same collection."""
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided"
         )
-
-    # Parse form data to get titles and descriptions
-    form_data = await request.form()
-
-    # Extract titles and descriptions from indexed form fields
-    titles = []
-    descriptions = []
-
-    # Get all title fields (titles.0, titles.1, etc.)
-    i = 0
-    while f"titles.{i}" in form_data:
-        titles.append(form_data[f"titles.{i}"])
-        i += 1
-
-    # Get all description fields (descriptions.0, descriptions.1, etc.)
-    i = 0
-    while f"descriptions.{i}" in form_data:
-        descriptions.append(form_data[f"descriptions.{i}"])
-        i += 1
 
     created_documents = []
     failed_uploads = []
@@ -85,17 +64,12 @@ async def bulk_upload_documents(
                 resource=FileResouceEnum.DOCUMENT,
             )
 
-            title = titles[i] if i < len(titles) and titles[i] else None
-            description = (
-                descriptions[i] if i < len(descriptions) and descriptions[i] else None
-            )
-
             document_data = DocumentCreateRequest(
                 user_id=current_user.id,
                 collection_id=collection_id,
                 file_id=file_response.id,
-                title=title,
-                description=description,
+                title=None,
+                description=None,
                 summary=None,
             )
 
