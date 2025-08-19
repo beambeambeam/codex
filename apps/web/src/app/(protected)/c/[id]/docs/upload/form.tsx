@@ -21,8 +21,6 @@ const documentUploadSchema = z.object({
   files: z
     .object({
       file: z.instanceof(File),
-      title: z.string(),
-      description: z.string(),
     })
     .array()
     .min(MIN_FILES, "At least 1 file for upload")
@@ -42,8 +40,6 @@ function DocumentUploadForm() {
       mutate({
         body: {
           files: value.files.map((item) => item.file),
-          titles: value.files.map((item) => item.title),
-          descriptions: value.files.map((item) => item.description),
           collection_id: params.id,
         },
         bodySerializer: JsonToFormData,
