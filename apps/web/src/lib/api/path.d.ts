@@ -404,6 +404,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/documents/{document_id}/audit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Document Audit
+     * @description Get all audit records for a document by ID.
+     */
+    get: operations["get_document_audit_api_v1_documents__document_id__audit_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -599,6 +619,40 @@ export interface components {
        * @description Profile image URL of the contributor
        */
       imgUrl?: string | null;
+    };
+    /**
+     * DocumentActionEnum
+     * @enum {string}
+     */
+    DocumentActionEnum: "CREATE" | "UPDATE" | "DELETE";
+    /** DocumentAudit */
+    DocumentAudit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Document Id
+       * Format: uuid
+       */
+      document_id: string;
+      /** User Id */
+      user_id?: string | null;
+      /** Old Values */
+      old_values?: {
+        [key: string]: unknown;
+      } | null;
+      /** New Values */
+      new_values?: {
+        [key: string]: unknown;
+      } | null;
+      action_type: components["schemas"]["DocumentActionEnum"];
+      /**
+       * Timestamp
+       * Format: date-time
+       */
+      timestamp: string;
     };
     /** DocumentResponse */
     DocumentResponse: {
@@ -1598,6 +1652,37 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_document_audit_api_v1_documents__document_id__audit_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentAudit"][];
+        };
       };
       /** @description Validation Error */
       422: {

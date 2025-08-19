@@ -8,6 +8,7 @@ import {
   InfoIcon,
 } from "lucide-react";
 
+import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
@@ -130,7 +131,9 @@ function DocumentPage() {
                   type={data?.file?.type ?? ""}
                 />
               </TabsContent>
-              <TabsContent value="Audit">Audit</TabsContent>
+              <TabsContent value="Audit">
+                <DocumentAudit />
+              </TabsContent>
             </Tabs>
           </div>
         </ResizablePanel>
