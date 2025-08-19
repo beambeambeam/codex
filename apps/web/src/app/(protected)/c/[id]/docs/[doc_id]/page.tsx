@@ -11,6 +11,7 @@ import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
@@ -108,14 +109,43 @@ function DocumentPage() {
                   <CardContent>
                     <div className="flex w-full flex-col gap-4">
                       <div className="flex flex-col gap-2">
-                        <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
+                          Title
+                          <Button
+                            className="w-fit text-xs"
+                            size="sm"
+                            variant="outline"
+                          >
+                            Generate New Title
+                          </Button>
+                        </h2>
+                        <p className="text-md font-sans">
+                          {data?.title ?? "Untitled Document"}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
                           Description
+                          <Button
+                            className="w-fit text-xs"
+                            size="sm"
+                            variant="outline"
+                          >
+                            Generate New Description
+                          </Button>
                         </h2>
                         <p className="text-md font-sans">{data?.description}</p>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
                           Summary
+                          <Button
+                            className="w-fit text-xs"
+                            size="sm"
+                            variant="outline"
+                          >
+                            Generate New Summary
+                          </Button>
                         </h2>
                         <p className="text-md font-sans">
                           {data?.summary ?? "No summary yet!"}
