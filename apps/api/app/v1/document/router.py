@@ -135,6 +135,23 @@ async def get_documents_table(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
+@router.get(
+    "/{document_id}",
+    response_model=DocumentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_document(
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Get a document by ID."""
+    try:
+        return document_service.get_document(document_id=document_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
 @router.delete(
     "/{document_id}",
     status_code=status.HTTP_204_NO_CONTENT,
