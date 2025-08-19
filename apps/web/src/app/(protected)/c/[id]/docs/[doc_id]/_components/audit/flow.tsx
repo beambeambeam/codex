@@ -2,6 +2,7 @@
 
 import { Background, ReactFlow } from "@xyflow/react";
 
+import { DocumentAuditNode } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit/node";
 import { useGraphState } from "@/hooks/use-graph";
 
 function DocumentAuditFlow() {
@@ -16,6 +17,7 @@ function DocumentAuditFlow() {
           type: "straight",
         }}
         fitView
+        nodeTypes={{ documentAuditNode: DocumentAuditNode }}
       >
         <Background />
       </ReactFlow>

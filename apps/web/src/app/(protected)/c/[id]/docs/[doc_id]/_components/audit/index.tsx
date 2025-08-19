@@ -44,6 +44,7 @@ function DocumentAudit() {
               id: item.id ?? `node-${idx}`,
               position: { x: 0, y: idx * 100 },
               data: item,
+              type: "documentAuditNode",
             }))
           : []
       }
