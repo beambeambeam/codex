@@ -351,7 +351,7 @@ export interface paths {
     put?: never;
     /**
      * Bulk Upload Documents
-     * @description Bulk upload multiple files to the same collection. Each file can have its own title and description.
+     * @description Bulk upload multiple files to the same collection.
      */
     post: operations["bulk_upload_documents_api_v1_documents_uploads_post"];
     delete?: never;
