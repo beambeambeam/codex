@@ -1,4 +1,7 @@
 import Image from "next/image";
+import { BookXIcon } from "lucide-react";
+
+import { TextBlinkLoader } from "@/components/ui/loader";
 
 interface FilePreviewProps {
   file: File | string;
@@ -38,14 +41,24 @@ function FilePreview(props: FilePreviewProps) {
     // Fallback for unsupported file types
     if (typeof props.file === "string") {
       return (
-        <a
-          href={props.file}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline"
-        >
-          Download file
-        </a>
+        <div className="flex h-full w-full items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <BookXIcon className="size-12" />
+            <TextBlinkLoader
+              text="Unable to preview this file."
+              className="text-xl"
+            />
+
+            <a
+              href={props.file}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive underline"
+            >
+              Download file
+            </a>
+          </div>
+        </div>
       );
     }
 
