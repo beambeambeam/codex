@@ -37,23 +37,25 @@ function DocumentAudit() {
   );
 
   return (
-    <GraphStoreProvider
-      initialNodes={
-        Array.isArray(data)
-          ? data.map((item, idx) => ({
-              id: item.id ?? `node-${idx}`,
-              position: { x: 0, y: idx * 100 },
-              data: item,
-              type: "documentAuditNode",
-            }))
-          : []
-      }
-      initialEdges={[]}
-    >
-      <ReactFlowProvider>
-        <DocumentAuditFlow />
-      </ReactFlowProvider>
-    </GraphStoreProvider>
+    <div className="m-2 rounded-lg border-2">
+      <GraphStoreProvider
+        initialNodes={
+          Array.isArray(data)
+            ? data.map((item, idx) => ({
+                id: item.id ?? `node-${idx}`,
+                position: { x: 0, y: idx * 100 },
+                data: item,
+                type: "documentAuditNode",
+              }))
+            : []
+        }
+        initialEdges={[]}
+      >
+        <ReactFlowProvider>
+          <DocumentAuditFlow />
+        </ReactFlowProvider>
+      </GraphStoreProvider>
+    </div>
   );
 }
 export default DocumentAudit;

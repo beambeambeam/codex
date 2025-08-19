@@ -7,6 +7,7 @@ import {
   GitCompareArrowsIcon,
   InfoIcon,
 } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
@@ -25,6 +26,12 @@ import { mimeTypeToName } from "@/lib/utils";
 
 function DocumentPage() {
   const params = useParams<{ doc_id: string }>();
+  const [tab, setTab] = useQueryState(
+    "tab",
+    parseAsString.withDefault("in_depts"),
+  );
+
+  const onTabChange = (value: string) => setTab(value);
 
   const { data, isPending } = useQueryFetchClient.useQuery(
     "get",
@@ -77,48 +84,44 @@ function DocumentPage() {
               </div>
             </div>
             <Separator />
-            <Tabs defaultValue="In Depts">
+            <Tabs
+              defaultValue="in_depts"
+              value={tab}
+              onValueChange={onTabChange}
+            >
               <TabsList>
-                <TabsTrigger value="In Depts">
+                <TabsTrigger value="in_depts">
                   <InfoIcon />
                   In Depts
                 </TabsTrigger>
-                <TabsTrigger value="Knowledge Graph">
+                <TabsTrigger value="kg">
                   <GitCompareArrowsIcon />
-                  Knowledge Graph
+                  Knowledge
                 </TabsTrigger>
-                <TabsTrigger value="Audit">
+                <TabsTrigger value="audit">
                   <FileClockIcon />
                   Audit
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="In Depts">
+              <TabsContent value="in_depts">
                 <Card>
                   <CardContent>
-                    <TabsContent value="In Depts">
-                      <div className="flex w-full flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                          <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
-                            Description
-                          </h2>
-                          <p className="text-md font-sans">
-                            {data?.description}
-                          </p>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
-                            Summary
-                          </h2>
-                          <p className="text-md font-sans">
-                            {data?.summary ?? "No summary yet!"}
-                          </p>
-                        </div>
+                    <div className="flex w-full flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                          Description
+                        </h2>
+                        <p className="text-md font-sans">{data?.description}</p>
                       </div>
-                    </TabsContent>
-                    <TabsContent value="Knowledge Graph">
-                      Change your Knowledge Graph here.
-                    </TabsContent>
-                    <TabsContent value="Audit">Audit</TabsContent>
+                      <div className="flex flex-col gap-2">
+                        <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                          Summary
+                        </h2>
+                        <p className="text-md font-sans">
+                          {data?.summary ?? "No summary yet!"}
+                        </p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -131,7 +134,7 @@ function DocumentPage() {
                   type={data?.file?.type ?? ""}
                 />
               </TabsContent>
-              <TabsContent value="Audit">
+              <TabsContent value="audit">
                 <DocumentAudit />
               </TabsContent>
             </Tabs>
