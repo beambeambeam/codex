@@ -1,6 +1,6 @@
 "use client";
 
-import { Background, ReactFlow } from "@xyflow/react";
+import { Background, Controls, ReactFlow } from "@xyflow/react";
 
 import { DocumentAuditNode } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit/node";
 import { useGraphState } from "@/hooks/use-graph";
@@ -20,6 +20,7 @@ function DocumentAuditFlow() {
         nodeTypes={{ documentAuditNode: DocumentAuditNode }}
       >
         <Background />
+        <Controls className="text-black" />
       </ReactFlow>
     </div>
   );
