@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Pill, PillAvatar } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import { components } from "@/lib/api/path";
+import { mimeTypeToName } from "@/lib/utils";
 
 export type DocumentsType = components["schemas"]["DocumentResponse"];
 
@@ -77,6 +78,22 @@ export const documentColumns = [
     meta: {
       label: "Uploaded By",
       placeholder: "Search uploader...",
+      variant: "text",
+      icon: Text,
+    },
+    enableColumnFilter: true,
+  }),
+  columnHelper.accessor("file.type", {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="File Type" />
+    ),
+    cell: (info) =>
+      mimeTypeToName(
+        info.getValue() ?? <p className="text-muted-foreground">Unknown</p>,
+      ),
+    meta: {
+      label: "File Type",
+      placeholder: "Search file types...",
       variant: "text",
       icon: Text,
     },
