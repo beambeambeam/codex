@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
-import DocumentUploader from "@/app/(protected)/c/[id]/docs/upload/uploader";
+import DocumentUploader from "@/app/(protected)/c/[id]/docs/_components/upload/uploader";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { useAppForm } from "@/components/ui/tanstack-form";

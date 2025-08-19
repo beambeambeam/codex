@@ -1,7 +1,7 @@
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { Text } from "lucide-react";
 
-import DocumentAcions from "@/app/(protected)/c/[id]/docs/table/actions";
+import DocumentAcions from "@/app/(protected)/c/[id]/docs/_components/table/actions";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { components } from "@/lib/api/path";
 
