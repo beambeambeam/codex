@@ -13,6 +13,7 @@ import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/au
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import FilePreview from "@/components/ui/file-preview";
 import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import {
@@ -54,7 +55,10 @@ function DocumentPage() {
     <section className="flex h-full flex-col gap-3 border-t-2 p-4">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel>
-          <div>d</div>
+          <FilePreview
+            file={data?.file?.url ?? ""}
+            type={data?.file?.type ?? ""}
+          />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
