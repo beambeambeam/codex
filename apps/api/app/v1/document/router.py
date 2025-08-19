@@ -12,7 +12,12 @@ from typing import List
 from uuid import UUID
 
 
-from .schemas import DocumentCreateRequest, DocumentResponse, PaginatedDocumentResponse
+from .schemas import (
+    DocumentCreateRequest,
+    DocumentResponse,
+    PaginatedDocumentResponse,
+    DocumentAudit,
+)
 from .service import DocumentService
 from .dependencies import get_document_service
 from ..user.dependencies import get_current_user
@@ -148,6 +153,24 @@ async def get_document(
     """Get a document by ID."""
     try:
         return document_service.get_document(document_id=document_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get(
+    "/{document_id}/audit",
+    response_model=List[DocumentAudit],
+    status_code=status.HTTP_200_OK,
+)
+async def get_document_audit(
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Get all audit records for a document by ID."""
+    try:
+        document_service.get_document(document_id=document_id)
+        return document_service.audit.get_audits_for_document(document_id=document_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
