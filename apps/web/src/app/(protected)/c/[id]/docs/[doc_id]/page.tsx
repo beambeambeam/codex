@@ -125,16 +125,14 @@ function DocumentPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent
-                value="Knowledge Graph"
-                className="h-full w-full font-sans"
-              >
+              <TabsContent value="kg" className="h-full w-full font-sans">
                 <DocumentKnowledgeGraph
                   knowledge_graph={data?.knowledge_graph ?? null}
                   type={data?.file?.type ?? ""}
                 />
               </TabsContent>
               <TabsContent value="audit">
+                <p>Graph Audit</p>
                 <DocumentAudit />
               </TabsContent>
             </Tabs>
