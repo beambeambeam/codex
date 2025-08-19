@@ -1,8 +1,15 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { BookIcon } from "lucide-react";
+import {
+  BookIcon,
+  FileClockIcon,
+  GitCompareArrowsIcon,
+  InfoIcon,
+} from "lucide-react";
 
+import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
+import { Card, CardContent } from "@/components/ui/card";
 import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import {
@@ -10,13 +17,15 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { mimeTypeToName } from "@/lib/utils";
 
 function DocumentPage() {
   const params = useParams<{ doc_id: string }>();
 
-  const { data } = useQueryFetchClient.useQuery(
+  const { data, isPending } = useQueryFetchClient.useQuery(
     "get",
     "/api/v1/documents/{document_id}",
     {
@@ -28,6 +37,10 @@ function DocumentPage() {
     },
   );
 
+  if (isPending) {
+    return null;
+  }
+
   return (
     <section className="flex h-full flex-col gap-3 border-t-2 p-4">
       <ResizablePanelGroup direction="horizontal">
@@ -36,7 +49,7 @@ function DocumentPage() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <div className="flex h-full w-full flex-col px-4">
+          <div className="flex h-full w-full flex-col gap-6 px-4">
             <div className="flex flex-col gap-2">
               <h1 className="text-xl">{data?.title ?? "Untitled Document"}</h1>
               <h1 className="text-muted-foreground text-md">
@@ -62,6 +75,63 @@ function DocumentPage() {
                 </Pill>
               </div>
             </div>
+            <Separator />
+            <Tabs defaultValue="In Depts">
+              <TabsList>
+                <TabsTrigger value="In Depts">
+                  <InfoIcon />
+                  In Depts
+                </TabsTrigger>
+                <TabsTrigger value="Knowledge Graph">
+                  <GitCompareArrowsIcon />
+                  Knowledge Graph
+                </TabsTrigger>
+                <TabsTrigger value="Audit">
+                  <FileClockIcon />
+                  Audit
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="In Depts">
+                <Card>
+                  <CardContent>
+                    <TabsContent value="In Depts">
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                          <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                            Description
+                          </h2>
+                          <p className="text-md font-sans">
+                            {data?.description}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <h2 className="text-muted-foreground flex items-center gap-0.5 text-sm">
+                            Summary
+                          </h2>
+                          <p className="text-md font-sans">
+                            {data?.summary ?? "No summary yet!"}
+                          </p>
+                        </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="Knowledge Graph">
+                      Change your Knowledge Graph here.
+                    </TabsContent>
+                    <TabsContent value="Audit">Audit</TabsContent>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent
+                value="Knowledge Graph"
+                className="h-full w-full font-sans"
+              >
+                <DocumentKnowledgeGraph
+                  knowledge_graph={data?.knowledge_graph ?? null}
+                  type={data?.file?.type ?? ""}
+                />
+              </TabsContent>
+              <TabsContent value="Audit">Audit</TabsContent>
+            </Tabs>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
