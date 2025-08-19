@@ -5,9 +5,36 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+interface ErrorDetail {
+  msg: string;
+}
+
+interface ErrorWithDetailArray {
+  detail: ErrorDetail[];
+}
+
+interface ErrorWithDetailString {
+  detail: string;
+}
+
 export function parseErrorDetail(error: unknown): string | undefined {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "detail" in error &&
+    Array.isArray((error as ErrorWithDetailArray).detail)
+  ) {
+    const details = (error as ErrorWithDetailArray).detail;
+    if (
+      details.length > 0 &&
+      details[0] &&
+      typeof details[0].msg === "string"
+    ) {
+      return details.map((d) => d.msg).join("; ");
+    }
+  }
   return typeof error === "object" && error !== null && "detail" in error
-    ? (error as { detail?: string }).detail
+    ? (error as ErrorWithDetailString).detail
     : undefined;
 }
 
