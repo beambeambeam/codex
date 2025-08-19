@@ -387,7 +387,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get Document
+     * @description Get a document by ID.
+     */
+    get: operations["get_document_api_v1_documents__document_id__get"];
     put?: never;
     post?: never;
     /**
@@ -420,16 +424,6 @@ export interface components {
     Body_bulk_upload_documents_api_v1_documents_uploads_post: {
       /** Files */
       files: File[];
-      /**
-       * Titles
-       * @default []
-       */
-      titles: string[];
-      /**
-       * Descriptions
-       * @default []
-       */
-      descriptions: string[];
       /**
        * Collection Id
        * Format: uuid
@@ -1543,6 +1537,37 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PaginatedDocumentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_document_api_v1_documents__document_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"];
         };
       };
       /** @description Validation Error */
