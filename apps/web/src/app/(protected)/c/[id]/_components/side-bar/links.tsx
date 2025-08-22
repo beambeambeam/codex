@@ -108,7 +108,7 @@ function CollectionLinks() {
               onClick={() => router.push("?collection=settings")}
             >
               <BookAlertIcon />
-              Collection&apos;s Settings
+              Settings
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

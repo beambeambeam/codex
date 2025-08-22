@@ -10,7 +10,7 @@ function CollectionInfo() {
     <div className="flex flex-col gap-3 p-4">
       <h1 className="flex items-start justify-start gap-1 text-lg font-bold">
         <AlbumIcon />
-        Collection.
+        Collection
       </h1>
       <CollectionUpdateForm
         defaultValues={{
