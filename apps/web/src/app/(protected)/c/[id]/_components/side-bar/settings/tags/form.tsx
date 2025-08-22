@@ -117,6 +117,7 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
                         console.log(color);
                         if (Array.isArray(color) && color.length >= 3) {
                           const [r, g, b] = color;
+                          // Convert RGBA to hex, ignoring alpha for hex representation
                           const hex = `#${Math.round(r).toString(16).padStart(2, "0")}${Math.round(g).toString(16).padStart(2, "0")}${Math.round(b).toString(16).padStart(2, "0")}`;
                           field.handleChange(hex);
                         }

@@ -67,42 +67,74 @@ export const ColorPicker = ({
   className,
   ...props
 }: ColorPickerProps) => {
-  const selectedColor = Color(value);
+  const selectedColor = value ? Color(value) : Color(defaultValue);
   const defaultColor = Color(defaultValue);
+  const onChangeRef = useRef(onChange);
 
-  const [hue, setHue] = useState(
-    selectedColor.hue() || defaultColor.hue() || 0,
-  );
-  const [saturation, setSaturation] = useState(
-    selectedColor.saturationl() || defaultColor.saturationl() || 100,
-  );
-  const [lightness, setLightness] = useState(
-    selectedColor.lightness() || defaultColor.lightness() || 50,
-  );
-  const [alpha, setAlpha] = useState(
-    selectedColor.alpha() * 100 || defaultColor.alpha() * 100,
-  );
+  // Update the ref when onChange changes
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  const [hue, setHue] = useState(() => {
+    try {
+      return selectedColor.hue() || defaultColor.hue() || 0;
+    } catch {
+      return defaultColor.hue() || 0;
+    }
+  });
+  const [saturation, setSaturation] = useState(() => {
+    try {
+      return selectedColor.saturationl() || defaultColor.saturationl() || 100;
+    } catch {
+      return defaultColor.saturationl() || 100;
+    }
+  });
+  const [lightness, setLightness] = useState(() => {
+    try {
+      return selectedColor.lightness() || defaultColor.lightness() || 50;
+    } catch {
+      return defaultColor.lightness() || 50;
+    }
+  });
+  const [alpha, setAlpha] = useState(() => {
+    try {
+      return (selectedColor.alpha() || 1) * 100;
+    } catch {
+      return (defaultColor.alpha() || 1) * 100;
+    }
+  });
   const [mode, setMode] = useState("hex");
 
   // Update color when controlled value changes
   useEffect(() => {
     if (value) {
-      const color = Color.rgb(value).rgb().object();
+      try {
+        const color = Color(value);
+        const hsl = color.hsl().array();
 
-      setHue(color.r ?? 0);
-      setSaturation(color.g ?? 0);
-      setLightness(color.b ?? 0);
-      setAlpha(color.a ?? 100);
+        setHue(hsl[0] ?? 0);
+        setSaturation(hsl[1] ?? 0);
+        setLightness(hsl[2] ?? 0);
+        setAlpha((color.alpha() ?? 1) * 100);
+      } catch (error) {
+        console.warn("Invalid color value:", value, error);
+        // Fall back to default values
+        setHue(defaultColor.hue() || 0);
+        setSaturation(defaultColor.saturationl() || 100);
+        setLightness(defaultColor.lightness() || 50);
+        setAlpha((defaultColor.alpha() || 1) * 100);
+      }
     }
-  }, [value]);
+  }, [value, defaultColor]);
 
   // Notify parent of changes
   useEffect(() => {
-    if (onChange) {
+    if (onChangeRef.current) {
       const color = Color.hsl(hue, saturation, lightness).alpha(alpha / 100);
       const rgba = color.rgb().array();
 
-      onChange([rgba[0], rgba[1], rgba[2], alpha / 100]);
+      onChangeRef.current([rgba[0], rgba[1], rgba[2], rgba[3]]);
     }
   }, [hue, saturation, lightness, alpha]);
 
@@ -135,9 +167,12 @@ export const ColorPickerSelection = memo(
   ({ className, ...props }: ColorPickerSelectionProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [positionX, setPositionX] = useState(0);
-    const [positionY, setPositionY] = useState(0);
-    const { hue, setSaturation, setLightness } = useColorPicker();
+    const { hue, saturation, lightness, setSaturation, setLightness } =
+      useColorPicker();
+
+    // Calculate initial position based on saturation and lightness
+    const positionX = saturation / 100;
+    const positionY = 1 - lightness / 100; // Invert lightness for Y position
 
     const backgroundGradient = useMemo(() => {
       return `linear-gradient(0deg, rgba(0,0,0,1), rgba(0,0,0,0)),
@@ -159,13 +194,8 @@ export const ColorPickerSelection = memo(
           0,
           Math.min(1, (event.clientY - rect.top) / rect.height),
         );
-        setPositionX(x);
-        setPositionY(y);
         setSaturation(x * 100);
-        const topLightness = x < 0.01 ? 100 : 50 + 50 * (1 - x);
-        const lightness = topLightness * (1 - y);
-
-        setLightness(lightness);
+        setLightness((1 - y) * 100);
       },
       [isDragging, setSaturation, setLightness],
     );
