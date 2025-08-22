@@ -6,12 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  ColorPicker,
-  ColorPickerAlpha,
-  ColorPickerHue,
-  ColorPickerSelection,
-} from "@/components/ui/color-picker";
+import { ColorPicker } from "@/components/ui/color-picker";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { useQueryFetchClient } from "@/lib/api/client";
@@ -26,7 +21,11 @@ const tagCreateFormSchema = z.object({
 
 export type TagCreateFormSchemaType = z.infer<typeof tagCreateFormSchema>;
 
-function TagForm(props: FormProps<TagCreateFormSchemaType>) {
+function TagForm(
+  props: FormProps<TagCreateFormSchemaType> & {
+    closeDialog: () => void;
+  },
+) {
   const params = useParams() as { id?: string };
   const collectionId = params?.id;
 
@@ -57,7 +56,7 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
     validators: { onChange: tagCreateFormSchema },
     defaultValues: {
       title: props.defaultValues?.title ?? "",
-      color: props.defaultValues?.color ?? "",
+      color: props.defaultValues?.color ?? generateRandomColor(),
     },
     onSubmit: async ({ value }) => {
       mutate({
@@ -116,24 +115,11 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
                   />
                   <div className="flex-1">
                     <ColorPicker
-                      value={field.state.value || "#3B82F6"}
-                      onChange={(color) => {
-                        console.log(color);
-                        if (Array.isArray(color) && color.length >= 3) {
-                          const [r, g, b] = color;
-                          // Convert RGBA to hex, ignoring alpha for hex representation
-                          const hex = `#${Math.round(r).toString(16).padStart(2, "0")}${Math.round(g).toString(16).padStart(2, "0")}${Math.round(b).toString(16).padStart(2, "0")}`;
-                          field.handleChange(hex);
-                        }
+                      value={field.state.value}
+                      onChange={(value: string) => {
+                        field.handleChange(value);
                       }}
-                      className="h-32"
-                    >
-                      <ColorPickerSelection className="h-20 w-full" />
-                      <div className="flex gap-2">
-                        <ColorPickerHue className="flex-1" />
-                        <ColorPickerAlpha className="w-16" />
-                      </div>
-                    </ColorPicker>
+                    />
                   </div>
                 </div>
               </field.FormControl>

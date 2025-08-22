@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { PlusIcon, TagIcon, TagsIcon } from "lucide-react";
 
 import TagForm from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/form";
@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { generateRandomColor } from "@/lib/utils";
 
 function CollectionTag() {
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
@@ -24,7 +25,7 @@ function CollectionTag() {
           <TagIcon className="h-4 w-4" />
           <h3 className="text-sm font-medium">Tags</h3>
         </div>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="h-8">
               <PlusIcon className="mr-1 h-3 w-3" />
@@ -40,6 +41,7 @@ function CollectionTag() {
                 color: generateRandomColor(),
                 title: "",
               }}
+              closeDialog={() => setOpen(false)}
             />
           </DialogContent>
         </Dialog>
