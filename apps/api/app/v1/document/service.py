@@ -663,7 +663,6 @@ class DocumentService:
                     raise ValueError(f"Tag with ID {tag_id} does not exist")
 
                 document_tag = DocumentTag(
-                    id=uuid.uuid4(),
                     document_id=UUID(document_id),
                     tag_id=UUID(tag_id),
                 )
