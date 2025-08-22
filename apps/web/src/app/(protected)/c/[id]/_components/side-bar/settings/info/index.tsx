@@ -1,4 +1,4 @@
-import { AlbumIcon } from "lucide-react";
+import { AlbumIcon, TriangleAlertIcon } from "lucide-react";
 
 import { useCollectionState } from "@/app/(protected)/c/[id]/_components/context";
 import CollectionDelete from "@/app/(protected)/c/[id]/_components/side-bar/settings/info/delete";
@@ -18,7 +18,10 @@ function CollectionInfo() {
           description: collection.description ?? "",
         }}
       />
-      <h1 className="text-destructive text-lg font-bold">Danger Zone.</h1>
+      <h1 className="text-destructive flex items-start justify-start gap-1 text-lg font-bold">
+        <TriangleAlertIcon />
+        Danger Zone.
+      </h1>
       <div className="bg-destructive/10 flex flex-col rounded-lg border-2 border-dashed p-2">
         <div className="flex w-full items-center gap-2">
           <CollectionDelete />
