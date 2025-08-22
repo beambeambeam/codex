@@ -22,7 +22,7 @@ function CollectionSettings() {
   );
 
   const [tab, setTab] = useQueryState(
-    "tab",
+    "settings-tab",
     parseAsString.withDefault("project"),
   );
   const onTabChange = (value: string) => setTab(value);
@@ -34,7 +34,7 @@ function CollectionSettings() {
     <Dialog
       open={open === "settings"}
       onOpenChange={(isOpen) => {
-        setTab("");
+        setTab(null);
         setOpen(isOpen ? "settings" : "");
       }}
     >
