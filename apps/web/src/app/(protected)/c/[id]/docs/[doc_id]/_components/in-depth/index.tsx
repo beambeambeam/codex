@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BookmarkIcon, EditIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 import DocumentUpdateForm from "./form";
 
@@ -54,7 +55,9 @@ export function InDepth({ description, summary }: InDepthProps) {
             <BookmarkIcon />
             Description
           </Badge>
-          <EditIcon className="text-muted-foreground/60 size-6" />
+          <Button size="icon-sm" variant="ghost" onClick={handleEdit}>
+            <EditIcon className="size-4" />
+          </Button>
         </div>
         <p
           className="text-md text-md hover:bg-muted/50 cursor-pointer rounded-lg border p-4 font-sans transition-colors"
@@ -71,7 +74,9 @@ export function InDepth({ description, summary }: InDepthProps) {
             <BookmarkIcon />
             Summary
           </Badge>
-          <EditIcon className="text-muted-foreground/60 size-6" />
+          <Button size="icon-sm" variant="ghost" onClick={handleEdit}>
+            <EditIcon className="size-4" />
+          </Button>
         </div>
         <p
           className="text-md hover:bg-muted/50 cursor-pointer rounded-lg border p-4 font-sans transition-colors"

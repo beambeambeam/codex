@@ -179,13 +179,8 @@ export function DocumentTags(props: DocumentTagsProps) {
         <span className="text-muted-foreground text-sm">No tags</span>
       )}
 
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={handleEditClick}
-        className="h-6 w-6 p-0"
-      >
-        <EditIcon className="h-3 w-3" />
+      <Button size="icon-sm" variant="ghost" onClick={handleEditClick}>
+        <EditIcon />
       </Button>
     </div>
   );
