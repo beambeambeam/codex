@@ -3,10 +3,13 @@
 import React, { useCallback, useState } from "react";
 import { useParams } from "next/navigation";
 import { EditIcon } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { useQueryFetchClient } from "@/lib/api/client";
+import { cacheUtils } from "@/lib/query/cache";
+import { parseErrorDetail } from "@/lib/utils";
 
 interface Tag {
   id: string;
@@ -21,7 +24,7 @@ interface DocumentTagsProps {
 }
 
 export function DocumentTags(props: DocumentTagsProps) {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string; doc_id: string }>();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
 
@@ -36,6 +39,25 @@ export function DocumentTags(props: DocumentTagsProps) {
       },
     },
   );
+
+  // Update document tags mutation
+  const { mutate: updateDocumentTags, isPending: isUpdating } =
+    useQueryFetchClient.useMutation(
+      "put",
+      "/api/v1/documents/{document_id}/tags",
+      {
+        onSuccess() {
+          toast.success("Tags updated successfully");
+          cacheUtils.invalidateQueries([
+            "get",
+            "/api/v1/documents/{document_id}",
+          ]);
+        },
+        onError(err: unknown) {
+          toast.error(parseErrorDetail(err) || "Failed to update tags");
+        },
+      },
+    );
 
   const tagOptions: Option[] = (availableTags ?? []).map((tag) => ({
     value: tag.id,
@@ -60,8 +82,22 @@ export function DocumentTags(props: DocumentTagsProps) {
   }, []);
 
   const handleSaveTags = useCallback(() => {
+    const tagIds = selectedTags.map((tag) => tag.value);
+
+    updateDocumentTags({
+      params: {
+        path: {
+          document_id: params.doc_id,
+        },
+      },
+      body: {
+        document_id: params.doc_id,
+        tag_ids: tagIds,
+      },
+    });
+
     setIsEditing(false);
-  }, []);
+  }, [selectedTags, updateDocumentTags, params.doc_id]);
 
   const handleTagChange = useCallback((options: Option[]) => {
     setSelectedTags(options);
@@ -78,15 +114,22 @@ export function DocumentTags(props: DocumentTagsProps) {
             placeholder="Select tags..."
             maxSelected={10}
             className="min-w-[200px]"
+            emptyIndicator="No more tags found."
           />
         </div>
-        <Button size="sm" onClick={handleSaveTags} className="h-8">
-          Save
+        <Button
+          size="sm"
+          onClick={handleSaveTags}
+          disabled={isUpdating}
+          className="h-8"
+        >
+          {isUpdating ? "Saving..." : "Save"}
         </Button>
         <Button
           size="sm"
           variant="outline"
           onClick={handleCancelEdit}
+          disabled={isUpdating}
           className="h-8"
         >
           Cancel

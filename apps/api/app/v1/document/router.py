@@ -20,6 +20,7 @@ from .schemas import (
     TagUpdateRequest,
     TagResponse,
     DocumentTagCreateRequest,
+    DocumentTagUpdateRequest,
     DocumentTagResponse,
 )
 from .service import DocumentService
@@ -309,3 +310,23 @@ async def get_document_tags(
         return document_service.get_document_tags(document_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.put(
+    "/{document_id}/tags",
+    response_model=List[TagResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def update_document_tags(
+    document_id: str,
+    document_tag_update: DocumentTagUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Update all tags for a document in one operation."""
+    try:
+        return document_service.update_document_tags(
+            document_id, document_tag_update.tag_ids
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

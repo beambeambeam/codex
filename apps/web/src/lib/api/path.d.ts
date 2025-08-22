@@ -544,7 +544,11 @@ export interface paths {
      * @description Get all tags for a specific document.
      */
     get: operations["get_document_tags_api_v1_documents__document_id__tags_get"];
-    put?: never;
+    /**
+     * Update Document Tags
+     * @description Update all tags for a document in one operation.
+     */
+    put: operations["update_document_tags_api_v1_documents__document_id__tags_put"];
     post?: never;
     delete?: never;
     options?: never;
@@ -835,6 +839,20 @@ export interface components {
        */
       document_id: string;
       tag: components["schemas"]["TagResponse"];
+    };
+    /** DocumentTagUpdateRequest */
+    DocumentTagUpdateRequest: {
+      /**
+       * Document Id
+       * Format: uuid
+       * @description ID of the document
+       */
+      document_id: string;
+      /**
+       * Tag Ids
+       * @description List of tag IDs to assign to the document
+       */
+      tag_ids: string[];
     };
     /** EdgeDataSchema */
     EdgeDataSchema: {
@@ -2135,6 +2153,41 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_document_tags_api_v1_documents__document_id__tags_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DocumentTagUpdateRequest"];
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {

@@ -539,6 +539,67 @@ class DocumentService:
             if doc_tag.tag
         ]
 
+    def update_document_tags(
+        self, document_id: str, tag_ids: List[str]
+    ) -> List[TagResponse]:
+        """Update all tags for a document in one operation."""
+        try:
+            # Get current document tags
+            current_document_tags = (
+                self.db.query(DocumentTag)
+                .filter(DocumentTag.document_id == document_id)
+                .all()
+            )
+            current_tag_ids = {str(dt.tag_id) for dt in current_document_tags}
+
+            # Convert input tag_ids to set for easier comparison
+            new_tag_ids = set(str(tag_id) for tag_id in tag_ids)
+
+            # Find tags to add
+            tags_to_add = new_tag_ids - current_tag_ids
+
+            # Find tags to remove
+            tags_to_remove = current_tag_ids - new_tag_ids
+
+            # Remove tags
+            for tag_id in tags_to_remove:
+                document_tag = (
+                    self.db.query(DocumentTag)
+                    .filter(
+                        DocumentTag.document_id == document_id,
+                        DocumentTag.tag_id == tag_id,
+                    )
+                    .first()
+                )
+                if document_tag:
+                    self.db.delete(document_tag)
+
+            # Add new tags
+            for tag_id in tags_to_add:
+                # Verify tag exists
+                tag = self.db.query(Tag).filter(Tag.id == tag_id).first()
+                if not tag:
+                    raise ValueError(f"Tag with ID {tag_id} does not exist")
+
+                document_tag = DocumentTag(
+                    id=uuid.uuid4(),
+                    document_id=UUID(document_id),
+                    tag_id=UUID(tag_id),
+                )
+                self.db.add(document_tag)
+
+            self.db.commit()
+
+            # Return updated tags
+            return self.get_document_tags(document_id)
+
+        except IntegrityError as e:
+            self.db.rollback()
+            raise ValueError(f"Database integrity error: {str(e)}")
+        except Exception as e:
+            self.db.rollback()
+            raise ValueError(f"Error updating document tags: {str(e)}")
+
 
 class DocumentAuditService:
     @staticmethod
