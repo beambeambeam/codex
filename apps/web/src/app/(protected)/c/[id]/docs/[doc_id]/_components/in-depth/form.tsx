@@ -2,9 +2,11 @@
 
 import React, { useCallback } from "react";
 import { useParams } from "next/navigation";
+import { BookmarkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +27,7 @@ export type DocumentUpdateFormSchemaType = z.infer<
 interface DocumentUpdateFormProps
   extends FormProps<DocumentUpdateFormSchemaType> {
   onSuccess?: () => void;
+  onCacel?: () => void;
 }
 
 function DocumentUpdateForm(props: DocumentUpdateFormProps) {
@@ -88,7 +91,13 @@ function DocumentUpdateForm(props: DocumentUpdateFormProps) {
         <form.AppField name="description">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Description</field.FormLabel>
+              <field.FormLabel>
+                {" "}
+                <Badge>
+                  <BookmarkIcon />
+                  Description
+                </Badge>
+              </field.FormLabel>
               <field.FormControl>
                 <Textarea
                   id="description"
@@ -109,7 +118,12 @@ function DocumentUpdateForm(props: DocumentUpdateFormProps) {
         <form.AppField name="summary">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Summary</field.FormLabel>
+              <field.FormLabel>
+                <Badge>
+                  <BookmarkIcon />
+                  Summary
+                </Badge>
+              </field.FormLabel>
               <field.FormControl>
                 <Textarea
                   id="summary"
@@ -128,6 +142,15 @@ function DocumentUpdateForm(props: DocumentUpdateFormProps) {
         </form.AppField>
 
         <div className="flex w-full items-end justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-fit"
+            disabled={isPending}
+            onClick={() => props.onCacel?.()}
+          >
+            Cancel
+          </Button>
           <Button
             type="submit"
             disabled={isPending}

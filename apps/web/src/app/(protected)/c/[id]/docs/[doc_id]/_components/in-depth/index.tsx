@@ -27,21 +27,13 @@ export function InDepth({ description, summary }: InDepthProps) {
   if (isEditing) {
     return (
       <div className="flex w-full flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Edit Document Details</h3>
-          <button
-            onClick={handleCancel}
-            className="text-muted-foreground hover:text-foreground text-sm"
-          >
-            Cancel
-          </button>
-        </div>
         <DocumentUpdateForm
           defaultValues={{
             description: description || "",
             summary: summary || "",
           }}
           onSuccess={handleCancel}
+          onCacel={handleCancel}
         />
       </div>
     );
