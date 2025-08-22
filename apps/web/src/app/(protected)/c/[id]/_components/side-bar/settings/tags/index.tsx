@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PlusIcon, TagIcon } from "lucide-react";
+import { PlusIcon, TagIcon, TagsIcon } from "lucide-react";
 
 import TagForm from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/form";
 import TagList from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/list";
@@ -24,7 +24,7 @@ function generateRandomColor(): string {
 
 function CollectionTag() {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TagIcon className="h-4 w-4" />
@@ -43,7 +43,7 @@ function CollectionTag() {
             </DialogHeader>
             <TagForm
               defaultValues={{
-                color: "",
+                color: generateRandomColor(),
                 title: "",
               }}
             />
@@ -54,7 +54,8 @@ function CollectionTag() {
       <Separator />
 
       <div className="space-y-2">
-        <h4 className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+        <h4 className="text-muted-foreground flex items-center gap-1 text-xs font-medium uppercase tracking-wide">
+          <TagsIcon className="size-4" />
           Existing Tags
         </h4>
         <TagList />
