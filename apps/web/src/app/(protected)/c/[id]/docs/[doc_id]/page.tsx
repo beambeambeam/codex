@@ -12,6 +12,7 @@ import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
+import { DocumentTags } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/tags";
 import { Badge } from "@/components/ui/badge";
 import FilePreview from "@/components/ui/file-preview";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
@@ -85,6 +86,12 @@ function DocumentPage() {
                   <BookIcon />
                   {mimeTypeToName(data?.file?.type)}
                 </Badge>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Tags:</span>
+                  <DocumentTags tags={data?.tags ?? []} />
+                </div>
               </div>
             </div>
             <Separator />
