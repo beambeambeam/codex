@@ -41,8 +41,9 @@ class DocumentTagCreateRequest(BaseModel):
 
 class DocumentTagUpdateRequest(BaseModel):
     document_id: UUID = Field(..., description="ID of the document")
-    tag_ids: List[UUID] = Field(
-        ..., description="List of tag IDs to assign to the document"
+    tag_ids: List[str] = Field(
+        ...,
+        description="List of tag IDs (UUIDs) or tag titles (strings) to assign to the document",
     )
 
 

@@ -422,6 +422,25 @@ class DocumentService:
             id=tag.id, collection_id=tag.collection_id, title=tag.title, color=tag.color
         )
 
+    def get_tag_by_title_and_collection(
+        self, title: str, collection_id: str
+    ) -> TagResponse:
+        """Get a tag by title and collection ID."""
+        tag = (
+            self.db.query(Tag)
+            .filter(Tag.title == title, Tag.collection_id == collection_id)
+            .first()
+        )
+        if not tag:
+            return None
+
+        return TagResponse(
+            id=tag.id,
+            collection_id=tag.collection_id,
+            title=tag.title,
+            color=tag.color,
+        )
+
     def update_tag(self, tag_id: str, tag_update: TagUpdateRequest) -> TagResponse:
         """Update a tag."""
         tag = self.db.query(Tag).filter(Tag.id == tag_id).first()

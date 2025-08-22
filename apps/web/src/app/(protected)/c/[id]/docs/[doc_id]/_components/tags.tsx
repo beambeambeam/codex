@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { cacheUtils } from "@/lib/query/cache";
-import { parseErrorDetail } from "@/lib/utils";
+import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
 
 interface Tag {
   id: string;
@@ -81,9 +81,27 @@ export function DocumentTags(props: DocumentTagsProps) {
     setSelectedTags([]);
   }, []);
 
-  const handleSaveTags = useCallback(() => {
-    const tagIds = selectedTags.map((tag) => tag.value);
+  const handleSaveTags = useCallback(async () => {
+    // Convert selected tags to tag IDs or titles
+    const tagIds: string[] = [];
 
+    for (const tag of selectedTags) {
+      // Check if this is a UUID (existing tag) or a string (new tag to create)
+      const isUUID =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          tag.value,
+        );
+
+      if (isUUID) {
+        // Existing tag - use the UUID
+        tagIds.push(tag.value);
+      } else {
+        // New tag - use the title (will be created by backend)
+        tagIds.push(tag.label);
+      }
+    }
+
+    // Update document tags (backend will handle creating new tags)
     updateDocumentTags({
       params: {
         path: {
@@ -111,10 +129,12 @@ export function DocumentTags(props: DocumentTagsProps) {
             value={selectedTags}
             onChange={handleTagChange}
             options={tagOptions}
-            placeholder="Select tags..."
+            placeholder="Select or create tags..."
             maxSelected={10}
             className="min-w-[200px]"
             emptyIndicator="No more tags found."
+            creatable
+            hideClearAllButton
           />
         </div>
         <Button
