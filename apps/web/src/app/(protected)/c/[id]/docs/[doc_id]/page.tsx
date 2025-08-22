@@ -63,8 +63,14 @@ function DocumentPage() {
         <ResizableHandle withHandle />
         <ResizablePanel>
           <div className="flex h-full w-full flex-col gap-6 px-4">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-xl">{data?.title ?? "Untitled Document"}</h1>
+            <div className="flex flex-col gap-2 p-4 pt-8">
+              <h1 className="text-xl">
+                {data?.title ?? (
+                  <span className="text-muted-foreground">
+                    Untitled Document
+                  </span>
+                )}
+              </h1>
               <h1 className="text-muted-foreground text-md">
                 {decodeURIComponent(data?.file?.name ?? "")}
               </h1>
