@@ -394,7 +394,7 @@ async def update_document_tags(
 
                     new_tag = document_service.create_tag(
                         TagCreateRequest(
-                            collection_id=collection_id,
+                            collection_id=UUID(collection_id),
                             title=tag_title,
                             color=generateRandomColor(),
                         )

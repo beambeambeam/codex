@@ -467,7 +467,7 @@ class DocumentService:
 
     def get_tag_by_title_and_collection(
         self, title: str, collection_id: str
-    ) -> TagResponse:
+    ) -> Optional[TagResponse]:
         """Get a tag by title and collection ID."""
         tag = (
             self.db.query(Tag)
