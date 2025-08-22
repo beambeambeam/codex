@@ -1,7 +1,7 @@
 import { BookMarkedIcon, FolderUpIcon, Table2Icon } from "lucide-react";
 
-import DocumentTable from "@/app/(protected)/c/[id]/docs/table";
-import DocumentUploadForm from "@/app/(protected)/c/[id]/docs/upload/form";
+import DocumentTable from "@/app/(protected)/c/[id]/docs/_components/table";
+import DocumentUploadForm from "@/app/(protected)/c/[id]/docs/_components/upload/form";
 
 function DocsPage() {
   return (

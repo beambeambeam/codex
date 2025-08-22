@@ -11,61 +11,37 @@ export function JsonToFormData(body: {
 }) {
   const formData = new FormData();
   for (const key in body) {
-    const value = body[key];
-
-    if (value === null || value === undefined) {
+    if (body[key] === null) {
       continue;
     }
 
-    if (Array.isArray(value)) {
-      value.forEach((item, idx) => {
-        if (item instanceof File) {
-          formData.append(
-            `${key}[${idx}]`,
-            item,
-            encodeURIComponent(item.name),
-          );
-        } else if (item instanceof Blob) {
-          formData.append(`${key}[${idx}]`, item);
-        } else if (typeof item === "boolean" || typeof item === "object") {
-          formData.append(`${key}[${idx}]`, JSON.stringify(item));
-        } else if (typeof item === "number") {
-          formData.append(`${key}[${idx}]`, item.toString());
-        } else if (typeof item === "string") {
-          formData.append(`${key}[${idx}]`, item);
-        }
-      });
+    if (
+      Array.isArray(body[key]) &&
+      body[key].every((item) => item instanceof File)
+    ) {
+      body[key].forEach((file) =>
+        formData.append(key, file, encodeURIComponent(file.name)),
+      );
       continue;
     }
 
-    if (value instanceof File) {
-      formData.append(key, value, encodeURIComponent(value.name));
+    if (body[key] instanceof File) {
+      formData.append(key, body[key], encodeURIComponent(body[key].name));
       continue;
     }
 
-    if (value instanceof Blob) {
-      formData.append(key, value);
+    if (typeof body[key] === "object" || typeof body[key] === "boolean") {
+      formData.append(key, JSON.stringify(body[key]));
       continue;
     }
 
-    if (typeof value === "boolean") {
-      formData.append(key, JSON.stringify(value));
+    if (typeof body[key] === "number") {
+      formData.append(key, body[key].toString());
       continue;
     }
 
-    if (typeof value === "number") {
-      formData.append(key, value.toString());
-      continue;
-    }
-
-    if (typeof value === "string") {
-      formData.append(key, value);
-      continue;
-    }
-
-    // Handle remaining objects
-    if (typeof value === "object") {
-      formData.append(key, JSON.stringify(value));
+    if (typeof body[key] === "string") {
+      formData.append(key, body[key]);
     }
   }
 

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
 
-import { documentColumns } from "@/app/(protected)/c/[id]/docs/table/columns";
+import { documentColumns } from "@/app/(protected)/c/[id]/docs/_components/table/columns";
 import { DataTable } from "@/components/data-table";
 import { DataTableFilterMenu } from "@/components/data-table/filter-menu";
 import { DataTableSkeleton } from "@/components/data-table/skeleton";

@@ -1014,7 +1014,7 @@ function formatBytes(bytes: number) {
   return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${sizes[i]}`;
 }
 
-function getFileIcon(file: File) {
+export function getFileIcon(file: File) {
   const type = file.type;
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
 

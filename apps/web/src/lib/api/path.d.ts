@@ -351,7 +351,7 @@ export interface paths {
     put?: never;
     /**
      * Bulk Upload Documents
-     * @description Bulk upload multiple files to the same collection. Each file can have its own title and description.
+     * @description Bulk upload multiple files to the same collection.
      */
     post: operations["bulk_upload_documents_api_v1_documents_uploads_post"];
     delete?: never;
@@ -387,7 +387,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get Document
+     * @description Get a document by ID.
+     */
+    get: operations["get_document_api_v1_documents__document_id__get"];
     put?: never;
     post?: never;
     /**
@@ -395,6 +399,26 @@ export interface paths {
      * @description Delete a document by ID. Only the owner can delete their document.
      */
     delete: operations["delete_document_api_v1_documents__document_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/{document_id}/audit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Document Audit
+     * @description Get all audit records for a document by ID.
+     */
+    get: operations["get_document_audit_api_v1_documents__document_id__audit_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -420,16 +444,6 @@ export interface components {
     Body_bulk_upload_documents_api_v1_documents_uploads_post: {
       /** Files */
       files: File[];
-      /**
-       * Titles
-       * @default []
-       */
-      titles: string[];
-      /**
-       * Descriptions
-       * @default []
-       */
-      descriptions: string[];
       /**
        * Collection Id
        * Format: uuid
@@ -605,6 +619,40 @@ export interface components {
        * @description Profile image URL of the contributor
        */
       imgUrl?: string | null;
+    };
+    /**
+     * DocumentActionEnum
+     * @enum {string}
+     */
+    DocumentActionEnum: "CREATE" | "UPDATE" | "DELETE";
+    /** DocumentAudit */
+    DocumentAudit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Document Id
+       * Format: uuid
+       */
+      document_id: string;
+      /** User Id */
+      user_id?: string | null;
+      /** Old Values */
+      old_values?: {
+        [key: string]: unknown;
+      } | null;
+      /** New Values */
+      new_values?: {
+        [key: string]: unknown;
+      } | null;
+      action_type: components["schemas"]["DocumentActionEnum"];
+      /**
+       * Timestamp
+       * Format: date-time
+       */
+      timestamp: string;
     };
     /** DocumentResponse */
     DocumentResponse: {
@@ -1556,6 +1604,37 @@ export interface operations {
       };
     };
   };
+  get_document_api_v1_documents__document_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   delete_document_api_v1_documents__document_id__delete: {
     parameters: {
       query?: never;
@@ -1573,6 +1652,37 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_document_audit_api_v1_documents__document_id__audit_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentAudit"][];
+        };
       };
       /** @description Validation Error */
       422: {

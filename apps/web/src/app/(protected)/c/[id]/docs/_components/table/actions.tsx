@@ -7,8 +7,8 @@ import {
   TrashIcon,
 } from "lucide-react";
 
+import { DocumentsType } from "@/app/(protected)/c/[id]/docs/_components/table/columns";
 import { useRemoveDocuments } from "@/app/(protected)/c/[id]/docs/_lib/use-remove-documents";
-import { DocumentsType } from "@/app/(protected)/c/[id]/docs/table/columns";
 import {
   AlertDialog,
   AlertDialogAction,

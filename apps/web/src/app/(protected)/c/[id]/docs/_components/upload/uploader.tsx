@@ -3,12 +3,6 @@ import { UploadIcon, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Editable,
-  EditableArea,
-  EditableInput,
-  EditablePreview,
-} from "@/components/ui/editable";
-import {
   FileUpload,
   FileUploadDropzone,
   FileUploadItem,
@@ -25,8 +19,6 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5mb
 interface DocumentUploadWithTitleProps {
   value: {
     file: File;
-    title: string;
-    description: string;
   }[];
   onValueChange?: (value: DocumentUploadWithTitleProps["value"]) => void;
 }
@@ -85,46 +77,6 @@ function DocumentUploader(props: DocumentUploadWithTitleProps) {
                     {mimeTypeToName(file.file.type)}
                   </Badge>
                 </div>
-                <Editable
-                  defaultValue={file.title}
-                  placeholder="No Title Provide"
-                  onValueChange={(title) => {
-                    const newValue = [...value];
-                    if (newValue[index]) {
-                      newValue[index] = {
-                        file: newValue[index].file,
-                        title,
-                        description: newValue[index].description ?? "",
-                      };
-                      setValue(newValue);
-                    }
-                  }}
-                >
-                  <EditableArea>
-                    <EditablePreview />
-                    <EditableInput />
-                  </EditableArea>
-                </Editable>
-                <Editable
-                  defaultValue={file.description}
-                  placeholder="No Description Provided"
-                  onValueChange={(description) => {
-                    const newValue = [...value];
-                    if (newValue[index]) {
-                      newValue[index] = {
-                        file: newValue[index].file,
-                        title: newValue[index].title ?? "",
-                        description,
-                      };
-                      setValue(newValue);
-                    }
-                  }}
-                >
-                  <EditableArea>
-                    <EditablePreview className="text-xs" />
-                    <EditableInput className="text-xs" />
-                  </EditableArea>
-                </Editable>
               </div>
             </FileUploadItemMetadata>
           </FileUploadItem>
