@@ -60,7 +60,7 @@ function CollectionTag() {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <TagIcon className="size-5" />
+          <TagIcon className="size-5 font-bold" />
           <h3 className="text-lg font-bold">Tags</h3>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
