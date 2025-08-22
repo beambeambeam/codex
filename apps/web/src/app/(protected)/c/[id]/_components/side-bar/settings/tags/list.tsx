@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { EditIcon, Trash2Icon } from "lucide-react";
+import { EditIcon, TagsIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -85,8 +85,14 @@ function TagList() {
 
   if (tags.length === 0) {
     return (
-      <div className="text-muted-foreground py-4 text-center text-sm">
-        No tags created yet. Create your first tag to get started.
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="text-muted-foreground/60 flex flex-col items-center gap-2">
+          <div className="border-muted-foreground/60 border-3 rounded-full border-dashed p-4">
+            <TagsIcon className="size-12" />
+          </div>
+
+          <div className="flex flex-col items-center">No tags created yet.</div>
+        </div>
       </div>
     );
   }
