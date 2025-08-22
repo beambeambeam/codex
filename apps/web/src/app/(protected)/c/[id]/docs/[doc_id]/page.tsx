@@ -14,7 +14,6 @@ import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/au
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
 import { Badge } from "@/components/ui/badge";
 import FilePreview from "@/components/ui/file-preview";
-import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import {
   ResizableHandle,
@@ -75,23 +74,17 @@ function DocumentPage() {
                 {decodeURIComponent(data?.file?.name ?? "")}
               </h1>
               <div className="flex gap-0.5">
-                <Pill>
-                  <PillAvatar
-                    fallback={data?.user?.display[0]}
-                    src=""
-                    className="border"
-                  />
-                  {data?.user?.display}
-                </Pill>
-                <Pill>
+                <Badge>{data?.user?.display}</Badge>
+                <Badge>
                   <RelativeTimeCard
                     date={new Date(data?.file?.upload_at ?? "")}
+                    className="text-muted hover:text-muted"
                   />
-                </Pill>
-                <Pill>
-                  <PillIcon icon={BookIcon} />
+                </Badge>
+                <Badge>
+                  <BookIcon />
                   {mimeTypeToName(data?.file?.type)}
-                </Pill>
+                </Badge>
               </div>
             </div>
             <Separator />
