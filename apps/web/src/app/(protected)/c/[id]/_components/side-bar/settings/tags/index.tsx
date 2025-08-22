@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
-import { PlusIcon, TagIcon, TagsIcon } from "lucide-react";
+import { PlusIcon, TagIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import TagForm, {
@@ -17,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { cacheUtils } from "@/lib/query/cache";
 import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
@@ -60,9 +59,9 @@ function CollectionTag() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <TagIcon className="h-4 w-4" />
-          <h3 className="text-sm font-medium">Tags</h3>
+        <div className="flex items-center gap-1">
+          <TagIcon className="size-5" />
+          <h3 className="text-lg font-bold">Tags</h3>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -89,11 +88,8 @@ function CollectionTag() {
         </Dialog>
       </div>
 
-      <Separator />
-
       <div className="space-y-2">
         <h4 className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide">
-          <TagsIcon className="size-4" />
           Existing Tags
         </h4>
         <TagList />
