@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryFetchClient } from "@/lib/api/client";
-import { useDebouncedSearch } from "@/lib/hooks/useDebouncedSearch";
+import { useDebouncedSearch } from "@/lib/hooks/use-debounced-search";
 
 function HomeSearch() {
   const [open, setOpen] = useQueryState(

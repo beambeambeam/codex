@@ -62,7 +62,7 @@ function CollectionBreadcrums() {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <Select defaultValue={String(selectedIndex)}>
-                <SelectTrigger id="select-database">
+                <SelectTrigger className="border-0 shadow-none">
                   <SelectValue placeholder="Select database" />
                 </SelectTrigger>
                 <SelectContent>

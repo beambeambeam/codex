@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import {
   BookIcon,
-  BookmarkIcon,
   FileClockIcon,
   GitCompareArrowsIcon,
   InfoIcon,
@@ -11,10 +10,11 @@ import {
 import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
+import { InDepth } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/in-depth/index";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
+import { DocumentTags } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/tags";
 import { Badge } from "@/components/ui/badge";
 import FilePreview from "@/components/ui/file-preview";
-import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import {
   ResizableHandle,
@@ -75,23 +75,23 @@ function DocumentPage() {
                 {decodeURIComponent(data?.file?.name ?? "")}
               </h1>
               <div className="flex gap-0.5">
-                <Pill>
-                  <PillAvatar
-                    fallback={data?.user?.display[0]}
-                    src=""
-                    className="border"
-                  />
-                  {data?.user?.display}
-                </Pill>
-                <Pill>
+                <Badge>{data?.user?.display}</Badge>
+                <Badge>
                   <RelativeTimeCard
                     date={new Date(data?.file?.upload_at ?? "")}
+                    className="text-muted hover:text-muted"
                   />
-                </Pill>
-                <Pill>
-                  <PillIcon icon={BookIcon} />
+                </Badge>
+                <Badge>
+                  <BookIcon />
                   {mimeTypeToName(data?.file?.type)}
-                </Pill>
+                </Badge>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Tags:</span>
+                  <DocumentTags tags={data?.tags ?? []} />
+                </div>
               </div>
             </div>
             <Separator />
@@ -99,8 +99,9 @@ function DocumentPage() {
               defaultValue="in_depts"
               value={tab}
               onValueChange={onTabChange}
+              className="p-4"
             >
-              <TabsList>
+              <TabsList className="mb-2">
                 <TabsTrigger value="in_depts">
                   <InfoIcon />
                   In Depts
@@ -115,38 +116,10 @@ function DocumentPage() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="in_depts">
-                <div className="flex w-full flex-col gap-4 p-4">
-                  <div className="flex flex-col gap-2">
-                    <div>
-                      <Badge>
-                        <BookmarkIcon />
-                        Description
-                      </Badge>
-                    </div>
-                    <p className="text-md text-md rounded-lg border p-4 font-sans">
-                      {data?.description ?? (
-                        <span className="text-muted-foreground">
-                          No description yet!
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div>
-                      <Badge>
-                        <BookmarkIcon />
-                        Summary
-                      </Badge>
-                    </div>
-                    <p className="text-md rounded-lg border p-4 font-sans">
-                      {data?.summary ?? (
-                        <span className="text-muted-foreground">
-                          No summary yet!
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
+                <InDepth
+                  description={data?.description}
+                  summary={data?.summary}
+                />
               </TabsContent>
               <TabsContent value="kg" className="h-full w-full font-sans">
                 <Badge className="mb-3">Knowledge Graph</Badge>

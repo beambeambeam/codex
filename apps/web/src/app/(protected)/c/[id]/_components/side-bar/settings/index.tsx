@@ -1,9 +1,10 @@
 "use client";
 
-import { ArchiveIcon, UsersIcon } from "lucide-react";
+import { ArchiveIcon, TagIcon, UsersIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
 import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/settings/info";
+import CollectionTag from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags";
 import {
   Dialog,
   DialogContent,
@@ -21,19 +22,19 @@ function CollectionSettings() {
   );
 
   const [tab, setTab] = useQueryState(
-    "tab",
+    "settings-tab",
     parseAsString.withDefault("project"),
   );
   const onTabChange = (value: string) => setTab(value);
 
   const TABS_TRIGGER_CLASSNAME =
-    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none py-6";
+    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary hover:after:bg-accent data-[state=active]:hover:bg-accent relative w-full justify-start rounded-none border-none py-6 after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none";
 
   return (
     <Dialog
       open={open === "settings"}
       onOpenChange={(isOpen) => {
-        setTab("");
+        setTab(null);
         setOpen(isOpen ? "settings" : "");
       }}
     >
@@ -72,12 +73,23 @@ function CollectionSettings() {
                 />
                 Contributor
               </TabsTrigger>
+              <TabsTrigger value="tags" className={TABS_TRIGGER_CLASSNAME}>
+                <TagIcon
+                  className="-ms-0.5 me-1.5 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Tags
+              </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
             <TabsContent value="project" className="p-2">
               <CollectionInfo />
             </TabsContent>
             <TabsContent value="contributor" className="p-2"></TabsContent>
+            <TabsContent value="tags" className="p-2">
+              <CollectionTag />
+            </TabsContent>
           </Tabs>
         </div>
       </DialogContent>

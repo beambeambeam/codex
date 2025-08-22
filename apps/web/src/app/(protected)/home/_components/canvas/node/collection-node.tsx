@@ -2,7 +2,12 @@ import { memo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Handle, Position } from "@xyflow/react";
-import { AlbumIcon, BadgeInfoIcon, SquareArrowOutUpRight } from "lucide-react";
+import {
+  AlbumIcon,
+  BadgeInfoIcon,
+  SquareArrowOutUpRight,
+  UsersIcon,
+} from "lucide-react";
 
 import {
   BaseNode,
@@ -100,16 +105,22 @@ export const CollectionNode = memo((props: CollectionNodeProps) => {
               <p className="text-xs">{props.data.summary}</p>
             </div>
           )}
-          <div className="flex w-full">
-            <AvatarGroup
-              size="sm"
-              items={props.data.contributor.map((c, idx) => ({
-                id: idx,
-                name: c.display,
-                image: c.imgUrl,
-              }))}
-              maxVisible={5}
-            />
+          <div className="flex w-full flex-col">
+            <Badge variant="secondary">
+              <UsersIcon />
+              Contribualtor
+            </Badge>
+            <div className="flex w-full p-1">
+              <AvatarGroup
+                size="sm"
+                items={props.data.contributor.map((c, idx) => ({
+                  id: idx,
+                  name: c.display,
+                  image: c.imgUrl,
+                }))}
+                maxVisible={5}
+              />
+            </div>
           </div>
         </div>
       </BaseNodeContent>
