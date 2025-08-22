@@ -5,6 +5,17 @@ import { useParams } from "next/navigation";
 import { EditIcon, TagsIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -115,27 +126,50 @@ function TagList() {
           <div className="flex items-center gap-1">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                  <EditIcon className="h-3 w-3" />
+                <Button variant="ghost" size="icon-sm">
+                  <EditIcon />
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Edit Tag</DialogTitle>
                 </DialogHeader>
-                <TagForm />
+                <TagForm
+                  defaultValues={{
+                    color: tag.color,
+                    title: tag.title,
+                  }}
+                />
               </DialogContent>
             </Dialog>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive h-6 w-6 p-0"
-              onClick={() => handleDeleteTag(tag.id)}
-              disabled={isDeleting}
-            >
-              <Trash2Icon className="h-3 w-3" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive h-6 w-6 p-0"
+                  disabled={isDeleting}
+                >
+                  <Trash2Icon className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Tag</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete the tag &quot;{tag.title}
+                    &quot;? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleDeleteTag(tag.id)}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       ))}

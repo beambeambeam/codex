@@ -21,11 +21,7 @@ const tagCreateFormSchema = z.object({
 
 export type TagCreateFormSchemaType = z.infer<typeof tagCreateFormSchema>;
 
-function TagForm(
-  props: FormProps<TagCreateFormSchemaType> & {
-    closeDialog: () => void;
-  },
-) {
+function TagForm(props: FormProps<TagCreateFormSchemaType>) {
   const params = useParams() as { id?: string };
   const collectionId = params?.id;
 
