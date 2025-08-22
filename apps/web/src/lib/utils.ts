@@ -6,7 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 interface ErrorDetail {
+  loc: (string | number)[];
   msg: string;
+  type: string;
 }
 
 interface ErrorWithDetailArray {
@@ -17,7 +19,10 @@ interface ErrorWithDetailString {
   detail: string;
 }
 
-export function parseErrorDetail(error: unknown): string | undefined {
+export function parseErrorDetail(error: unknown): string {
+  // Check if we're in development mode
+  const isDev = process.env.NODE_ENV === "development";
+
   if (
     typeof error === "object" &&
     error !== null &&
@@ -25,17 +30,38 @@ export function parseErrorDetail(error: unknown): string | undefined {
     Array.isArray((error as ErrorWithDetailArray).detail)
   ) {
     const details = (error as ErrorWithDetailArray).detail;
-    if (
-      details.length > 0 &&
-      details[0] &&
-      typeof details[0].msg === "string"
-    ) {
-      return details.map((d) => d.msg).join("; ");
+    if (details.length > 0 && details[0]) {
+      if (isDev) {
+        // In development, return detailed error information
+        return details
+          .map((d) => {
+            const location = d.loc ? ` at ${d.loc.join(".")}` : "";
+            const type = d.type ? ` (${d.type})` : "";
+            return `${d.msg}${location}${type}`;
+          })
+          .join("; ");
+      } else {
+        // In production, return generic message
+        return "Something went wrong";
+      }
     }
   }
-  return typeof error === "object" && error !== null && "detail" in error
-    ? (error as ErrorWithDetailString).detail
-    : undefined;
+
+  if (typeof error === "object" && error !== null && "detail" in error) {
+    const detail = (error as ErrorWithDetailString).detail;
+    if (isDev) {
+      return typeof detail === "string" ? detail : "Unknown error occurred";
+    } else {
+      return "Something went wrong";
+    }
+  }
+
+  // Fallback for unknown error types
+  if (isDev) {
+    return error instanceof Error ? error.message : "Unknown error occurred";
+  } else {
+    return "Something went wrong";
+  }
 }
 
 const MIME_TYPE_DISPLAY: Record<string, string> = {
