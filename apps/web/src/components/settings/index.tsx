@@ -20,7 +20,7 @@ import { useUser } from "@/store/user";
 
 function Settings() {
   const TABS_TRIGGER_CLASSNAME =
-    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none";
+    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary hover:after:bg-accent data-[state=active]:hover:bg-accent relative w-full justify-start rounded-none border-none py-6 after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none";
 
   const { user } = useUser();
 
@@ -35,20 +35,20 @@ function Settings() {
           <Settings2Icon />
         </Button>
       </DialogTrigger>
-      <DialogContent className="md:min-w-4xl max-w-full">
-        <DialogHeader>
+      <DialogContent className="md:min-w-4xl max-w-full p-0">
+        <DialogHeader className="p-0 px-6 pt-5">
           <DialogTitle>User&apos;s Settings</DialogTitle>
           <DialogDescription hidden>
             This is dialog for settings change for overall
           </DialogDescription>
         </DialogHeader>
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto border-t-2">
           <Tabs
             defaultValue="tab-1"
             orientation="vertical"
-            className="h-[70vh] w-full flex-row"
+            className="h-[70vh] w-full flex-row !gap-0"
           >
-            <TabsList className="text-foreground flex-col items-start justify-start gap-1 rounded-none bg-transparent px-1 py-0">
+            <TabsList className="text-foreground flex-col items-start justify-start gap-1 rounded-none bg-transparent py-0 !pr-0">
               <TabsTrigger value="tab-1" className={TABS_TRIGGER_CLASSNAME}>
                 <UserPenIcon
                   className="-ms-0.5 me-1.5 opacity-60"
@@ -59,7 +59,7 @@ function Settings() {
               </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
-            <TabsContent value="tab-1" className="pl-4">
+            <TabsContent value="tab-1" className="p-2">
               <Scroller className="flex h-full flex-col gap-y-4">
                 <div className="flex items-center gap-6">
                   <Avatar className="size-36">
@@ -96,4 +96,5 @@ function Settings() {
     </Dialog>
   );
 }
+
 export default Settings;
