@@ -1,8 +1,13 @@
 import { createColumnHelper, Row } from "@tanstack/react-table";
-import { Text } from "lucide-react";
+import { Tag, Text } from "lucide-react";
 
 import DocumentAcions from "@/app/(protected)/c/[id]/docs/_components/table/actions";
 import { DataTableColumnHeader } from "@/components/data-table/header";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Pill, PillAvatar } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
 import { components } from "@/lib/api/path";
@@ -55,6 +60,69 @@ export const documentColumns = [
       placeholder: "Filter by description...",
       variant: "text",
       icon: Text,
+    },
+    enableColumnFilter: true,
+  }),
+  columnHelper.accessor("tags", {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tags" />
+    ),
+    cell: (info) => {
+      const tags = info.getValue();
+      if (!tags || tags.length === 0) {
+        return <p className="text-muted-foreground">No tags</p>;
+      }
+
+      const displayTags = tags.slice(0, 2);
+      const remainingCount = tags.length - 2;
+
+      return (
+        <div className="flex items-center gap-1">
+          {displayTags.map((tag) => (
+            <div
+              key={tag.id}
+              className="relative inline-flex h-7 w-fit cursor-default items-center rounded-md border px-2 text-xs font-medium transition-all"
+              style={{
+                backgroundColor: `${tag.color}20`,
+                color: tag.color,
+              }}
+            >
+              <span className="capitalize">{tag.title}</span>
+            </div>
+          ))}
+          {remainingCount > 0 && (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <div className="bg-secondary text-secondary-foreground hover:bg-secondary/80 relative inline-flex h-7 w-fit cursor-pointer items-center rounded-md border px-2 text-xs font-medium transition-all">
+                  +{remainingCount}
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-auto p-2">
+                <div className="flex flex-wrap gap-1">
+                  {tags.slice(2).map((tag) => (
+                    <div
+                      key={tag.id}
+                      className="relative inline-flex h-7 w-fit cursor-default items-center rounded-md border px-2 text-xs font-medium transition-all"
+                      style={{
+                        backgroundColor: `${tag.color}20`,
+                        color: tag.color,
+                      }}
+                    >
+                      <span className="capitalize">{tag.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          )}
+        </div>
+      );
+    },
+    meta: {
+      label: "Tags",
+      placeholder: "Filter by tags...",
+      variant: "text",
+      icon: Tag,
     },
     enableColumnFilter: true,
   }),

@@ -166,3 +166,23 @@ export function generateRandomColor(): string {
   const b = Math.floor(Math.random() * 256);
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
+
+/**
+ * Calculate the contrast color (black or white) for a given background color
+ * Uses the relative luminance formula to determine if text should be black or white
+ */
+export function getContrastColor(hexColor: string): string {
+  // Remove the # if present
+  const hex = hexColor.replace("#", "");
+
+  // Convert hex to RGB
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  // Calculate relative luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  // Return black for light backgrounds, white for dark backgrounds
+  return luminance > 0.5 ? "#000000" : "#ffffff";
+}
