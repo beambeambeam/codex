@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import {
   BookIcon,
-  BookmarkIcon,
   FileClockIcon,
   GitCompareArrowsIcon,
   InfoIcon,
@@ -11,6 +10,7 @@ import {
 import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
+import { InDepth } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/in-depth";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
 import { DocumentTags } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/tags";
 import { Badge } from "@/components/ui/badge";
@@ -115,38 +115,10 @@ function DocumentPage() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="in_depts">
-                <div className="flex w-full flex-col gap-4 p-4">
-                  <div className="flex flex-col gap-2">
-                    <div>
-                      <Badge>
-                        <BookmarkIcon />
-                        Description
-                      </Badge>
-                    </div>
-                    <p className="text-md text-md rounded-lg border p-4 font-sans">
-                      {data?.description ?? (
-                        <span className="text-muted-foreground">
-                          No description yet!
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div>
-                      <Badge>
-                        <BookmarkIcon />
-                        Summary
-                      </Badge>
-                    </div>
-                    <p className="text-md rounded-lg border p-4 font-sans">
-                      {data?.summary ?? (
-                        <span className="text-muted-foreground">
-                          No summary yet!
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
+                <InDepth
+                  description={data?.description}
+                  summary={data?.summary}
+                />
               </TabsContent>
               <TabsContent value="kg" className="h-full w-full font-sans">
                 <Badge className="mb-3">Knowledge Graph</Badge>
