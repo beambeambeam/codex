@@ -16,6 +16,7 @@ from ...utils.color import generateRandomColor
 
 from .schemas import (
     DocumentCreateRequest,
+    DocumentUpdateRequest,
     DocumentResponse,
     PaginatedDocumentResponse,
     DocumentAudit,
@@ -136,6 +137,28 @@ async def get_document(
     """Get a document by ID."""
     try:
         return document_service.get_document(document_id=document_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.put(
+    "/{document_id}",
+    response_model=DocumentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def update_document(
+    document_id: str,
+    document_update: DocumentUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    document_service: DocumentService = Depends(get_document_service),
+):
+    """Update a document by ID."""
+    try:
+        return document_service.update_document(
+            document_id=document_id,
+            document_update=document_update,
+            user_id=str(current_user.id),
+        )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 

@@ -392,7 +392,11 @@ export interface paths {
      * @description Get a document by ID.
      */
     get: operations["get_document_api_v1_documents__document_id__get"];
-    put?: never;
+    /**
+     * Update Document
+     * @description Update a document by ID.
+     */
+    put: operations["update_document_api_v1_documents__document_id__put"];
     post?: never;
     /**
      * Delete Document
@@ -850,9 +854,27 @@ export interface components {
       document_id: string;
       /**
        * Tag Ids
-       * @description List of tag IDs to assign to the document
+       * @description List of tag IDs (UUIDs) or tag titles (strings) to assign to the document
        */
       tag_ids: string[];
+    };
+    /** DocumentUpdateRequest */
+    DocumentUpdateRequest: {
+      /**
+       * Title
+       * @description Title of the document
+       */
+      title?: string | null;
+      /**
+       * Description
+       * @description Description of the document
+       */
+      description?: string | null;
+      /**
+       * Summary
+       * @description Summary of the document
+       */
+      summary?: string | null;
     };
     /** EdgeDataSchema */
     EdgeDataSchema: {
@@ -1840,6 +1862,41 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_document_api_v1_documents__document_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DocumentUpdateRequest"];
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {

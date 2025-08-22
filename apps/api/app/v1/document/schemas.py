@@ -85,6 +85,12 @@ class DocumentCreateRequest(BaseModel):
     summary: Optional[str] = Field(None, description="Summary of the document")
 
 
+class DocumentUpdateRequest(BaseModel):
+    title: Optional[str] = Field(None, description="Title of the document")
+    description: Optional[str] = Field(None, description="Description of the document")
+    summary: Optional[str] = Field(None, description="Summary of the document")
+
+
 class DocumentResponse(BaseModel):
     id: UUID
     collection_id: Optional[UUID] = None

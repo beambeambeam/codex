@@ -6,6 +6,7 @@ from ..models.user import User
 from ..models.collection import Collection
 from .schemas import (
     DocumentCreateRequest,
+    DocumentUpdateRequest,
     DocumentResponse,
     PaginatedDocumentResponse,
     TagCreateRequest,
@@ -288,6 +289,48 @@ class DocumentService:
             per_page=per_page,
             total_pages=total_pages,
         )
+
+    def update_document(
+        self,
+        document_id: str,
+        document_update: DocumentUpdateRequest,
+        user_id: Optional[str] = None,
+    ) -> DocumentResponse:
+        """Update document details (title, description, summary)."""
+        document = self.db.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
+
+        # Prepare old values for audit
+        old_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Update the document fields
+        if document_update.title is not None:
+            document.title = document_update.title
+        if document_update.description is not None:
+            document.description = document_update.description
+        if document_update.summary is not None:
+            document.summary = document_update.summary
+
+        # Prepare new values for audit
+        new_values = {
+            c.name: getattr(document, c.name) for c in document.__table__.columns
+        }
+
+        # Audit the update
+        self.audit.create_audit(
+            document_id=str(document_id),
+            action=DocumentActionEnum.UPDATE,
+            user_id=str(user_id) if user_id else None,
+            old_values=old_values,
+            new_values=new_values,
+        )
+
+        self.db.commit()
+
+        return self.get_document(document_id)
 
     def update_document_collection(
         self,

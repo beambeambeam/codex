@@ -10,7 +10,7 @@ import {
 import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
-import { InDepth } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/in-depth";
+import { InDepth } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/in-depth/index";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
 import { DocumentTags } from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/tags";
 import { Badge } from "@/components/ui/badge";
