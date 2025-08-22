@@ -54,7 +54,7 @@ function CollectionTag() {
       <Separator />
 
       <div className="space-y-2">
-        <h4 className="text-muted-foreground flex items-center gap-1 text-xs font-medium uppercase tracking-wide">
+        <h4 className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide">
           <TagsIcon className="size-4" />
           Existing Tags
         </h4>
