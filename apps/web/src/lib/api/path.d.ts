@@ -424,6 +424,134 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/documents/tags": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create Tag
+     * @description Create a new tag.
+     */
+    post: operations["create_tag_api_v1_documents_tags_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/tags/collection/{collection_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Tags By Collection
+     * @description Get all tags for a specific collection.
+     */
+    get: operations["get_tags_by_collection_api_v1_documents_tags_collection__collection_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/tags/{tag_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Tag
+     * @description Get a tag by ID.
+     */
+    get: operations["get_tag_api_v1_documents_tags__tag_id__get"];
+    /**
+     * Update Tag
+     * @description Update a tag.
+     */
+    put: operations["update_tag_api_v1_documents_tags__tag_id__put"];
+    post?: never;
+    /**
+     * Delete Tag
+     * @description Delete a tag.
+     */
+    delete: operations["delete_tag_api_v1_documents_tags__tag_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/document-tags": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add Tag To Document
+     * @description Add a tag to a document.
+     */
+    post: operations["add_tag_to_document_api_v1_documents_document_tags_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/document-tags/{document_id}/{tag_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove Tag From Document
+     * @description Remove a tag from a document.
+     */
+    delete: operations["remove_tag_from_document_api_v1_documents_document_tags__document_id___tag_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/documents/{document_id}/tags": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Document Tags
+     * @description Get all tags for a specific document.
+     */
+    get: operations["get_document_tags_api_v1_documents__document_id__tags_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -676,6 +804,37 @@ export interface components {
       /** Is Graph Extracted */
       is_graph_extracted: boolean;
       knowledge_graph: components["schemas"]["KnowledgeGraph"] | null;
+      /** Tags */
+      tags?: components["schemas"]["TagResponse"][] | null;
+    };
+    /** DocumentTagCreateRequest */
+    DocumentTagCreateRequest: {
+      /**
+       * Document Id
+       * Format: uuid
+       * @description ID of the document
+       */
+      document_id: string;
+      /**
+       * Tag Id
+       * Format: uuid
+       * @description ID of the tag
+       */
+      tag_id: string;
+    };
+    /** DocumentTagResponse */
+    DocumentTagResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Document Id
+       * Format: uuid
+       */
+      document_id: string;
+      tag: components["schemas"]["TagResponse"];
     };
     /** EdgeDataSchema */
     EdgeDataSchema: {
@@ -752,6 +911,55 @@ export interface components {
       per_page: number;
       /** Total Pages */
       total_pages: number;
+    };
+    /** TagCreateRequest */
+    TagCreateRequest: {
+      /**
+       * Collection Id
+       * Format: uuid
+       * @description ID of the collection that owns the tag
+       */
+      collection_id: string;
+      /**
+       * Title
+       * @description Title of the tag
+       */
+      title: string;
+      /**
+       * Color
+       * @description Color of the tag (hex code)
+       */
+      color: string;
+    };
+    /** TagResponse */
+    TagResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Collection Id
+       * Format: uuid
+       */
+      collection_id: string;
+      /** Title */
+      title: string;
+      /** Color */
+      color: string;
+    };
+    /** TagUpdateRequest */
+    TagUpdateRequest: {
+      /**
+       * Title
+       * @description Title of the tag
+       */
+      title?: string | null;
+      /**
+       * Color
+       * @description Color of the tag (hex code)
+       */
+      color?: string | null;
     };
     /**
      * UserEditRequest
@@ -1682,6 +1890,259 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["DocumentAudit"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_tag_api_v1_documents_tags_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TagCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_tags_by_collection_api_v1_documents_tags_collection__collection_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_tag_api_v1_documents_tags__tag_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tag_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_tag_api_v1_documents_tags__tag_id__put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tag_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TagUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_tag_api_v1_documents_tags__tag_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tag_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_tag_to_document_api_v1_documents_document_tags_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DocumentTagCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentTagResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  remove_tag_from_document_api_v1_documents_document_tags__document_id___tag_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+        tag_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_document_tags_api_v1_documents__document_id__tags_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TagResponse"][];
         };
       };
       /** @description Validation Error */

@@ -11,7 +11,7 @@ from .enum import CollectionActionEnum, CollectionPermissionEnum
 import uuid
 
 if TYPE_CHECKING:
-    from .document import Document
+    from .document import Document, Tag
 
 
 class Collection(Base):
@@ -26,6 +26,9 @@ class Collection(Base):
 
     documents: Mapped[list["Document"]] = relationship(
         "Document", back_populates="collection", cascade="all, delete-orphan"
+    )
+    tags: Mapped[list["Tag"]] = relationship(
+        "Tag", back_populates="collection", cascade="all, delete-orphan"
     )
 
 

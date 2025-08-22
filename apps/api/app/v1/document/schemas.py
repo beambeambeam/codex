@@ -9,6 +9,45 @@ from ..user.schemas import UserInfoSchema
 from ..models.enum import DocumentActionEnum
 
 
+# Tag schemas
+class TagCreateRequest(BaseModel):
+    collection_id: UUID = Field(
+        ..., description="ID of the collection that owns the tag"
+    )
+    title: str = Field(..., description="Title of the tag")
+    color: str = Field(..., description="Color of the tag (hex code)")
+
+
+class TagUpdateRequest(BaseModel):
+    title: Optional[str] = Field(None, description="Title of the tag")
+    color: Optional[str] = Field(None, description="Color of the tag (hex code)")
+
+
+class TagResponse(BaseModel):
+    id: UUID
+    collection_id: UUID
+    title: str
+    color: str
+
+    class Config:
+        from_attributes = True
+
+
+# Document tag schemas
+class DocumentTagCreateRequest(BaseModel):
+    document_id: UUID = Field(..., description="ID of the document")
+    tag_id: UUID = Field(..., description="ID of the tag")
+
+
+class DocumentTagResponse(BaseModel):
+    id: UUID
+    document_id: UUID
+    tag: TagResponse
+
+    class Config:
+        from_attributes = True
+
+
 # DocumentAudit schema for audit API responses
 class DocumentAudit(BaseModel):
     id: UUID
@@ -49,6 +88,7 @@ class DocumentResponse(BaseModel):
     is_vectorized: bool
     is_graph_extracted: bool
     knowledge_graph: Optional[KnowledgeGraph]
+    tags: Optional[List[TagResponse]] = None
 
     class Config:
         from_attributes = True
