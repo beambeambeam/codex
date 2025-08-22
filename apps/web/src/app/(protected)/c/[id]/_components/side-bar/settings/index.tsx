@@ -28,7 +28,7 @@ function CollectionSettings() {
   const onTabChange = (value: string) => setTab(value);
 
   const TABS_TRIGGER_CLASSNAME =
-    "hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none py-6";
+    "hover:bg-accent hover:bg-accent hover:text-foreground data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent relative w-full justify-start after:absolute after:inset-y-0 after:start-0 after:-ms-1 after:w-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-none rounded-none py-6";
 
   return (
     <Dialog
