@@ -99,8 +99,9 @@ function DocumentPage() {
               defaultValue="in_depts"
               value={tab}
               onValueChange={onTabChange}
+              className="p-4"
             >
-              <TabsList>
+              <TabsList className="mb-2">
                 <TabsTrigger value="in_depts">
                   <InfoIcon />
                   In Depts
