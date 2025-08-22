@@ -416,10 +416,8 @@ class DocumentService:
 
         return result
 
-    # Tag CRUD operations
     def create_tag(self, tag_create: TagCreateRequest) -> TagResponse:
         """Create a new tag."""
-        # Verify collection exists
         collection_exists = (
             self.db.query(Collection)
             .filter(Collection.id == tag_create.collection_id)
@@ -427,6 +425,20 @@ class DocumentService:
         )
         if not collection_exists:
             raise ValueError(f"Collection with id {tag_create.collection_id} not found")
+
+        # Prevent duplicate tag titles within the same collection
+        existing_tag = (
+            self.db.query(Tag)
+            .filter(
+                Tag.title == tag_create.title,
+                Tag.collection_id == tag_create.collection_id,
+            )
+            .first()
+        )
+        if existing_tag:
+            raise ValueError(
+                f"Tag with title '{tag_create.title}' already exists in collection {tag_create.collection_id}"
+            )
 
         try:
             tag = Tag(
