@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import {
   BookIcon,
+  BookmarkIcon,
   FileClockIcon,
   GitCompareArrowsIcon,
   InfoIcon,
@@ -11,8 +12,7 @@ import { parseAsString, useQueryState } from "nuqs";
 
 import DocumentAudit from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/audit";
 import DocumentKnowledgeGraph from "@/app/(protected)/c/[id]/docs/[doc_id]/_components/kg";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import FilePreview from "@/components/ui/file-preview";
 import { Pill, PillAvatar, PillIcon } from "@/components/ui/pill";
 import { RelativeTimeCard } from "@/components/ui/relative-time-card";
@@ -109,64 +109,48 @@ function DocumentPage() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="in_depts">
-                <Card>
-                  <CardContent>
-                    <div className="flex w-full flex-col gap-4">
-                      <div className="flex flex-col gap-2">
-                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
-                          Title
-                          <Button
-                            className="w-fit text-xs"
-                            size="sm"
-                            variant="outline"
-                          >
-                            Generate New Title
-                          </Button>
-                        </h2>
-                        <p className="text-md font-sans">
-                          {data?.title ?? "Untitled Document"}
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
-                          Description
-                          <Button
-                            className="w-fit text-xs"
-                            size="sm"
-                            variant="outline"
-                          >
-                            Generate New Description
-                          </Button>
-                        </h2>
-                        <p className="text-md font-sans">{data?.description}</p>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h2 className="text-muted-foreground flex items-center gap-2 text-sm">
-                          Summary
-                          <Button
-                            className="w-fit text-xs"
-                            size="sm"
-                            variant="outline"
-                          >
-                            Generate New Summary
-                          </Button>
-                        </h2>
-                        <p className="text-md font-sans">
-                          {data?.summary ?? "No summary yet!"}
-                        </p>
-                      </div>
+                <div className="flex w-full flex-col gap-4 p-4">
+                  <div className="flex flex-col gap-2">
+                    <div>
+                      <Badge>
+                        <BookmarkIcon />
+                        Description
+                      </Badge>
                     </div>
-                  </CardContent>
-                </Card>
+                    <p className="text-md text-md rounded-lg border p-4 font-sans">
+                      {data?.description ?? (
+                        <span className="text-muted-foreground">
+                          No description yet!
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div>
+                      <Badge>
+                        <BookmarkIcon />
+                        Summary
+                      </Badge>
+                    </div>
+                    <p className="text-md rounded-lg border p-4 font-sans">
+                      {data?.summary ?? (
+                        <span className="text-muted-foreground">
+                          No summary yet!
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
               </TabsContent>
               <TabsContent value="kg" className="h-full w-full font-sans">
+                <Badge className="mb-3">Knowledge Graph</Badge>
                 <DocumentKnowledgeGraph
                   knowledge_graph={data?.knowledge_graph ?? null}
                   type={data?.file?.type ?? ""}
                 />
               </TabsContent>
               <TabsContent value="audit">
-                <p>Graph Audit</p>
+                <Badge className="mb-1">Audit</Badge>
                 <DocumentAudit />
               </TabsContent>
             </Tabs>
