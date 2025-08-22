@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { cacheUtils } from "@/lib/query/cache";
-import { parseErrorDetail } from "@/lib/utils";
+import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
 import FormProps from "@/types/form";
 
 const tagCreateFormSchema = z.object({
@@ -42,6 +42,10 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
             "/api/v1/documents/tags/collection/{collection_id}",
           ]);
         }
+        form.reset({
+          title: "",
+          color: generateRandomColor(),
+        });
       },
       onError(err: unknown) {
         toast.error(parseErrorDetail(err) || "Failed to create tag");
