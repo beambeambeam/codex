@@ -3,6 +3,7 @@
 import { BookmarkIcon, EditIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface InDepthProps {
   description?: string | null;
@@ -39,6 +40,10 @@ export function InDepth({ description, summary }: InDepthProps) {
             <span className="text-muted-foreground">No summary yet!</span>
           )}
         </p>
+      </div>
+      <div className="flex w-full justify-end gap-2">
+        <Button variant="secondary">Cancel</Button>
+        <Button>Save</Button>
       </div>
     </div>
   );
