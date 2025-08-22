@@ -23,9 +23,16 @@ from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
 import uuid
+import re
 from ..user.schemas import UserInfoSchema
 from ..schemas.graph import KnowledgeGraph
 import math
+from ...utils.color import generateRandomColor
+
+_UUID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
 
 
 class DocumentService:
@@ -661,6 +668,77 @@ class DocumentService:
         except Exception as e:
             self.db.rollback()
             raise ValueError(f"Error updating document tags: {str(e)}")
+
+    def replace_document_tags(
+        self, document_id: str, tag_items: List[str]
+    ) -> List[TagResponse]:
+        """Replace all tags for a document.
+
+        Accepts a list of tag identifiers which can be UUID strings or new tag
+        titles. New titles will be created within the same collection as the
+        document. Returns the updated list of TagResponse objects.
+        """
+        document = self.db.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            raise ValueError(f"Document with id {document_id} not found")
+
+        collection_id = document.collection_id
+        if not collection_id:
+            raise ValueError(
+                "Cannot create tags for a document without a collection_id"
+            )
+
+        existing_tag_ids: List[str] = []
+        new_titles: List[str] = []
+
+        for item in tag_items:
+            if isinstance(item, str) and _UUID_PATTERN.match(item):
+                existing_tag_ids.append(item)
+            elif isinstance(item, str):
+                new_titles.append(item)
+            else:
+                existing_tag_ids.append(str(item))
+
+        created_ids: List[str] = []
+
+        for title in new_titles:
+            tag = (
+                self.db.query(Tag)
+                .filter(Tag.title == title, Tag.collection_id == collection_id)
+                .first()
+            )
+            if tag:
+                created_ids.append(str(tag.id))
+                continue
+
+            # Create tag with basic get-or-create safety: attempt insert, on
+            # IntegrityError re-query to handle concurrent creators.
+            try:
+                new_tag = Tag(
+                    collection_id=collection_id,
+                    title=title,
+                    color=generateRandomColor(),
+                )
+                self.db.add(new_tag)
+                self.db.commit()
+                self.db.refresh(new_tag)
+                created_ids.append(str(new_tag.id))
+            except IntegrityError:
+                # Possible race - rollback and re-query
+                self.db.rollback()
+                tag2 = (
+                    self.db.query(Tag)
+                    .filter(Tag.title == title, Tag.collection_id == collection_id)
+                    .first()
+                )
+                if tag2:
+                    created_ids.append(str(tag2.id))
+                else:
+                    raise ValueError(f"Unable to create tag '{title}'")
+
+        all_tag_ids = existing_tag_ids + created_ids
+
+        return self.update_document_tags(document_id, all_tag_ids)
 
 
 class DocumentAuditService:

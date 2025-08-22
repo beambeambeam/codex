@@ -11,9 +11,6 @@ from typing import List
 from uuid import UUID
 
 
-from ...utils.color import generateRandomColor
-
-
 from .schemas import (
     DocumentCreateRequest,
     DocumentUpdateRequest,
@@ -351,61 +348,9 @@ async def update_document_tags(
 ):
     """Update all tags for a document in one operation."""
     try:
-        # Process tag data - separate existing tags from new tags to create
-        existing_tag_ids = []
-        new_tags_to_create = []
-
-        for tag_item in document_tag_update.tag_ids:
-            if isinstance(tag_item, str):
-                # Check if it's a UUID (existing tag) or a string (new tag to create)
-                import re
-
-                is_uuid = re.match(
-                    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-                    tag_item,
-                    re.IGNORECASE,
-                )
-
-                if is_uuid:
-                    existing_tag_ids.append(tag_item)
-                else:
-                    # This is a new tag title to create
-                    new_tags_to_create.append(tag_item)
-            else:
-                existing_tag_ids.append(str(tag_item))
-
-        # Create new tags first
-        created_tag_ids = []
-        for tag_title in new_tags_to_create:
-            document = document_service.get_document(document_id)
-            collection_id = (
-                str(document.collection_id) if document.collection_id else None
-            )
-
-            if collection_id:
-                # Check if tag already exists
-                existing_tag = document_service.get_tag_by_title_and_collection(
-                    tag_title, collection_id
-                )
-                if existing_tag:
-                    created_tag_ids.append(str(existing_tag.id))
-                else:
-                    # Create new tag
-
-                    new_tag = document_service.create_tag(
-                        TagCreateRequest(
-                            collection_id=UUID(collection_id),
-                            title=tag_title,
-                            color=generateRandomColor(),
-                        )
-                    )
-                    created_tag_ids.append(str(new_tag.id))
-
-        # Combine all tag IDs
-        all_tag_ids = existing_tag_ids + created_tag_ids
-
-        # Update document tags
-        return document_service.update_document_tags(document_id, all_tag_ids)
+        return document_service.replace_document_tags(
+            document_id=document_id, tag_items=document_tag_update.tag_ids
+        )
 
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
