@@ -8,4 +8,7 @@ export interface ExternalFormProps<SchemaType> {
   disabled?: boolean;
   isPending?: boolean;
   isError?: boolean;
+  onSubmit?: (values: SchemaType) => void | Promise<void>;
+  closeDialog?: () => void;
+  mode?: "create" | "edit";
 }

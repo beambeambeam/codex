@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { EditIcon, TagsIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -22,13 +22,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { cacheUtils } from "@/lib/query/cache";
 import { parseErrorDetail } from "@/lib/utils";
 
-import TagForm from "./form";
+import TagForm, { TagCreateFormSchemaType } from "./form";
 
 interface Tag {
   id: string;
@@ -40,6 +39,8 @@ interface Tag {
 function TagList() {
   const params = useParams() as { id?: string };
   const collectionId = params?.id;
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const { data: tags = [], isLoading } = useQueryFetchClient.useQuery(
     "get",
@@ -74,6 +75,24 @@ function TagList() {
       },
     );
 
+  const { mutate: updateTag, isPending: isUpdating } =
+    useQueryFetchClient.useMutation("put", "/api/v1/documents/tags/{tag_id}", {
+      onSuccess() {
+        toast.success("Tag updated successfully");
+        if (collectionId) {
+          cacheUtils.invalidateQueries([
+            "get",
+            "/api/v1/documents/tags/collection/{collection_id}",
+          ]);
+        }
+        setEditDialogOpen(false);
+        setEditingTag(null);
+      },
+      onError(err: unknown) {
+        toast.error(parseErrorDetail(err) || "Failed to update tag");
+      },
+    });
+
   const handleDeleteTag = (tagId: string) => {
     deleteTag({
       params: {
@@ -82,6 +101,27 @@ function TagList() {
         },
       },
     });
+  };
+
+  const handleUpdateTag = async (values: TagCreateFormSchemaType) => {
+    if (!editingTag) return;
+
+    updateTag({
+      params: {
+        path: {
+          tag_id: editingTag.id,
+        },
+      },
+      body: {
+        title: values.title,
+        color: values.color,
+      },
+    });
+  };
+
+  const handleEditClick = (tag: Tag) => {
+    setEditingTag(tag);
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -124,24 +164,13 @@ function TagList() {
           </div>
 
           <div className="flex items-center gap-1">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon-sm">
-                  <EditIcon />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Edit Tag</DialogTitle>
-                </DialogHeader>
-                <TagForm
-                  defaultValues={{
-                    color: tag.color,
-                    title: tag.title,
-                  }}
-                />
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => handleEditClick(tag)}
+            >
+              <EditIcon />
+            </Button>
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -173,6 +202,26 @@ function TagList() {
           </div>
         </div>
       ))}
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Tag</DialogTitle>
+          </DialogHeader>
+          {editingTag && (
+            <TagForm
+              defaultValues={{
+                color: editingTag.color,
+                title: editingTag.title,
+              }}
+              isPending={isUpdating}
+              onSubmit={handleUpdateTag}
+              closeDialog={() => setEditDialogOpen(false)}
+              mode="edit"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

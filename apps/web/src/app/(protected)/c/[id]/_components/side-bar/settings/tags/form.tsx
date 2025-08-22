@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useParams } from "next/navigation";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
-import { useQueryFetchClient } from "@/lib/api/client";
-import { cacheUtils } from "@/lib/query/cache";
-import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
-import FormProps from "@/types/form";
+import { generateRandomColor } from "@/lib/utils";
+import { ExternalFormProps } from "@/types/form";
 
 const tagCreateFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -21,32 +17,8 @@ const tagCreateFormSchema = z.object({
 
 export type TagCreateFormSchemaType = z.infer<typeof tagCreateFormSchema>;
 
-function TagForm(props: FormProps<TagCreateFormSchemaType>) {
-  const params = useParams() as { id?: string };
-  const collectionId = params?.id;
-
-  const { mutate, isPending } = useQueryFetchClient.useMutation(
-    "post",
-    "/api/v1/documents/tags",
-    {
-      onSuccess() {
-        toast.success("Tag created successfully");
-        if (collectionId) {
-          cacheUtils.invalidateQueries([
-            "get",
-            "/api/v1/documents/tags/collection/{collection_id}",
-          ]);
-        }
-        form.reset({
-          title: "",
-          color: generateRandomColor(),
-        });
-      },
-      onError(err: unknown) {
-        toast.error(parseErrorDetail(err) || "Failed to create tag");
-      },
-    },
-  );
+function TagForm(props: ExternalFormProps<TagCreateFormSchemaType>) {
+  const mode = props.mode || "create";
 
   const form = useAppForm({
     validators: { onChange: tagCreateFormSchema },
@@ -55,13 +27,15 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
       color: props.defaultValues?.color ?? generateRandomColor(),
     },
     onSubmit: async ({ value }) => {
-      mutate({
-        body: {
-          collection_id: collectionId || "",
-          title: value.title,
-          color: value.color,
-        },
-      });
+      if (props.onSubmit) {
+        await props.onSubmit(value);
+      }
+      if (mode === "create") {
+        form.reset({
+          title: "",
+          color: generateRandomColor(),
+        });
+      }
     },
   });
 
@@ -73,6 +47,13 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
     },
     [form],
   );
+
+  const getButtonText = () => {
+    if (props.isPending) {
+      return mode === "create" ? "Creating..." : "Updating...";
+    }
+    return mode === "create" ? "Create Tag" : "Update Tag";
+  };
 
   return (
     <form.AppForm>
@@ -89,7 +70,7 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  disabled={isPending}
+                  disabled={props.isPending || props.disabled}
                 />
               </field.FormControl>
               <field.FormMessage />
@@ -127,11 +108,11 @@ function TagForm(props: FormProps<TagCreateFormSchemaType>) {
         <div className="flex w-full items-end justify-end gap-2">
           <Button
             type="submit"
-            disabled={isPending}
+            disabled={props.isPending || props.disabled}
             className="w-fit"
             variant="outline"
           >
-            {isPending ? "Creating..." : "Create Tag"}
+            {getButtonText()}
           </Button>
         </div>
       </form>

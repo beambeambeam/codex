@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
 import { PlusIcon, TagIcon, TagsIcon } from "lucide-react";
+import { toast } from "sonner";
 
-import TagForm from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/form";
+import TagForm, {
+  TagCreateFormSchemaType,
+} from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/form";
 import TagList from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/list";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +18,45 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { generateRandomColor } from "@/lib/utils";
+import { useQueryFetchClient } from "@/lib/api/client";
+import { cacheUtils } from "@/lib/query/cache";
+import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
 
 function CollectionTag() {
   const [open, setOpen] = useState(false);
+  const params = useParams() as { id?: string };
+  const collectionId = params?.id;
+
+  const { mutate, isPending } = useQueryFetchClient.useMutation(
+    "post",
+    "/api/v1/documents/tags",
+    {
+      onSuccess() {
+        toast.success("Tag created successfully");
+        if (collectionId) {
+          cacheUtils.invalidateQueries([
+            "get",
+            "/api/v1/documents/tags/collection/{collection_id}",
+          ]);
+        }
+        setOpen(false);
+      },
+      onError(err: unknown) {
+        toast.error(parseErrorDetail(err) || "Failed to create tag");
+      },
+    },
+  );
+
+  const handleSubmit = async (values: TagCreateFormSchemaType) => {
+    mutate({
+      body: {
+        collection_id: collectionId || "",
+        title: values.title,
+        color: values.color,
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
@@ -41,7 +80,10 @@ function CollectionTag() {
                 color: generateRandomColor(),
                 title: "",
               }}
+              isPending={isPending}
+              onSubmit={handleSubmit}
               closeDialog={() => setOpen(false)}
+              mode="create"
             />
           </DialogContent>
         </Dialog>
