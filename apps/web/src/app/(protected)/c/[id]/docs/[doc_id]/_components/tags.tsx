@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { useQueryFetchClient } from "@/lib/api/client";
 import { cacheUtils } from "@/lib/query/cache";
-import { generateRandomColor, parseErrorDetail } from "@/lib/utils";
+import { parseErrorDetail } from "@/lib/utils";
 
 interface Tag {
   id: string;

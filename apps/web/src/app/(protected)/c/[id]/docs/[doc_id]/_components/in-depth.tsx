@@ -1,6 +1,6 @@
 "use client";
 
-import { BookmarkIcon } from "lucide-react";
+import { BookmarkIcon, EditIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -11,13 +11,14 @@ interface InDepthProps {
 
 export function InDepth({ description, summary }: InDepthProps) {
   return (
-    <div className="flex w-full flex-col gap-4 p-4">
+    <div className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <div>
+        <div className="flex items-center gap-1">
           <Badge>
             <BookmarkIcon />
             Description
           </Badge>
+          <EditIcon className="text-muted-foreground/60 size-6" />
         </div>
         <p className="text-md text-md rounded-lg border p-4 font-sans">
           {description ?? (
@@ -26,11 +27,12 @@ export function InDepth({ description, summary }: InDepthProps) {
         </p>
       </div>
       <div className="flex flex-col gap-2">
-        <div>
+        <div className="flex items-center gap-1">
           <Badge>
             <BookmarkIcon />
             Summary
           </Badge>
+          <EditIcon className="text-muted-foreground/60 size-6" />
         </div>
         <p className="text-md rounded-lg border p-4 font-sans">
           {summary ?? (
