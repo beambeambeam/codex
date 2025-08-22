@@ -1,6 +1,15 @@
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import TIMESTAMP, ForeignKey, Text, Boolean, JSON, event, Enum, Integer
+from sqlalchemy import (
+    TIMESTAMP,
+    ForeignKey,
+    Text,
+    Boolean,
+    JSON,
+    event,
+    Enum,
+    Integer,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -53,6 +62,9 @@ class Document(Base):
     chunks: Mapped[list["Chunk"]] = relationship(
         "Chunk", back_populates="document", cascade="all, delete-orphan"
     )
+    document_tags: Mapped[list["DocumentTag"]] = relationship(
+        "DocumentTag", back_populates="document", cascade="all, delete-orphan"
+    )
 
     def validate_knowledge_graph_data(
         self, knowledge_graph_data: Optional[dict]
@@ -64,6 +76,49 @@ class Document(Base):
         """Set knowledge graph with validation."""
         self.validate_knowledge_graph_data(knowledge_graph_data)
         self.knowledge_graph = knowledge_graph_data
+
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    collection_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("collection.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(Text, nullable=False)
+    color: Mapped[str] = mapped_column(Text, nullable=False)
+
+    collection: Mapped["Collection"] = relationship("Collection", back_populates="tags")
+    document_tags: Mapped[list["DocumentTag"]] = relationship(
+        "DocumentTag", back_populates="tag", cascade="all, delete-orphan"
+    )
+
+
+class DocumentTag(Base):
+    __tablename__ = "document_tag"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    tag_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tags.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    document: Mapped["Document"] = relationship(
+        "Document", back_populates="document_tags"
+    )
+    tag: Mapped["Tag"] = relationship("Tag", back_populates="document_tags")
 
 
 class Chunk(Base):
