@@ -60,7 +60,7 @@ function CollectionSettings() {
                   size={16}
                   aria-hidden="true"
                 />
-                Project
+                Collection
               </TabsTrigger>
               <TabsTrigger
                 value="contributor"
