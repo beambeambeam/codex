@@ -7,11 +7,16 @@ import CollectionUpdateForm from "@/app/(protected)/c/[id]/_components/side-bar/
 function CollectionInfo() {
   const { collection } = useCollectionState();
   return (
-    <div className="flex flex-col gap-3 p-4">
-      <h1 className="flex items-start justify-start gap-1 text-lg font-bold">
-        <AlbumIcon />
-        Collection
-      </h1>
+    <div className="flex flex-col gap-8 p-4">
+      <div>
+        <h1 className="flex items-start justify-start gap-1 text-lg font-bold">
+          <AlbumIcon />
+          Collection
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          Information about this collections.
+        </p>
+      </div>
       <CollectionUpdateForm
         defaultValues={{
           title: collection.title ?? "",

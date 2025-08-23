@@ -9,6 +9,7 @@ import TagForm, {
   TagCreateFormSchemaType,
 } from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/form";
 import TagList from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags/list";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -59,9 +60,12 @@ function CollectionTag() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <TagIcon className="size-5 font-bold" />
-          <h3 className="text-lg font-bold">Tags</h3>
+        <div>
+          <div className="flex items-center gap-1">
+            <TagIcon className="size-5 font-bold" />
+            <h3 className="text-lg font-bold">Tags</h3>
+          </div>
+          <p className="text-muted-foreground text-sm">Collection tags.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -88,10 +92,8 @@ function CollectionTag() {
         </Dialog>
       </div>
 
-      <div className="space-y-2">
-        <h4 className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide">
-          Existing Tags
-        </h4>
+      <div className="space-y-2 pt-3">
+        <Badge>Existing Tags</Badge>
         <TagList />
       </div>
     </div>

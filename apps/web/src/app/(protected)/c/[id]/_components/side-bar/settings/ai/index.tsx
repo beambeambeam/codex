@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
+import { BotIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -103,7 +104,9 @@ function CollectionAi() {
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between p-4">
           <div>
-            <h3 className="text-lg font-semibold">AI Preferences</h3>
+            <h3 className="flex items-center gap-1 text-lg font-semibold">
+              <BotIcon /> AI Preferences
+            </h3>
             <p className="text-muted-foreground text-sm">
               Configure how AI should interact with this collection
             </p>
@@ -118,15 +121,17 @@ function CollectionAi() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center p-4">
         <div>
-          <h3 className="text-lg font-semibold">AI Preferences</h3>
+          <h3 className="flex items-center gap-1 text-lg font-semibold">
+            <BotIcon /> AI Preferences
+          </h3>
           <p className="text-muted-foreground text-sm">
             Configure how AI should interact with this collection
           </p>
         </div>
       </div>
-      <Scroller className="flex flex-1 flex-col gap-y-6 p-4">
+      <Scroller className="flex flex-col gap-y-6 p-4">
         <form.AppForm>
           <form className="flex flex-col gap-y-6" onSubmit={handleSubmit}>
             <form.AppField name="tones_and_style">
@@ -199,22 +204,17 @@ function CollectionAi() {
             </form.AppField>
           </form>
         </form.AppForm>
-
-        <div className="pt-10"></div>
       </Scroller>
-
-      <div className="bg-background p-4">
-        <div className="flex w-full items-center justify-end gap-2">
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="w-fit"
-            variant="outline"
-            onClick={handleSubmit}
-          >
-            {isPending ? "Saving..." : "Save"}
-          </Button>
-        </div>
+      <div className="flex w-full justify-end px-4">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="w-fit"
+          variant="outline"
+          onClick={handleSubmit}
+        >
+          {isPending ? "Saving..." : "Save"}
+        </Button>
       </div>
     </div>
   );
