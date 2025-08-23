@@ -252,6 +252,34 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/collections/{collection_id}/ai-preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Collection Ai Preferences
+     * @description Get collection AI preferences.
+     */
+    get: operations["get_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_get"];
+    /**
+     * Update Collection Ai Preferences
+     * @description Update collection AI preferences. Creates if doesn't exist.
+     */
+    put: operations["update_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_put"];
+    post?: never;
+    /**
+     * Delete Collection Ai Preferences
+     * @description Delete collection AI preferences.
+     */
+    delete: operations["delete_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/collections/{collection_id}/permissions": {
     parameters: {
       query?: never;
@@ -619,6 +647,68 @@ export interface components {
       file: File;
       /** Resource */
       resource: string;
+    };
+    /**
+     * CollectionAiPreferenceRequest
+     * @description Collection AI preference request payload
+     */
+    CollectionAiPreferenceRequest: {
+      /**
+       * Tones And Style
+       * @example Professional and formal tone
+       */
+      tones_and_style?: string | null;
+      /**
+       * Skillset
+       * @example Technical documentation, API design
+       */
+      skillset?: string | null;
+      /**
+       * Sensitivity
+       * @example Handle sensitive data with care
+       */
+      sensitivity?: string | null;
+    };
+    /**
+     * CollectionAiPreferenceResponse
+     * @description Collection AI preference response payload
+     */
+    CollectionAiPreferenceResponse: {
+      /**
+       * Id
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id: string;
+      /**
+       * Collection Id
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      collection_id: string;
+      /**
+       * Tones And Style
+       * @example Professional and formal tone
+       */
+      tones_and_style?: string | null;
+      /**
+       * Skillset
+       * @example Technical documentation, API design
+       */
+      skillset?: string | null;
+      /**
+       * Sensitivity
+       * @example Handle sensitive data with care
+       */
+      sensitivity?: string | null;
+      /**
+       * Created At
+       * @example 2024-01-01T00:00:00Z
+       */
+      created_at: string;
+      /**
+       * Updated At
+       * @example 2024-01-01T00:00:00Z
+       */
+      updated_at: string;
     };
     /**
      * CollectionAuditResponse
@@ -1712,6 +1802,101 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["CollectionAuditResponse"][];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionAiPreferenceResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CollectionAiPreferenceRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CollectionAiPreferenceResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_collection_ai_preferences_api_v1_collections__collection_id__ai_preferences_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        collection_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

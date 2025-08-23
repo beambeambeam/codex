@@ -4,7 +4,6 @@ from .schemas import (
     CollectionResponse,
     CollectionPermissionResponse,
     CollectionAiPreferenceRequest,
-    CollectionAiPreferenceResponse,
 )
 from ..models.collection import (
     Collection,
@@ -258,6 +257,79 @@ class CollectionService:
     def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
         """Get all collections a user has access to."""
         return self.permission.get_user_collections(user_id)
+
+    # AI Preference methods
+    def get_collection_ai_preference(
+        self, collection_id: str
+    ) -> Optional[CollectionAiPreference]:
+        """Get collection AI preference by collection ID."""
+        return (
+            self.db.query(CollectionAiPreference)
+            .filter(CollectionAiPreference.collection_id == collection_id)
+            .first()
+        )
+
+    def create_collection_ai_preference(
+        self,
+        collection_id: str,
+        preference_data: CollectionAiPreferenceRequest,
+    ) -> CollectionAiPreference:
+        """Create collection AI preference."""
+
+        # Check if collection exists
+        collection = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection:
+            raise HTTPException(status_code=404, detail="Collection not found")
+
+        preference = CollectionAiPreference(
+            id=str(uuid4()),
+            collection_id=collection_id,
+            tones_and_style=preference_data.tones_and_style,
+            skillset=preference_data.skillset,
+            sensitivity=preference_data.sensitivity,
+        )
+
+        self.db.add(preference)
+        self.db.commit()
+        self.db.refresh(preference)
+        return preference
+
+    def update_collection_ai_preference(
+        self,
+        collection_id: str,
+        preference_data: CollectionAiPreferenceRequest,
+    ) -> CollectionAiPreference:
+        """Update collection AI preference."""
+
+        preference = self.get_collection_ai_preference(collection_id)
+        if not preference:
+            raise HTTPException(
+                status_code=404,
+                detail="Collection AI preference not found",
+            )
+
+        preference.tones_and_style = preference_data.tones_and_style
+        preference.skillset = preference_data.skillset
+        preference.sensitivity = preference_data.sensitivity
+
+        self.db.commit()
+        self.db.refresh(preference)
+        return preference
+
+    def delete_collection_ai_preference(self, collection_id: str) -> None:
+        """Delete collection AI preference."""
+
+        preference = self.get_collection_ai_preference(collection_id)
+        if not preference:
+            raise HTTPException(
+                status_code=404,
+                detail="Collection AI preference not found",
+            )
+
+        self.db.delete(preference)
+        self.db.commit()
 
 
 class CollectionAuditService:
@@ -656,75 +728,3 @@ class CollectionPermissionService:
 
         self.db.add(audit)
         return audit
-
-    def get_collection_ai_preference(
-        self, collection_id: str
-    ) -> Optional[CollectionAiPreference]:
-        """Get collection AI preference by collection ID."""
-        return (
-            self.db.query(CollectionAiPreference)
-            .filter(CollectionAiPreference.collection_id == collection_id)
-            .first()
-        )
-
-    def create_collection_ai_preference(
-        self,
-        collection_id: str,
-        preference_data: CollectionAiPreferenceRequest,
-    ) -> CollectionAiPreference:
-        """Create collection AI preference."""
-
-        # Check if collection exists
-        collection = (
-            self.db.query(Collection).filter(Collection.id == collection_id).first()
-        )
-        if not collection:
-            raise HTTPException(status_code=404, detail="Collection not found")
-
-        preference = CollectionAiPreference(
-            id=str(uuid4()),
-            collection_id=collection_id,
-            tones_and_style=preference_data.tones_and_style,
-            skillset=preference_data.skillset,
-            sensitivity=preference_data.sensitivity,
-        )
-
-        self.db.add(preference)
-        self.db.commit()
-        self.db.refresh(preference)
-        return preference
-
-    def update_collection_ai_preference(
-        self,
-        collection_id: str,
-        preference_data: CollectionAiPreferenceRequest,
-    ) -> CollectionAiPreference:
-        """Update collection AI preference."""
-
-        preference = self.get_collection_ai_preference(collection_id)
-        if not preference:
-            raise HTTPException(
-                status_code=404,
-                detail="Collection AI preference not found",
-            )
-
-        preference.tones_and_style = preference_data.tones_and_style
-        preference.skillset = preference_data.skillset
-        preference.sensitivity = preference_data.sensitivity
-
-        self.db.commit()
-        self.db.refresh(preference)
-        return preference
-
-    def delete_collection_ai_preference(self, collection_id: str) -> None:
-        """Delete collection AI preference."""
-
-        preference = self.get_collection_ai_preference(collection_id)
-        if not preference:
-            raise HTTPException(
-                status_code=404,
-                detail="Collection AI preference not found",
-            )
-
-        self.db.delete(preference)
-        self.db.commit()
