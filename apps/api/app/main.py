@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.v1 import app_v1_route
+from scalar_fastapi import get_scalar_api_reference, Theme
 
 
 app = FastAPI(
@@ -21,6 +22,15 @@ app.add_middleware(
 )
 
 app.include_router(app_v1_route)
+
+
+@app.get("/documents", include_in_schema=False)
+async def scalar_html():
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url or "/openapi.json",
+        title=app.title,
+        theme=Theme.ALTERNATE,
+    )
 
 
 def main():
