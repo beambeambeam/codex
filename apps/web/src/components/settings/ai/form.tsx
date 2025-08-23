@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Scroller } from "@/components/ui/scroller";
 import {
   Select,
   SelectContent,
@@ -149,203 +150,218 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
   );
 
   return (
-    <form.AppForm>
-      <form className="flex flex-col gap-y-6" onSubmit={handleSubmit}>
-        <form.AppField name="call">
-          {(field) => (
-            <field.FormItem>
-              <field.FormLabel>
-                <Badge>
-                  <BotIcon className="size-4" />
-                  AI Call
-                </Badge>
-              </field.FormLabel>
-              <field.FormControl>
-                <Textarea
-                  id="call"
-                  placeholder="Enter AI call instruction (e.g., You are a helpful assistant)..."
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  disabled={isPending}
-                  className="min-h-[100px]"
-                />
-              </field.FormControl>
-              <field.FormMessage />
-            </field.FormItem>
-          )}
-        </form.AppField>
-
-        <form.AppField name="skillset">
-          {(field) => (
-            <field.FormItem>
-              <field.FormLabel>
-                <Badge>
-                  <TargetIcon className="size-4" />
-                  Skillset
-                </Badge>
-              </field.FormLabel>
-              <field.FormControl>
-                <Textarea
-                  id="skillset"
-                  placeholder="Enter your skillset (e.g., Python, JavaScript, React)..."
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  disabled={isPending}
-                  className="min-h-[80px]"
-                />
-              </field.FormControl>
-              <field.FormMessage />
-            </field.FormItem>
-          )}
-        </form.AppField>
-
-        <form.AppField name="depth_of_explanation">
-          {(field) => (
-            <field.FormItem>
-              <field.FormLabel>
-                <Badge>
-                  <MessageSquareIcon className="size-4" />
-                  Depth of Explanation
-                </Badge>
-              </field.FormLabel>
-              <field.FormControl>
-                <Select
-                  value={field.state.value}
-                  onValueChange={field.handleChange}
-                  disabled={isPending}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select explanation depth" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SHORT">Short</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="DETAIL">Detail</SelectItem>
-                  </SelectContent>
-                </Select>
-              </field.FormControl>
-              <field.FormMessage />
-            </field.FormItem>
-          )}
-        </form.AppField>
-
-        <form.AppField name="language_preference.LANGUAGE">
-          {(field) => (
-            <field.FormItem>
-              <field.FormLabel>
-                <Badge>
-                  <LanguagesIcon className="size-4" />
-                  Language Preferences
-                </Badge>
-              </field.FormLabel>
-              <field.FormControl>
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-2">
-                    {(field.state.value || []).map((lang, index) => (
-                      <Badge key={index} variant="secondary" className="gap-1">
-                        {lang}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-0 hover:bg-transparent"
-                          onClick={() => removeLanguage(index)}
-                          disabled={isPending}
-                        >
-                          <XIcon className="size-3" />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addLanguage}
-                    disabled={isPending}
-                  >
-                    Add Language
-                  </Button>
-                </div>
-              </field.FormControl>
-              <field.FormMessage />
-            </field.FormItem>
-          )}
-        </form.AppField>
-
-        <form.AppField name="stopwords.STOP">
-          {(field) => (
-            <field.FormItem>
-              <field.FormLabel>
-                <Badge>
-                  <XIcon className="size-4" />
-                  Stopwords
-                </Badge>
-              </field.FormLabel>
-              <field.FormControl>
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-2">
-                    {(field.state.value || []).map((word, index) => (
-                      <Badge
-                        key={index}
-                        variant="destructive"
-                        className="gap-1"
-                      >
-                        {word}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-0 hover:bg-transparent"
-                          onClick={() => removeStopword(index)}
-                          disabled={isPending}
-                        >
-                          <XIcon className="size-3" />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addStopword}
-                    disabled={isPending}
-                  >
-                    Add Stopword
-                  </Button>
-                </div>
-              </field.FormControl>
-              <field.FormMessage />
-            </field.FormItem>
-          )}
-        </form.AppField>
-
-        <div className="flex w-full items-end justify-end gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-fit"
-            disabled={isPending}
-            onClick={() => props.onCancel?.()}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="w-fit"
-            variant="outline"
-          >
-            {isPending ? "Saving..." : "Save"}
-          </Button>
+    <Scroller className="flex h-full flex-col gap-y-6 p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">AI Preferences</h3>
+          <p className="text-muted-foreground text-sm">
+            Configure how AI should interact with you
+          </p>
         </div>
-      </form>
-    </form.AppForm>
+      </div>
+
+      <form.AppForm>
+        <form className="flex flex-col gap-y-6" onSubmit={handleSubmit}>
+          <form.AppField name="call">
+            {(field) => (
+              <field.FormItem>
+                <field.FormLabel>
+                  <Badge>
+                    <BotIcon className="size-4" />
+                    AI Call
+                  </Badge>
+                </field.FormLabel>
+                <field.FormControl>
+                  <Textarea
+                    id="call"
+                    placeholder="Enter AI call instruction (e.g., You are a helpful assistant)..."
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    disabled={isPending}
+                    className="min-h-[100px]"
+                  />
+                </field.FormControl>
+                <field.FormMessage />
+              </field.FormItem>
+            )}
+          </form.AppField>
+
+          <form.AppField name="skillset">
+            {(field) => (
+              <field.FormItem>
+                <field.FormLabel>
+                  <Badge>
+                    <TargetIcon className="size-4" />
+                    Skillset
+                  </Badge>
+                </field.FormLabel>
+                <field.FormControl>
+                  <Textarea
+                    id="skillset"
+                    placeholder="Enter your skillset (e.g., Python, JavaScript, React)..."
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    disabled={isPending}
+                    className="min-h-[80px]"
+                  />
+                </field.FormControl>
+                <field.FormMessage />
+              </field.FormItem>
+            )}
+          </form.AppField>
+
+          <form.AppField name="depth_of_explanation">
+            {(field) => (
+              <field.FormItem>
+                <field.FormLabel>
+                  <Badge>
+                    <MessageSquareIcon className="size-4" />
+                    Depth of Explanation
+                  </Badge>
+                </field.FormLabel>
+                <field.FormControl>
+                  <Select
+                    value={field.state.value}
+                    onValueChange={field.handleChange}
+                    disabled={isPending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select explanation depth" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SHORT">Short</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="DETAIL">Detail</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </field.FormControl>
+                <field.FormMessage />
+              </field.FormItem>
+            )}
+          </form.AppField>
+
+          <form.AppField name="language_preference.LANGUAGE">
+            {(field) => (
+              <field.FormItem>
+                <field.FormLabel>
+                  <Badge>
+                    <LanguagesIcon className="size-4" />
+                    Language Preferences
+                  </Badge>
+                </field.FormLabel>
+                <field.FormControl>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
+                      {(field.state.value || []).map((lang, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-1"
+                        >
+                          {lang}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 hover:bg-transparent"
+                            onClick={() => removeLanguage(index)}
+                            disabled={isPending}
+                          >
+                            <XIcon className="size-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addLanguage}
+                      disabled={isPending}
+                    >
+                      Add Language
+                    </Button>
+                  </div>
+                </field.FormControl>
+                <field.FormMessage />
+              </field.FormItem>
+            )}
+          </form.AppField>
+
+          <form.AppField name="stopwords.STOP">
+            {(field) => (
+              <field.FormItem>
+                <field.FormLabel>
+                  <Badge>
+                    <XIcon className="size-4" />
+                    Stopwords
+                  </Badge>
+                </field.FormLabel>
+                <field.FormControl>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
+                      {(field.state.value || []).map((word, index) => (
+                        <Badge
+                          key={index}
+                          variant="destructive"
+                          className="gap-1"
+                        >
+                          {word}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 hover:bg-transparent"
+                            onClick={() => removeStopword(index)}
+                            disabled={isPending}
+                          >
+                            <XIcon className="size-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addStopword}
+                      disabled={isPending}
+                    >
+                      Add Stopword
+                    </Button>
+                  </div>
+                </field.FormControl>
+                <field.FormMessage />
+              </field.FormItem>
+            )}
+          </form.AppField>
+
+          <div className="flex w-full items-end justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-fit"
+              disabled={isPending}
+              onClick={() => props.onCancel?.()}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-fit"
+              variant="outline"
+            >
+              {isPending ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </form>
+      </form.AppForm>
+    </Scroller>
   );
 }
 

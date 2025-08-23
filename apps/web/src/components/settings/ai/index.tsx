@@ -12,17 +12,10 @@ import {
 import AiPreferenceForm from "@/components/settings/ai/form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Scroller } from "@/components/ui/scroller";
 import { useQueryFetchClient } from "@/lib/api/client";
 
-function AiPreferenceIndex() {
+function AiPreference() {
   const [isEditing, setIsEditing] = useState(false);
 
   const {
@@ -69,8 +62,26 @@ function AiPreferenceIndex() {
     );
   }
 
+  const PreferenceItem = ({
+    icon: Icon,
+    title,
+    children,
+  }: {
+    icon: React.ComponentType<{ className?: string }>;
+    title: string;
+    children: React.ReactNode;
+  }) => (
+    <div>
+      <div className="mb-4 flex items-center gap-2">
+        <Icon className="size-5" />
+        <h4 className="font-semibold">{title}</h4>
+      </div>
+      {children}
+    </div>
+  );
+
   return (
-    <Scroller className="flex h-full flex-col gap-y-6">
+    <Scroller className="flex h-full flex-col gap-y-6 p-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">AI Preferences</h3>
@@ -86,115 +97,72 @@ function AiPreferenceIndex() {
       {preference ? (
         <div className="space-y-6">
           {preference.call && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BotIcon className="size-5" />
-                  AI Call
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm">
-                  {preference.call}
-                </p>
-              </CardContent>
-            </Card>
+            <PreferenceItem icon={BotIcon} title="AI Call">
+              <p className="text-muted-foreground text-sm">{preference.call}</p>
+            </PreferenceItem>
           )}
 
           {preference.skillset && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TargetIcon className="size-5" />
-                  Skillset
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm">
-                  {preference.skillset}
-                </p>
-              </CardContent>
-            </Card>
+            <PreferenceItem icon={TargetIcon} title="Skillset">
+              <p className="text-muted-foreground text-sm">
+                {preference.skillset}
+              </p>
+            </PreferenceItem>
           )}
 
           {preference.depth_of_explanation && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquareIcon className="size-5" />
-                  Depth of Explanation
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Badge variant="outline">
-                  {preference.depth_of_explanation.charAt(0) +
-                    preference.depth_of_explanation.slice(1).toLowerCase()}
-                </Badge>
-              </CardContent>
-            </Card>
+            <PreferenceItem
+              icon={MessageSquareIcon}
+              title="Depth of Explanation"
+            >
+              <Badge variant="outline">
+                {preference.depth_of_explanation.charAt(0) +
+                  preference.depth_of_explanation.slice(1).toLowerCase()}
+              </Badge>
+            </PreferenceItem>
           )}
 
           {preference.language_preference?.LANGUAGE &&
             preference.language_preference.LANGUAGE.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <LanguagesIcon className="size-5" />
-                    Language Preferences
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {preference.language_preference.LANGUAGE.map(
-                      (lang, index) => (
-                        <Badge key={index} variant="secondary">
-                          {lang}
-                        </Badge>
-                      ),
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <PreferenceItem icon={LanguagesIcon} title="Language Preferences">
+                <div className="flex flex-wrap gap-2">
+                  {preference.language_preference.LANGUAGE.map(
+                    (lang, index) => (
+                      <Badge key={index} variant="secondary">
+                        {lang}
+                      </Badge>
+                    ),
+                  )}
+                </div>
+              </PreferenceItem>
             )}
 
           {preference.stopwords?.STOP &&
             preference.stopwords.STOP.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <XIcon className="size-5" />
-                    Stopwords
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {preference.stopwords.STOP.map((word, index) => (
-                      <Badge key={index} variant="destructive">
-                        {word}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <PreferenceItem icon={XIcon} title="Stopwords">
+                <div className="flex flex-wrap gap-2">
+                  {preference.stopwords.STOP.map((word, index) => (
+                    <Badge key={index} variant="destructive">
+                      {word}
+                    </Badge>
+                  ))}
+                </div>
+              </PreferenceItem>
             )}
         </div>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>No AI Preferences Set</CardTitle>
-            <CardDescription>
+        <div className="rounded-lg border p-6">
+          <div className="mb-4">
+            <h4 className="font-semibold">No AI Preferences Set</h4>
+            <p className="text-muted-foreground text-sm">
               Configure your AI preferences to personalize your experience
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => setIsEditing(true)}>
-              Set AI Preferences
-            </Button>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <Button onClick={() => setIsEditing(true)}>Set AI Preferences</Button>
+        </div>
       )}
     </Scroller>
   );
 }
 
-export default AiPreferenceIndex;
+export default AiPreference;

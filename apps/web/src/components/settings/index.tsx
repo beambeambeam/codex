@@ -1,6 +1,6 @@
 import { BotIcon, Settings2Icon, UserIcon, UserPenIcon } from "lucide-react";
 
-import AiPreferenceIndex from "@/components/settings/ai";
+import AiPreference from "@/components/settings/ai";
 import DisplayForm from "@/components/settings/display-form";
 import SignOutButton from "@/components/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -96,7 +96,7 @@ function Settings() {
               </Scroller>
             </TabsContent>
             <TabsContent value="ai" className="p-2">
-              <AiPreferenceIndex />
+              <AiPreference />
             </TabsContent>
           </Tabs>
         </div>
