@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from typing import List
 
 from .schemas import (
@@ -7,6 +7,8 @@ from .schemas import (
     CollectionAuditResponse,
     CollectionPermissionRequest,
     CollectionPermissionResponse,
+    CollectionAiPreferenceRequest,
+    CollectionAiPreferenceResponse,
 )
 from .service import CollectionService
 from .dependencies import (
@@ -16,7 +18,6 @@ from .dependencies import (
 from ..user.dependencies import get_current_user
 from ..models.user import User
 from ..models.enum import CollectionPermissionEnum
-from fastapi import Body
 
 
 router = APIRouter(prefix="/collections", tags=["collections"])
@@ -158,6 +159,95 @@ def delete_collection(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"
         )
+    return None
+
+
+@router.get(
+    "/{collection_id}/ai-preferences",
+    response_model=CollectionAiPreferenceResponse,
+    status_code=status.HTTP_200_OK,
+)
+def get_collection_ai_preferences(
+    collection_id: str,
+    _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+) -> CollectionAiPreferenceResponse:
+    """Get collection AI preferences."""
+
+    preference = collection_service.get_collection_ai_preference(collection_id)
+
+    if not preference:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="AI preferences not found",
+        )
+
+    return CollectionAiPreferenceResponse(
+        id=str(preference.id),
+        collection_id=str(preference.collection_id),
+        tones_and_style=preference.tones_and_style,
+        skillset=preference.skillset,
+        sensitivity=preference.sensitivity,
+        created_at=preference.created_at.isoformat(),
+        updated_at=preference.updated_at.isoformat(),
+    )
+
+
+@router.put(
+    "/{collection_id}/ai-preferences",
+    response_model=CollectionAiPreferenceResponse,
+    status_code=status.HTTP_200_OK,
+)
+def update_collection_ai_preferences(
+    collection_id: str,
+    preference_data: CollectionAiPreferenceRequest,
+    _: None = Depends(has_permission(CollectionPermissionEnum.EDIT)),
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+) -> CollectionAiPreferenceResponse:
+    """Update collection AI preferences. Creates if doesn't exist."""
+
+    # Check if preference exists
+    existing_preference = collection_service.get_collection_ai_preference(collection_id)
+
+    if existing_preference:
+        # Update existing preference
+        updated_preference = collection_service.update_collection_ai_preference(
+            collection_id=collection_id,
+            preference_data=preference_data,
+        )
+    else:
+        # Create new preference
+        updated_preference = collection_service.create_collection_ai_preference(
+            collection_id=collection_id,
+            preference_data=preference_data,
+        )
+
+    return CollectionAiPreferenceResponse(
+        id=str(updated_preference.id),
+        collection_id=str(updated_preference.collection_id),
+        tones_and_style=updated_preference.tones_and_style,
+        skillset=updated_preference.skillset,
+        sensitivity=updated_preference.sensitivity,
+        created_at=updated_preference.created_at.isoformat(),
+        updated_at=updated_preference.updated_at.isoformat(),
+    )
+
+
+@router.delete(
+    "/{collection_id}/ai-preferences",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_collection_ai_preferences(
+    collection_id: str,
+    _: None = Depends(has_permission(CollectionPermissionEnum.EDIT)),
+    current_user: User = Depends(get_current_user),
+    collection_service: CollectionService = Depends(get_collection_service),
+):
+    """Delete collection AI preferences."""
+
+    collection_service.delete_collection_ai_preference(collection_id)
     return None
 
 

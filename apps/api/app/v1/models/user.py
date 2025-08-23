@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import TIMESTAMP, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enum import DepthOfExplanationEnum
 import uuid
 
 
@@ -36,6 +37,9 @@ class User(Base):
     files_uploaded = relationship("File", back_populates="uploader")
     documents = relationship("Document", back_populates="user")
     document_audits = relationship("DocumentAudit", back_populates="user")
+    ai_preferences = relationship(
+        "UserAiPreference", back_populates="user", uselist=False
+    )
 
 
 class Account(Base):
@@ -90,3 +94,32 @@ class Session(Base):
     expires_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP, nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="sessions")
+
+
+class UserAiPreference(Base):
+    __tablename__ = "user_ai_preference"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    call: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    skillset: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    depth_of_explanation: Mapped[Optional[DepthOfExplanationEnum]] = mapped_column(
+        Text, nullable=True
+    )
+    language_preference: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    stopwords: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, nullable=False, server_default=func.current_timestamp()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="ai_preferences")

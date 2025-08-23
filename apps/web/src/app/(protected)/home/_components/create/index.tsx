@@ -26,9 +26,8 @@ function CreateCollectionDialog() {
       onOpenChange={(isOpen) => setOpen(isOpen ? "create" : "")}
     >
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" size="icon">
           <PlusIcon />
-          <span className="hidden lg:inline">Create new Collection!</span>
         </Button>
       </DialogTrigger>
       <DialogContent

@@ -9,6 +9,7 @@ import CreateCollectionDialog from "@/app/(protected)/home/_components/create";
 import HomeSearch from "@/app/(protected)/home/_components/search";
 import Settings from "@/components/settings";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleThemeButton } from "@/components/ui/toggle-theme";
 import { useUser } from "@/store/user";
 
 function HomePage() {
@@ -24,6 +25,7 @@ function HomePage() {
         <div className="flex gap-2">
           <HomeSearch />
           <CreateCollectionDialog />
+          <ToggleThemeButton />
           <Settings />
         </div>
       </div>

@@ -5,6 +5,7 @@ import {
   BookMarkedIcon,
   BookTextIcon,
 } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 
 import {
   SidebarGroup,
@@ -47,6 +48,11 @@ function CollectionLinks() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const pathname = usePathname() ?? "";
+
+  const [, setOpen] = useQueryState(
+    "collection",
+    parseAsString.withDefault(""),
+  );
 
   const collectionBase = `/c/${params.id}`;
   const relativePath = pathname.startsWith(collectionBase)
@@ -105,10 +111,10 @@ function CollectionLinks() {
           <SidebarMenuItem key="settings">
             <SidebarMenuButton
               tooltip="Settings"
-              onClick={() => router.push("?collection=settings")}
+              onClick={() => setOpen("settings")}
             >
               <BookAlertIcon />
-              Collection&apos;s Settings
+              Settings
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
