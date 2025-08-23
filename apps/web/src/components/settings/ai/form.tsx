@@ -24,6 +24,7 @@ import {
 import { useAppForm } from "@/components/ui/tanstack-form";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryFetchClient } from "@/lib/api/client";
+import { cacheUtils } from "@/lib/query/cache";
 import { parseErrorDetail } from "@/lib/utils";
 import FormProps from "@/types/form";
 
@@ -53,6 +54,7 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
     {
       onSuccess() {
         toast.success("AI preferences updated successfully");
+        cacheUtils.invalidateQueries(["get", "/api/v1/auth/ai-preferences"]);
         props.onSuccess?.();
       },
       onError(err: unknown) {
@@ -99,22 +101,22 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
 
   // Common language options
   const languageOptions: Option[] = [
-    { value: "EN", label: "English" },
-    { value: "TH", label: "Thai" },
-    { value: "ZH", label: "Chinese" },
-    { value: "JA", label: "Japanese" },
-    { value: "KO", label: "Korean" },
-    { value: "ES", label: "Spanish" },
-    { value: "FR", label: "French" },
-    { value: "DE", label: "German" },
-    { value: "IT", label: "Italian" },
-    { value: "PT", label: "Portuguese" },
-    { value: "RU", label: "Russian" },
-    { value: "AR", label: "Arabic" },
-    { value: "HI", label: "Hindi" },
-    { value: "ID", label: "Indonesian" },
-    { value: "MS", label: "Malay" },
-    { value: "VI", label: "Vietnamese" },
+    { value: "English", label: "English" },
+    { value: "Thai", label: "Thai" },
+    { value: "Chinese", label: "Chinese" },
+    { value: "Japanese", label: "Japanese" },
+    { value: "Korean", label: "Korean" },
+    { value: "Spanish", label: "Spanish" },
+    { value: "French", label: "French" },
+    { value: "German", label: "German" },
+    { value: "Italian", label: "Italian" },
+    { value: "Portuguese", label: "Portuguese" },
+    { value: "Russian", label: "Russian" },
+    { value: "Arabic", label: "Arabic" },
+    { value: "Hindi", label: "Hindi" },
+    { value: "Indonesian", label: "Indonesian" },
+    { value: "Malay", label: "Malay" },
+    { value: "Vietnamese", label: "Vietnamese" },
   ];
 
   return (
@@ -136,13 +138,13 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                   <field.FormLabel>
                     <Badge>
                       <BotIcon className="size-4" />
-                      AI Call
+                      What should Codex call you?
                     </Badge>
                   </field.FormLabel>
                   <field.FormControl>
                     <Textarea
                       id="call"
-                      placeholder="Enter AI call instruction (e.g., You are a helpful assistant)..."
+                      placeholder="Enter your name or a source (e.g., 'John', 'Jane', 'Stack Overflow', 'Wikipedia')"
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -162,13 +164,13 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                   <field.FormLabel>
                     <Badge>
                       <TargetIcon className="size-4" />
-                      Skillset
+                      What do you do?
                     </Badge>
                   </field.FormLabel>
                   <field.FormControl>
                     <Textarea
                       id="skillset"
-                      placeholder="Enter your skillset (e.g., Python, JavaScript, React)..."
+                      placeholder="Describe your role, profession, or main interests (e.g., software engineer, student, designer, or your primary focus)..."
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -188,7 +190,7 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                   <field.FormLabel>
                     <Badge>
                       <MessageSquareIcon className="size-4" />
-                      Depth of Explanation
+                      How detailed should explanations be?
                     </Badge>
                   </field.FormLabel>
                   <field.FormControl>
@@ -201,13 +203,17 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                       }
                       disabled={isPending}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select explanation depth" />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Choose your preferred level of detail" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="SHORT">Short</SelectItem>
-                        <SelectItem value="MEDIUM">Medium</SelectItem>
-                        <SelectItem value="DETAIL">Detail</SelectItem>
+                        <SelectItem value="SHORT">Keep it brief</SelectItem>
+                        <SelectItem value="MEDIUM">
+                          Give me the essentials
+                        </SelectItem>
+                        <SelectItem value="DETAIL">
+                          Explain everything thoroughly
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </field.FormControl>
@@ -222,7 +228,7 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                   <field.FormLabel>
                     <Badge>
                       <LanguagesIcon className="size-4" />
-                      Language Preferences
+                      Which languages do you prefer?
                     </Badge>
                   </field.FormLabel>
                   <field.FormControl>
@@ -237,7 +243,7 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                         field.handleChange(options.map((opt) => opt.value));
                       }}
                       options={languageOptions}
-                      placeholder="Select languages..."
+                      placeholder="Choose your preferred languages..."
                       maxSelected={10}
                       className="min-w-[200px]"
                       emptyIndicator="No languages found."
@@ -256,7 +262,7 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                   <field.FormLabel>
                     <Badge>
                       <TargetIcon className="size-4" />
-                      Stopwords
+                      Any words you&apos;d like Codex to avoid?
                     </Badge>
                   </field.FormLabel>
                   <field.FormControl>
@@ -268,10 +274,10 @@ function AiPreferenceForm(props: AiPreferenceFormProps) {
                       onChange={(options) => {
                         field.handleChange(options.map((opt) => opt.value));
                       }}
-                      placeholder="Add stopwords..."
+                      placeholder="Add words you'd prefer Codex to skip..."
                       maxSelected={20}
                       className="min-w-[200px]"
-                      emptyIndicator="No stopwords added yet."
+                      emptyIndicator="No words added yet."
                       creatable
                       hideClearAllButton
                       disabled={isPending}

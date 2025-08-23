@@ -12,19 +12,20 @@ import {
 import AiPreferenceForm from "@/components/settings/ai/form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pill } from "@/components/ui/pill";
 import { Scroller } from "@/components/ui/scroller";
 import { useQueryFetchClient } from "@/lib/api/client";
 
 function AiPreference() {
   const [isEditing, setIsEditing] = useState(false);
 
-  const {
-    data: aiPreferences,
-    isLoading,
-    refetch,
-  } = useQueryFetchClient.useQuery("get", "/api/v1/auth/ai-preferences", {
-    enabled: !isEditing,
-  });
+  const { data: aiPreferences, isLoading } = useQueryFetchClient.useQuery(
+    "get",
+    "/api/v1/auth/ai-preferences",
+    {
+      enabled: !isEditing,
+    },
+  );
 
   const preference = aiPreferences?.detail;
 
@@ -55,7 +56,6 @@ function AiPreference() {
         }}
         onSuccess={() => {
           setIsEditing(false);
-          refetch();
         }}
         onCancel={() => setIsEditing(false)}
       />
@@ -76,7 +76,12 @@ function AiPreference() {
         <Icon className="size-5" />
         <h4 className="font-semibold">{title}</h4>
       </Badge>
-      {children}
+      <div
+        className="hover:bg-foreground/2.5 cursor-pointer rounded-lg border-2 p-4"
+        onClick={() => setIsEditing(true)}
+      >
+        {children}
+      </div>
     </div>
   );
 
@@ -86,79 +91,91 @@ function AiPreference() {
         <div>
           <h3 className="text-lg font-semibold">AI Preferences</h3>
           <p className="text-muted-foreground text-sm">
-            Configure how AI should interact with you
+            Personalize how Codex interacts with you
           </p>
         </div>
         <Button onClick={() => setIsEditing(true)} variant="outline">
-          Edit Preferences
+          Edit Settings
         </Button>
       </div>
 
       {preference ? (
         <div className="space-y-6">
-          {preference.call && (
-            <PreferenceItem icon={BotIcon} title="AI Call">
-              <p className="text-muted-foreground text-sm">{preference.call}</p>
-            </PreferenceItem>
-          )}
+          <PreferenceItem icon={BotIcon} title="What should Codex call you?">
+            <p className="text-muted-foreground text-sm">
+              {preference.call || "Not set"}
+            </p>
+          </PreferenceItem>
 
-          {preference.skillset && (
-            <PreferenceItem icon={TargetIcon} title="Skillset">
-              <p className="text-muted-foreground text-sm">
-                {preference.skillset}
-              </p>
-            </PreferenceItem>
-          )}
+          <PreferenceItem icon={TargetIcon} title="What do you do?">
+            <p className="text-muted-foreground text-sm">
+              {preference.skillset || "Not specified"}
+            </p>
+          </PreferenceItem>
 
-          {preference.depth_of_explanation && (
-            <PreferenceItem
-              icon={MessageSquareIcon}
-              title="Depth of Explanation"
-            >
-              <Badge variant="outline">
-                {preference.depth_of_explanation.charAt(0) +
-                  preference.depth_of_explanation.slice(1).toLowerCase()}
-              </Badge>
-            </PreferenceItem>
-          )}
+          <PreferenceItem
+            icon={MessageSquareIcon}
+            title="How detailed should explanations be?"
+          >
+            <p className="text-muted-foreground text-sm">
+              {preference.depth_of_explanation === "SHORT" && "Keep it brief"}
+              {preference.depth_of_explanation === "MEDIUM" &&
+                "Give me the essentials"}
+              {preference.depth_of_explanation === "DETAIL" &&
+                "Explain everything thoroughly"}
+              {!preference.depth_of_explanation && "Not configured"}
+            </p>
+          </PreferenceItem>
 
-          {preference.language_preference?.LANGUAGE &&
-            preference.language_preference.LANGUAGE.length > 0 && (
-              <PreferenceItem icon={LanguagesIcon} title="Language Preferences">
-                <div className="flex flex-wrap gap-2">
-                  {preference.language_preference.LANGUAGE.map(
-                    (lang, index) => (
-                      <Badge key={index} variant="secondary">
-                        {lang}
-                      </Badge>
-                    ),
-                  )}
-                </div>
-              </PreferenceItem>
-            )}
+          <PreferenceItem
+            icon={LanguagesIcon}
+            title="Which languages do you prefer?"
+          >
+            <div className="flex flex-wrap gap-2">
+              {preference.language_preference?.LANGUAGE &&
+              preference.language_preference.LANGUAGE.length > 0 ? (
+                preference.language_preference.LANGUAGE.map((lang, index) => (
+                  <Pill key={index} variant="default">
+                    {lang}
+                  </Pill>
+                ))
+              ) : (
+                <span className="text-muted-foreground text-sm">
+                  No languages selected
+                </span>
+              )}
+            </div>
+          </PreferenceItem>
 
-          {preference.stopwords?.STOP &&
-            preference.stopwords.STOP.length > 0 && (
-              <PreferenceItem icon={XIcon} title="Stopwords">
-                <div className="flex flex-wrap gap-2">
-                  {preference.stopwords.STOP.map((word, index) => (
-                    <Badge key={index} variant="destructive">
-                      {word}
-                    </Badge>
-                  ))}
-                </div>
-              </PreferenceItem>
-            )}
+          <PreferenceItem
+            icon={XIcon}
+            title="Any words you'd like Codex to avoid?"
+          >
+            <div className="flex flex-wrap gap-2">
+              {preference.stopwords?.STOP &&
+              preference.stopwords.STOP.length > 0 ? (
+                preference.stopwords.STOP.map((word, index) => (
+                  <Badge key={index} variant="destructive">
+                    {word}
+                  </Badge>
+                ))
+              ) : (
+                <span className="text-muted-foreground text-sm">
+                  No words to avoid
+                </span>
+              )}
+            </div>
+          </PreferenceItem>
         </div>
       ) : (
         <div className="rounded-lg border p-6">
           <div className="mb-4">
-            <h4 className="font-semibold">No AI Preferences Set</h4>
+            <h4 className="font-semibold">No preferences set yet</h4>
             <p className="text-muted-foreground text-sm">
-              Configure your AI preferences to personalize your experience
+              Let&apos;s personalize how Codex interacts with you
             </p>
           </div>
-          <Button onClick={() => setIsEditing(true)}>Set AI Preferences</Button>
+          <Button onClick={() => setIsEditing(true)}>Set Preferences</Button>
         </div>
       )}
     </Scroller>
