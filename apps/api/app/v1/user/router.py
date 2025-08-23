@@ -8,6 +8,7 @@ from .schemas import (
     AuthStatusResponse,
     UserEditRequest,
     UserEditResponse,
+    UserAiPreferenceResponse,
 )
 from .service import UserService
 from .dependencies import get_user_service, get_current_user
@@ -184,5 +185,40 @@ def edit_user(
         message="User updated successfully",
         detail=UserEditResponse(
             display=updated_user.display or "",
+        ),
+    )
+
+
+@router.get(
+    "/ai-preferences",
+    response_model=CommonResponse[UserAiPreferenceResponse],
+    status_code=status.HTTP_200_OK,
+)
+def get_user_ai_preferences(
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> CommonResponse[UserAiPreferenceResponse]:
+    """Get current user AI preferences."""
+
+    preference = user_service.get_user_ai_preference(str(current_user.id))
+
+    if not preference:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="AI preferences not found",
+        )
+
+    return CommonResponse[UserAiPreferenceResponse](
+        message="AI preferences retrieved successfully",
+        detail=UserAiPreferenceResponse(
+            id=str(preference.id),
+            user_id=str(preference.user_id),
+            call=preference.call,
+            skillset=preference.skillset,
+            depth_of_explanation=preference.depth_of_explanation,
+            language_preference=preference.language_preference,
+            stopwords=preference.stopwords,
+            created_at=preference.created_at.isoformat(),
+            updated_at=preference.updated_at.isoformat(),
         ),
     )

@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
-from ..models.user import Account, User, Session as UserSession
+from ..models.user import Account, User, Session as UserSession, UserAiPreference
 
 
 class UserService:
@@ -85,7 +85,7 @@ class UserService:
         return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
 
     def create_user(self, username: str, email: str, password: str) -> User:
-        """Create a new user with account."""
+        """Create a new user with account and AI preference."""
 
         existing_user = (
             self.db.query(User)
@@ -107,12 +107,23 @@ class UserService:
             id=str(uuid4()), username=clean_username, email=email, display=username
         )
         self.db.add(user)
-        self.db.flush()  # get user.id
+        self.db.flush()
 
         account = Account(
             id=str(uuid4()), password=self.hash_password(password), user_id=user.id
         )
         self.db.add(account)
+
+        ai_preference = UserAiPreference(
+            id=str(uuid4()),
+            user_id=user.id,
+            call=None,
+            skillset=None,
+            depth_of_explanation=None,
+            language_preference=None,
+            stopwords=None,
+        )
+        self.db.add(ai_preference)
 
         self.db.commit()
         self.db.refresh(user)
@@ -223,3 +234,91 @@ class UserService:
         self.db.refresh(user)
 
         return user
+
+    def get_user_ai_preference(self, user_id: str) -> Optional[UserAiPreference]:
+        """Get user AI preference by user ID."""
+        return (
+            self.db.query(UserAiPreference)
+            .filter(UserAiPreference.user_id == user_id)
+            .first()
+        )
+
+    def create_user_ai_preference(
+        self,
+        user_id: str,
+        call: Optional[str] = None,
+        skillset: Optional[str] = None,
+        depth_of_explanation: Optional[str] = None,
+        language_preference: Optional[dict] = None,
+        stopwords: Optional[dict] = None,
+    ) -> UserAiPreference:
+        """Create user AI preference."""
+
+        # Check if preference already exists
+        existing_preference = self.get_user_ai_preference(user_id)
+        if existing_preference:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="AI preference already exists for this user",
+            )
+
+        preference = UserAiPreference(
+            id=str(uuid4()),
+            user_id=user_id,
+            call=call,
+            skillset=skillset,
+            depth_of_explanation=depth_of_explanation,
+            language_preference=language_preference,
+            stopwords=stopwords,
+        )
+
+        self.db.add(preference)
+        self.db.commit()
+        self.db.refresh(preference)
+        return preference
+
+    def update_user_ai_preference(
+        self,
+        user_id: str,
+        call: Optional[str] = None,
+        skillset: Optional[str] = None,
+        depth_of_explanation: Optional[str] = None,
+        language_preference: Optional[dict] = None,
+        stopwords: Optional[dict] = None,
+    ) -> UserAiPreference:
+        """Update user AI preference."""
+
+        preference = self.get_user_ai_preference(user_id)
+        if not preference:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="AI preference not found",
+            )
+
+        if call is not None:
+            preference.call = call
+        if skillset is not None:
+            preference.skillset = skillset
+        if depth_of_explanation is not None:
+            preference.depth_of_explanation = depth_of_explanation
+        if language_preference is not None:
+            preference.language_preference = language_preference
+        if stopwords is not None:
+            preference.stopwords = stopwords
+
+        self.db.commit()
+        self.db.refresh(preference)
+        return preference
+
+    def delete_user_ai_preference(self, user_id: str) -> None:
+        """Delete user AI preference."""
+
+        preference = self.get_user_ai_preference(user_id)
+        if not preference:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="AI preference not found",
+            )
+
+        self.db.delete(preference)
+        self.db.commit()
