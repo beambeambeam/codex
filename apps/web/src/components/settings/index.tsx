@@ -1,5 +1,6 @@
-import { Settings2Icon, UserIcon, UserPenIcon } from "lucide-react";
+import { BotIcon, Settings2Icon, UserIcon, UserPenIcon } from "lucide-react";
 
+import AiPreferenceIndex from "@/components/settings/ai";
 import DisplayForm from "@/components/settings/display-form";
 import SignOutButton from "@/components/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,12 +44,12 @@ function Settings() {
         </DialogHeader>
         <div className="h-full overflow-y-auto border-t-2">
           <Tabs
-            defaultValue="tab-1"
+            defaultValue="account"
             orientation="vertical"
             className="h-[70vh] w-full flex-row !gap-0"
           >
             <TabsList className="text-foreground flex-col items-start justify-start gap-1 rounded-none bg-transparent py-0 !pr-0">
-              <TabsTrigger value="tab-1" className={TABS_TRIGGER_CLASSNAME}>
+              <TabsTrigger value="account" className={TABS_TRIGGER_CLASSNAME}>
                 <UserPenIcon
                   className="-ms-0.5 me-1.5 opacity-60"
                   size={16}
@@ -56,9 +57,17 @@ function Settings() {
                 />
                 Account
               </TabsTrigger>
+              <TabsTrigger value="ai" className={TABS_TRIGGER_CLASSNAME}>
+                <BotIcon
+                  className="-ms-0.5 me-1.5 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                AI Preferences
+              </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
-            <TabsContent value="tab-1" className="p-2">
+            <TabsContent value="account" className="p-2">
               <Scroller className="flex h-full flex-col gap-y-4">
                 <div className="flex items-center gap-6">
                   <Avatar className="size-36">
@@ -85,6 +94,9 @@ function Settings() {
                   <SignOutButton />
                 </div>
               </Scroller>
+            </TabsContent>
+            <TabsContent value="ai" className="p-2">
+              <AiPreferenceIndex />
             </TabsContent>
           </Tabs>
         </div>

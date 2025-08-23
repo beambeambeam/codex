@@ -136,6 +136,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/ai-preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get User Ai Preferences
+     * @description Get current user AI preferences.
+     */
+    get: operations["get_user_ai_preferences_api_v1_auth_ai_preferences_get"];
+    /**
+     * Update User Ai Preferences
+     * @description Update current user AI preferences. Creates if doesn't exist.
+     */
+    put: operations["update_user_ai_preferences_api_v1_auth_ai_preferences_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/collections": {
     parameters: {
       query?: never;
@@ -713,6 +737,12 @@ export interface components {
       message: string;
       detail: components["schemas"]["AuthStatusResponse"] | null;
     };
+    /** CommonResponse[UserAiPreferenceResponse] */
+    CommonResponse_UserAiPreferenceResponse_: {
+      /** Message */
+      message: string;
+      detail: components["schemas"]["UserAiPreferenceResponse"] | null;
+    };
     /** CommonResponse[UserEditResponse] */
     CommonResponse_UserEditResponse_: {
       /** Message */
@@ -756,6 +786,11 @@ export interface components {
        */
       imgUrl?: string | null;
     };
+    /**
+     * DepthOfExplanationEnum
+     * @enum {string}
+     */
+    DepthOfExplanationEnum: "SHORT" | "MEDIUM" | "DETAIL";
     /**
      * DocumentActionEnum
      * @enum {string}
@@ -928,6 +963,20 @@ export interface components {
       /** Edges */
       edges: components["schemas"]["EdgeSchema"][];
     };
+    /**
+     * LanguagePreferenceModel
+     * @description Language preference model
+     */
+    LanguagePreferenceModel: {
+      /**
+       * Language
+       * @example [
+       *       "EN",
+       *       "TH"
+       *     ]
+       */
+      LANGUAGE: string[];
+    };
     /** NodeDataSchema */
     NodeDataSchema: {
       /** Label */
@@ -951,6 +1000,20 @@ export interface components {
       per_page: number;
       /** Total Pages */
       total_pages: number;
+    };
+    /**
+     * StopwordsModel
+     * @description Stopwords model
+     */
+    StopwordsModel: {
+      /**
+       * Stop
+       * @example [
+       *       "is",
+       *       "bad word"
+       *     ]
+       */
+      STOP: string[];
     };
     /** TagCreateRequest */
     TagCreateRequest: {
@@ -1000,6 +1063,74 @@ export interface components {
        * @description Color of the tag (hex code)
        */
       color?: string | null;
+    };
+    /**
+     * UserAiPreferenceRequest
+     * @description User AI preference request payload
+     */
+    UserAiPreferenceRequest: {
+      /**
+       * Call
+       * @example You are a helpful assistant
+       */
+      call?: string | null;
+      /**
+       * Skillset
+       * @example Python, JavaScript, React
+       */
+      skillset?: string | null;
+      /** @example MEDIUM */
+      depth_of_explanation?:
+        | components["schemas"]["DepthOfExplanationEnum"]
+        | null;
+      language_preference?:
+        | components["schemas"]["LanguagePreferenceModel"]
+        | null;
+      stopwords?: components["schemas"]["StopwordsModel"] | null;
+    };
+    /**
+     * UserAiPreferenceResponse
+     * @description User AI preference response payload
+     */
+    UserAiPreferenceResponse: {
+      /**
+       * Id
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id: string;
+      /**
+       * User Id
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      user_id: string;
+      /**
+       * Call
+       * @example You are a helpful assistant
+       */
+      call?: string | null;
+      /**
+       * Skillset
+       * @example Python, JavaScript, React
+       */
+      skillset?: string | null;
+      /** @example MEDIUM */
+      depth_of_explanation?:
+        | components["schemas"]["DepthOfExplanationEnum"]
+        | null;
+      language_preference?:
+        | components["schemas"]["LanguagePreferenceModel"]
+        | null;
+      stopwords?: components["schemas"]["StopwordsModel"] | null;
+      /**
+       * Created At
+       * @example 2024-01-01T00:00:00Z
+       */
+      created_at: string;
+      /**
+       * Updated At
+       * @example 2024-01-01T00:00:00Z
+       */
+      updated_at: string;
     };
     /**
      * UserEditRequest
@@ -1315,6 +1446,59 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CommonResponse_UserEditResponse_"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_user_ai_preferences_api_v1_auth_ai_preferences_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommonResponse_UserAiPreferenceResponse_"];
+        };
+      };
+    };
+  };
+  update_user_ai_preferences_api_v1_auth_ai_preferences_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserAiPreferenceRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommonResponse_UserAiPreferenceResponse_"];
         };
       };
       /** @description Validation Error */
