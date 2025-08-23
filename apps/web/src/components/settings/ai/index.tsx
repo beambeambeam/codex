@@ -47,7 +47,7 @@ function AiPreference() {
         defaultValues={{
           call: preference?.call || "",
           skillset: preference?.skillset || "",
-          depth_of_explanation: preference?.depth_of_explanation || undefined,
+          depth_of_explanation: preference?.depth_of_explanation || "MEDIUM",
           language_preference: preference?.language_preference || {
             LANGUAGE: [],
           },
@@ -72,10 +72,10 @@ function AiPreference() {
     children: React.ReactNode;
   }) => (
     <div>
-      <div className="mb-4 flex items-center gap-2">
+      <Badge className="mb-4 flex items-center gap-2">
         <Icon className="size-5" />
         <h4 className="font-semibold">{title}</h4>
-      </div>
+      </Badge>
       {children}
     </div>
   );
