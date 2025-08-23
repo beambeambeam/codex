@@ -1,7 +1,6 @@
 """Authentication request/response schemas."""
 
-from typing import Optional, List, Dict, Any
-from enum import Enum
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
 from ..models.enum import DepthOfExplanationEnum
 
@@ -56,6 +55,18 @@ class UserEditResponse(BaseModel):
     display: str = Field(..., example="John Doe")
 
 
+class LanguagePreferenceModel(BaseModel):
+    """Language preference model"""
+
+    LANGUAGE: List[str] = Field(..., example=["EN", "TH"])
+
+
+class StopwordsModel(BaseModel):
+    """Stopwords model"""
+
+    STOP: List[str] = Field(..., example=["is", "bad word"])
+
+
 class UserAiPreferenceRequest(BaseModel):
     """User AI preference request payload"""
 
@@ -64,12 +75,8 @@ class UserAiPreferenceRequest(BaseModel):
     depth_of_explanation: Optional[DepthOfExplanationEnum] = Field(
         None, example=DepthOfExplanationEnum.MEDIUM
     )
-    language_preference: Optional[Dict[str, List[str]]] = Field(
-        None, example={"LANGUAGE": ["EN", "TH"]}
-    )
-    stopwords: Optional[Dict[str, List[str]]] = Field(
-        None, example={"STOP": ["is", "bad word"]}
-    )
+    language_preference: Optional[LanguagePreferenceModel] = Field(None)
+    stopwords: Optional[StopwordsModel] = Field(None)
 
 
 class UserAiPreferenceResponse(BaseModel):
@@ -82,11 +89,7 @@ class UserAiPreferenceResponse(BaseModel):
     depth_of_explanation: Optional[DepthOfExplanationEnum] = Field(
         None, example=DepthOfExplanationEnum.MEDIUM
     )
-    language_preference: Optional[Dict[str, List[str]]] = Field(
-        None, example={"LANGUAGE": ["EN", "TH"]}
-    )
-    stopwords: Optional[Dict[str, List[str]]] = Field(
-        None, example={"STOP": ["is", "bad word"]}
-    )
+    language_preference: Optional[LanguagePreferenceModel] = Field(None)
+    stopwords: Optional[StopwordsModel] = Field(None)
     created_at: str = Field(..., example="2024-01-01T00:00:00Z")
     updated_at: str = Field(..., example="2024-01-01T00:00:00Z")

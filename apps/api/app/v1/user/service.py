@@ -254,14 +254,6 @@ class UserService:
     ) -> UserAiPreference:
         """Create user AI preference."""
 
-        # Check if preference already exists
-        existing_preference = self.get_user_ai_preference(user_id)
-        if existing_preference:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="AI preference already exists for this user",
-            )
-
         preference = UserAiPreference(
             id=str(uuid4()),
             user_id=user_id,

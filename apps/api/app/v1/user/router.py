@@ -9,6 +9,9 @@ from .schemas import (
     UserEditRequest,
     UserEditResponse,
     UserAiPreferenceResponse,
+    UserAiPreferenceRequest,
+    LanguagePreferenceModel,
+    StopwordsModel,
 )
 from .service import UserService
 from .dependencies import get_user_service, get_current_user
@@ -216,9 +219,81 @@ def get_user_ai_preferences(
             call=preference.call,
             skillset=preference.skillset,
             depth_of_explanation=preference.depth_of_explanation,
-            language_preference=preference.language_preference,
-            stopwords=preference.stopwords,
+            language_preference=LanguagePreferenceModel(
+                **preference.language_preference
+            )
+            if preference.language_preference
+            else None,
+            stopwords=StopwordsModel(**preference.stopwords)
+            if preference.stopwords
+            else None,
             created_at=preference.created_at.isoformat(),
             updated_at=preference.updated_at.isoformat(),
+        ),
+    )
+
+
+@router.put(
+    "/ai-preferences",
+    response_model=CommonResponse[UserAiPreferenceResponse],
+    status_code=status.HTTP_200_OK,
+)
+def update_user_ai_preferences(
+    preference_data: UserAiPreferenceRequest,
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> CommonResponse[UserAiPreferenceResponse]:
+    """Update current user AI preferences. Creates if doesn't exist."""
+
+    # Try to get existing preference
+    preference = user_service.get_user_ai_preference(str(current_user.id))
+
+    if preference:
+        # Update existing preference
+        updated_preference = user_service.update_user_ai_preference(
+            user_id=str(current_user.id),
+            call=preference_data.call,
+            skillset=preference_data.skillset,
+            depth_of_explanation=preference_data.depth_of_explanation,
+            language_preference=preference_data.language_preference.model_dump()
+            if preference_data.language_preference
+            else None,
+            stopwords=preference_data.stopwords.model_dump()
+            if preference_data.stopwords
+            else None,
+        )
+    else:
+        # Create new preference if doesn't exist
+        updated_preference = user_service.create_user_ai_preference(
+            user_id=str(current_user.id),
+            call=preference_data.call,
+            skillset=preference_data.skillset,
+            depth_of_explanation=preference_data.depth_of_explanation,
+            language_preference=preference_data.language_preference.model_dump()
+            if preference_data.language_preference
+            else None,
+            stopwords=preference_data.stopwords.model_dump()
+            if preference_data.stopwords
+            else None,
+        )
+
+    return CommonResponse[UserAiPreferenceResponse](
+        message="AI preferences updated successfully",
+        detail=UserAiPreferenceResponse(
+            id=str(updated_preference.id),
+            user_id=str(updated_preference.user_id),
+            call=updated_preference.call,
+            skillset=updated_preference.skillset,
+            depth_of_explanation=updated_preference.depth_of_explanation,
+            language_preference=LanguagePreferenceModel(
+                **updated_preference.language_preference
+            )
+            if updated_preference.language_preference
+            else None,
+            stopwords=StopwordsModel(**updated_preference.stopwords)
+            if updated_preference.stopwords
+            else None,
+            created_at=updated_preference.created_at.isoformat(),
+            updated_at=updated_preference.updated_at.isoformat(),
         ),
     )
