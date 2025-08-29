@@ -25,7 +25,7 @@ dev = [
 ]
 
 [tool.ty.src]
-exclude = [".ruff_cache", ".svn", ".tox", ".venv", "dist"]
+exclude = [".ruff_cache", ".svn", ".tox", ".venv", "dist", "alembic"]
 
 [tool.ruff]
 exclude = [".ruff_cache", ".svn", ".tox", ".venv", "dist"]
