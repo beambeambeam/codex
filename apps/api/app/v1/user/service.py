@@ -287,16 +287,11 @@ class UserService:
                 detail="AI preference not found",
             )
 
-        if call is not None:
-            preference.call = call
-        if skillset is not None:
-            preference.skillset = skillset
-        if depth_of_explanation is not None:
-            preference.depth_of_explanation = depth_of_explanation
-        if language_preference is not None:
-            preference.language_preference = language_preference
-        if stopwords is not None:
-            preference.stopwords = stopwords
+        preference.call = call
+        preference.skillset = skillset
+        preference.depth_of_explanation = depth_of_explanation
+        preference.language_preference = language_preference
+        preference.stopwords = stopwords
 
         self.db.commit()
         self.db.refresh(preference)
