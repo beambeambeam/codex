@@ -208,21 +208,10 @@ def update_collection_ai_preferences(
 ) -> CollectionAiPreferenceResponse:
     """Update collection AI preferences. Creates if doesn't exist."""
 
-    # Check if preference exists
-    existing_preference = collection_service.get_collection_ai_preference(collection_id)
-
-    if existing_preference:
-        # Update existing preference
-        updated_preference = collection_service.update_collection_ai_preference(
-            collection_id=collection_id,
-            preference_data=preference_data,
-        )
-    else:
-        # Create new preference
-        updated_preference = collection_service.create_collection_ai_preference(
-            collection_id=collection_id,
-            preference_data=preference_data,
-        )
+    updated_preference = collection_service.upsert_collection_ai_preference(
+        collection_id=collection_id,
+        preference_data=preference_data,
+    )
 
     return CollectionAiPreferenceResponse(
         id=str(updated_preference.id),

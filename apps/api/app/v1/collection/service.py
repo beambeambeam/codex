@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func, text
 from .schemas import (
     CollectionCreateRequest,
     CollectionResponse,
@@ -18,7 +19,6 @@ from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
 from uuid import uuid4
 from datetime import datetime, timezone
 from typing import Optional, List
-from sqlalchemy import func
 from fastapi import HTTPException
 
 
@@ -330,6 +330,67 @@ class CollectionService:
 
         self.db.delete(preference)
         self.db.commit()
+
+    def upsert_collection_ai_preference(
+        self,
+        collection_id: str,
+        preference_data: CollectionAiPreferenceRequest,
+    ) -> CollectionAiPreference:
+        collection = (
+            self.db.query(Collection).filter(Collection.id == collection_id).first()
+        )
+        if not collection:
+            raise HTTPException(status_code=404, detail="Collection not found")
+
+        # Use raw SQL for atomic upsert with PostgreSQL's ON CONFLICT
+
+        upsert_query = text("""
+            INSERT INTO collection_ai_preference (
+                id, collection_id, tones_and_style, skillset, sensitivity,
+                created_at, updated_at
+            ) VALUES (
+                :id, :collection_id, :tones_and_style, :skillset, :sensitivity,
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+            ON CONFLICT (collection_id) DO UPDATE SET
+                tones_and_style = EXCLUDED.tones_and_style,
+                skillset = EXCLUDED.skillset,
+                sensitivity = EXCLUDED.sensitivity,
+                updated_at = CURRENT_TIMESTAMP
+            RETURNING id, collection_id, tones_and_style, skillset, sensitivity,
+                      created_at, updated_at
+        """)
+
+        result = self.db.execute(
+            upsert_query,
+            {
+                "id": str(uuid4()),
+                "collection_id": collection_id,
+                "tones_and_style": preference_data.tones_and_style,
+                "skillset": preference_data.skillset,
+                "sensitivity": preference_data.sensitivity,
+            },
+        )
+
+        self.db.commit()
+
+        # Fetch the result to return a proper model instance
+        row = result.fetchone()
+        if not row:
+            raise HTTPException(status_code=500, detail="Failed to upsert preference")
+
+        # Create a model instance from the result
+        preference = CollectionAiPreference(
+            id=row.id,
+            collection_id=row.collection_id,
+            tones_and_style=row.tones_and_style,
+            skillset=row.skillset,
+            sensitivity=row.sensitivity,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+        return preference
 
 
 class CollectionAuditService:

@@ -129,6 +129,7 @@ class CollectionAiPreference(Base):
         UUID(as_uuid=True),
         ForeignKey("collection.id", ondelete="CASCADE"),
         nullable=False,
+        unique=True,  # Ensure one preference per collection
     )
     tones_and_style: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     skillset: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
