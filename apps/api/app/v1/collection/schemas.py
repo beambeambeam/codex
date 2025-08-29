@@ -87,3 +87,26 @@ class CollectionPermissionAuditResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CollectionAiPreferenceRequest(BaseModel):
+    """Collection AI preference request payload"""
+
+    tones_and_style: Optional[str] = Field(None, example="Professional and formal tone")
+    skillset: Optional[str] = Field(None, example="Technical documentation, API design")
+    sensitivity: Optional[str] = Field(None, example="Handle sensitive data with care")
+
+
+class CollectionAiPreferenceResponse(BaseModel):
+    """Collection AI preference response payload"""
+
+    id: str = Field(..., example="123e4567-e89b-12d3-a456-426614174000")
+    collection_id: str = Field(..., example="123e4567-e89b-12d3-a456-426614174000")
+    tones_and_style: Optional[str] = Field(None, example="Professional and formal tone")
+    skillset: Optional[str] = Field(None, example="Technical documentation, API design")
+    sensitivity: Optional[str] = Field(None, example="Handle sensitive data with care")
+    created_at: str = Field(..., example="2024-01-01T00:00:00Z")
+    updated_at: str = Field(..., example="2024-01-01T00:00:00Z")
+
+    class Config:
+        from_attributes = True

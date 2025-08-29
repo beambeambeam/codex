@@ -30,6 +30,9 @@ class Collection(Base):
     tags: Mapped[list["Tag"]] = relationship(
         "Tag", back_populates="collection", cascade="all, delete-orphan"
     )
+    ai_preferences = relationship(
+        "CollectionAiPreference", back_populates="collection", uselist=False
+    )
 
 
 class CollectionAudit(Base):
@@ -114,3 +117,33 @@ class CollectionPermissionAudit(Base):
         "CollectionPermission", backref="audits"
     )
     user: Mapped["User"] = relationship("User", backref="collection_permission_audits")
+
+
+class CollectionAiPreference(Base):
+    __tablename__ = "collection_ai_preference"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    collection_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("collection.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,  # Ensure one preference per collection
+    )
+    tones_and_style: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    skillset: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    sensitivity: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, nullable=False, server_default=func.current_timestamp()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
+
+    collection: Mapped["Collection"] = relationship(
+        "Collection", back_populates="ai_preferences"
+    )

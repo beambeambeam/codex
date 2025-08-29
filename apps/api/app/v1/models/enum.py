@@ -23,3 +23,9 @@ class CollectionPermissionEnum(str, Enum):
 class FileResouceEnum(str, Enum):
     DOCUMENT = "DOCUMENT"
     PROFILE_IMAGE = "PROFILE_IMAGE"
+
+
+class DepthOfExplanationEnum(str, Enum):
+    SHORT = "SHORT"
+    MEDIUM = "MEDIUM"
+    DETAIL = "DETAIL"

@@ -1,8 +1,9 @@
 "use client";
 
-import { ArchiveIcon, TagIcon, UsersIcon } from "lucide-react";
+import { ArchiveIcon, BotIcon, TagIcon, UsersIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
+import CollectionAi from "@/app/(protected)/c/[id]/_components/side-bar/settings/ai";
 import CollectionInfo from "@/app/(protected)/c/[id]/_components/side-bar/settings/info";
 import CollectionTag from "@/app/(protected)/c/[id]/_components/side-bar/settings/tags";
 import {
@@ -60,7 +61,7 @@ function CollectionSettings() {
                   size={16}
                   aria-hidden="true"
                 />
-                Project
+                Collection
               </TabsTrigger>
               <TabsTrigger
                 value="contributor"
@@ -81,6 +82,14 @@ function CollectionSettings() {
                 />
                 Tags
               </TabsTrigger>
+              <TabsTrigger value="ai" className={TABS_TRIGGER_CLASSNAME}>
+                <BotIcon
+                  className="-ms-0.5 me-1.5 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                AI Preferences
+              </TabsTrigger>
             </TabsList>
             <Separator orientation="vertical" />
             <TabsContent value="project" className="p-2">
@@ -89,6 +98,9 @@ function CollectionSettings() {
             <TabsContent value="contributor" className="p-2"></TabsContent>
             <TabsContent value="tags" className="p-2">
               <CollectionTag />
+            </TabsContent>
+            <TabsContent value="ai" className="p-2">
+              <CollectionAi />
             </TabsContent>
           </Tabs>
         </div>

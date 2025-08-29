@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/ui/tanstack-form";
@@ -86,7 +87,9 @@ function CollectionUpdateForm(
         <form.AppField name="title">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Title</field.FormLabel>
+              <field.FormLabel asChild>
+                <Badge className="text-xs">Title</Badge>
+              </field.FormLabel>
               <field.FormControl>
                 <Input
                   id="title"
@@ -106,7 +109,9 @@ function CollectionUpdateForm(
         <form.AppField name="description">
           {(field) => (
             <field.FormItem>
-              <field.FormLabel>Description</field.FormLabel>
+              <field.FormLabel asChild>
+                <Badge className="text-xs">Description</Badge>
+              </field.FormLabel>
               <field.FormControl>
                 <Textarea
                   id="description"
