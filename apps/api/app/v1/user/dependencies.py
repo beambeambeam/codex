@@ -1,11 +1,10 @@
-from fastapi import Depends, Request, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from .service import UserService
-from ..models.user import User
-
-from ...db import get_db
 from ...config import get_settings
+from ...db import get_db
+from ..models.user import User
+from .service import UserService
 
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:

@@ -1,47 +1,46 @@
+from uuid import UUID
+
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
-    status,
-    UploadFile,
     File,
     Form,
+    HTTPException,
+    UploadFile,
+    status,
 )
-from typing import List
-from uuid import UUID
 
-
+from ..models import FileResouceEnum
+from ..models.user import User
+from ..storage.dependencies import get_storage_service
+from ..storage.service import StorageService
+from ..user.dependencies import get_current_user
+from .dependencies import get_document_service
 from .schemas import (
-    DocumentCreateRequest,
-    DocumentUpdateRequest,
-    DocumentResponse,
-    PaginatedDocumentResponse,
     DocumentAudit,
-    TagCreateRequest,
-    TagUpdateRequest,
-    TagResponse,
+    DocumentCreateRequest,
+    DocumentResponse,
     DocumentTagCreateRequest,
-    DocumentTagUpdateRequest,
     DocumentTagResponse,
+    DocumentTagUpdateRequest,
+    DocumentUpdateRequest,
+    PaginatedDocumentResponse,
+    TagCreateRequest,
+    TagResponse,
+    TagUpdateRequest,
 )
 from .service import DocumentService
-from .dependencies import get_document_service
-from ..user.dependencies import get_current_user
-from ..models.user import User
-from ..storage.service import StorageService
-from ..storage.dependencies import get_storage_service
-from ..models import FileResouceEnum
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
 @router.post(
     "/uploads",
-    response_model=List[DocumentResponse],
+    response_model=list[DocumentResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def bulk_upload_documents(
-    files: List[UploadFile] = File(...),
+    files: list[UploadFile] = File(...),
     collection_id: UUID = Form(default=None),
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
@@ -118,7 +117,7 @@ async def get_documents_table(
             collection_id=collection_id, page=page, per_page=per_page
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get(
@@ -135,7 +134,7 @@ async def get_document(
     try:
         return document_service.get_document(document_id=document_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.put(
@@ -157,12 +156,12 @@ async def update_document(
             user_id=str(current_user.id),
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get(
     "/{document_id}/audit",
-    response_model=List[DocumentAudit],
+    response_model=list[DocumentAudit],
     status_code=status.HTTP_200_OK,
 )
 async def get_document_audit(
@@ -175,7 +174,7 @@ async def get_document_audit(
         document_service.get_document(document_id=document_id)
         return document_service.audit.get_audits_for_document(document_id=document_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.delete(
@@ -194,7 +193,7 @@ async def delete_document(
             document_id=document_id, user_id=str(current_user.id)
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 # Tag endpoints
@@ -212,12 +211,14 @@ async def create_tag(
     try:
         return document_service.create_tag(tag_create)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
 
 @router.get(
     "/tags/collection/{collection_id}",
-    response_model=List[TagResponse],
+    response_model=list[TagResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_tags_by_collection(
@@ -229,7 +230,7 @@ async def get_tags_by_collection(
     try:
         return document_service.get_tags_by_collection(collection_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get(
@@ -246,7 +247,7 @@ async def get_tag(
     try:
         return document_service.get_tag(tag_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.put(
@@ -264,7 +265,7 @@ async def update_tag(
     try:
         return document_service.update_tag(tag_id, tag_update)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.delete(
@@ -280,7 +281,7 @@ async def delete_tag(
     try:
         document_service.delete_tag(tag_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 # Document tag endpoints
@@ -298,7 +299,9 @@ async def add_tag_to_document(
     try:
         return document_service.add_tag_to_document(document_tag_create)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
 
 @router.delete(
@@ -315,12 +318,12 @@ async def remove_tag_from_document(
     try:
         document_service.remove_tag_from_document(document_id, tag_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get(
     "/{document_id}/tags",
-    response_model=List[TagResponse],
+    response_model=list[TagResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_document_tags(
@@ -332,12 +335,12 @@ async def get_document_tags(
     try:
         return document_service.get_document_tags(document_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.put(
     "/{document_id}/tags",
-    response_model=List[TagResponse],
+    response_model=list[TagResponse],
     status_code=status.HTTP_200_OK,
 )
 async def update_document_tags(
@@ -353,4 +356,6 @@ async def update_document_tags(
         )
 
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e

@@ -1,18 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
+from ...utils.response import CommonResponse
+from ..models.user import User
+from .dependencies import get_current_user, get_user_service
 from .schemas import (
-    UserRegisterRequest,
-    UserRegisterResponse,
-    UserLoginRequest,
-    UserLoginResponse,
     AuthStatusResponse,
     UserEditRequest,
     UserEditResponse,
+    UserLoginRequest,
+    UserLoginResponse,
+    UserRegisterRequest,
+    UserRegisterResponse,
 )
 from .service import UserService
-from .dependencies import get_user_service, get_current_user
-from ..models.user import User
-from ...utils.response import CommonResponse
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 

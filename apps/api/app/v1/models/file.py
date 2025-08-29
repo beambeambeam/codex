@@ -1,9 +1,11 @@
-from .base import Base
-from sqlalchemy import Column, Text, TIMESTAMP, Integer, ForeignKey
-from sqlalchemy.sql import func
+import uuid
+
+from sqlalchemy import TIMESTAMP, Column, ForeignKey, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
+from sqlalchemy.sql import func
+
+from .base import Base
 
 
 class File(Base):

@@ -1,25 +1,27 @@
+import uuid
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
-    TIMESTAMP,
-    ForeignKey,
-    Text,
-    Boolean,
     JSON,
-    event,
+    TIMESTAMP,
+    Boolean,
     Enum,
+    ForeignKey,
     Integer,
+    Text,
+    event,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
-import uuid
+
 from .base import Base
-from .knowledge_graph import validate_knowledge_graph
 from .enum import DocumentActionEnum
-from .user import User
 from .file import File
-from pgvector.sqlalchemy import Vector
+from .knowledge_graph import validate_knowledge_graph
+from .user import User
 
 if TYPE_CHECKING:
     from .collection import Collection

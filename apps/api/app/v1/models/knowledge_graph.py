@@ -1,9 +1,9 @@
 """Knowledge Graph schema and validation utilities."""
 
 from typing import Optional
+
 import jsonschema
 from jsonschema import ValidationError
-
 
 # JSON Schema for knowledge graph validation
 KNOWLEDGE_GRAPH_SCHEMA = {
@@ -67,7 +67,7 @@ def validate_knowledge_graph(knowledge_graph_data: Optional[dict]) -> None:
                 instance=knowledge_graph_data, schema=KNOWLEDGE_GRAPH_SCHEMA
             )
         except ValidationError as e:
-            raise ValueError(f"Invalid knowledge graph format: {e.message}")
+            raise ValueError(f"Invalid knowledge graph format: {e.message}") from e
 
 
 def create_empty_knowledge_graph() -> dict:

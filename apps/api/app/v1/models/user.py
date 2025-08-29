@@ -1,12 +1,13 @@
+import uuid
 from datetime import datetime
 from typing import Optional
+
 from sqlalchemy import TIMESTAMP, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
-import uuid
 
 
 class User(Base):

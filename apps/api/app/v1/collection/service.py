@@ -1,22 +1,25 @@
+import contextlib
+from datetime import datetime, timezone
+from typing import Optional
+from uuid import uuid4
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from .schemas import (
-    CollectionCreateRequest,
-    CollectionResponse,
-    CollectionPermissionResponse,
-)
+
 from ..models.collection import (
     Collection,
     CollectionAudit,
     CollectionPermission,
     CollectionPermissionAudit,
 )
-from ..models.user import User
 from ..models.document import Document
 from ..models.enum import CollectionActionEnum, CollectionPermissionEnum
-from uuid import uuid4
-from datetime import datetime, timezone
-from typing import Optional, List
-from sqlalchemy import func
+from ..models.user import User
+from .schemas import (
+    CollectionCreateRequest,
+    CollectionPermissionResponse,
+    CollectionResponse,
+)
 
 
 class CollectionService:
@@ -247,11 +250,11 @@ class CollectionService:
 
     def get_collection_permissions(
         self, collection_id: str
-    ) -> List[CollectionPermissionResponse]:
+    ) -> list[CollectionPermissionResponse]:
         """Get all permissions for a collection."""
         return self.permission.get_collection_permissions(collection_id)
 
-    def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
+    def get_user_collections(self, user_id: str) -> list[CollectionResponse]:
         """Get all collections a user has access to."""
         return self.permission.get_user_collections(user_id)
 
@@ -281,7 +284,7 @@ class CollectionAuditService:
         # Don't commit here - let the calling service handle the transaction
         return audit
 
-    def get_audits_for_collection(self, collection_id: str) -> List[CollectionAudit]:
+    def get_audits_for_collection(self, collection_id: str) -> list[CollectionAudit]:
         """Retrieve all audit records for a given collection."""
 
         return (
@@ -481,7 +484,7 @@ class CollectionPermissionService:
 
     def get_collection_permissions(
         self, collection_id: str
-    ) -> List[CollectionPermissionResponse]:
+    ) -> list[CollectionPermissionResponse]:
         """Get all permissions for a collection."""
 
         permissions = (
@@ -492,7 +495,7 @@ class CollectionPermissionService:
 
         return [CollectionPermissionResponse.model_validate(p) for p in permissions]
 
-    def get_user_collections(self, user_id: str) -> List[CollectionResponse]:
+    def get_user_collections(self, user_id: str) -> list[CollectionResponse]:
         """Get all collections a user has access to."""
         collections = (
             self.db.query(Collection)
@@ -506,7 +509,7 @@ class CollectionPermissionService:
 
     def search_collections(
         self, user_id: str, word: str = "", page: int = 1, per_page: int = 5
-    ) -> List[CollectionResponse]:
+    ) -> list[CollectionResponse]:
         """Search collections a user has access to by title.
 
         Behavior:
@@ -545,10 +548,8 @@ class CollectionPermissionService:
                 # not installed) the DB transaction can become aborted. Roll
                 # back the transaction before running the fallback query so
                 # subsequent SELECTs are executed in a clean transaction.
-                try:
+                with contextlib.suppress(Exception):
                     self.db.rollback()
-                except Exception:
-                    pass
 
                 collections = (
                     q.filter(Collection.title.ilike(f"%{word}%"))
@@ -562,8 +563,8 @@ class CollectionPermissionService:
         return self._enrich_collections(collections)
 
     def _enrich_collections(
-        self, collections: List[Collection]
-    ) -> List[CollectionResponse]:
+        self, collections: list[Collection]
+    ) -> list[CollectionResponse]:
         """Private helper to attach contributors, latest_update, and document_count to collections.
 
         This batches the DB queries for contributors, latest audit timestamps, and document counts to
@@ -612,7 +613,7 @@ class CollectionPermissionService:
         )
         document_count_map = {coll_id: count for coll_id, count in document_count_rows}
 
-        result: List[CollectionResponse] = []
+        result: list[CollectionResponse] = []
         for collection in collections:
             contributor_list = contributors_map.get(collection.id, [])
             latest_update = latest_map.get(collection.id)

@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 
 class NodeDataSchema(BaseModel):
@@ -23,5 +22,5 @@ class EdgeSchema(BaseModel):
 
 
 class KnowledgeGraph(BaseModel):
-    nodes: List[NodeSchema]
-    edges: List[EdgeSchema]
+    nodes: list[NodeSchema]
+    edges: list[EdgeSchema]

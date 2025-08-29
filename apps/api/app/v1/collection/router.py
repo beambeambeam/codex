@@ -1,23 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 
-from .schemas import (
-    CollectionCreateRequest,
-    CollectionResponse,
-    CollectionAuditResponse,
-    CollectionPermissionRequest,
-    CollectionPermissionResponse,
-)
-from .service import CollectionService
+from ..models.enum import CollectionPermissionEnum
+from ..models.user import User
+from ..user.dependencies import get_current_user
 from .dependencies import (
     get_collection_service,
     has_permission,
 )
-from ..user.dependencies import get_current_user
-from ..models.user import User
-from ..models.enum import CollectionPermissionEnum
-from fastapi import Body
-
+from .schemas import (
+    CollectionAuditResponse,
+    CollectionCreateRequest,
+    CollectionPermissionRequest,
+    CollectionPermissionResponse,
+    CollectionResponse,
+)
+from .service import CollectionService
 
 router = APIRouter(prefix="/collections", tags=["collections"])
 
@@ -44,13 +41,13 @@ def create_collection(
 
 @router.get(
     "",
-    response_model=List[CollectionResponse],
+    response_model=list[CollectionResponse],
     status_code=status.HTTP_200_OK,
 )
 def get_collections(
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
-) -> List[CollectionResponse]:
+) -> list[CollectionResponse]:
     """Get all collections the user has access to."""
 
     collections = collection_service.get_user_collections(str(current_user.id))
@@ -60,7 +57,7 @@ def get_collections(
 
 @router.get(
     "/search",
-    response_model=List[CollectionResponse],
+    response_model=list[CollectionResponse],
     status_code=status.HTTP_200_OK,
 )
 def search_collections(
@@ -69,7 +66,7 @@ def search_collections(
     per_page: int = 5,
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
-) -> List[CollectionResponse]:
+) -> list[CollectionResponse]:
     """Search collections by title with optional fuzzy matching and pagination."""
 
     return collection_service.permission.search_collections(
@@ -102,7 +99,7 @@ def get_collection(
 
 @router.get(
     "/{collection_id}/audits",
-    response_model=List[CollectionAuditResponse],
+    response_model=list[CollectionAuditResponse],
     status_code=status.HTTP_200_OK,
 )
 def get_collection_audits(
@@ -110,7 +107,7 @@ def get_collection_audits(
     _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
-) -> List[CollectionAuditResponse]:
+) -> list[CollectionAuditResponse]:
     """Get audits for a collection by ID."""
 
     audits = collection_service.get_collection_audits(collection_id)
@@ -163,7 +160,7 @@ def delete_collection(
 
 @router.get(
     "/{collection_id}/permissions",
-    response_model=List[CollectionPermissionResponse],
+    response_model=list[CollectionPermissionResponse],
     status_code=status.HTTP_200_OK,
 )
 def get_collection_permissions(
@@ -171,7 +168,7 @@ def get_collection_permissions(
     _: None = Depends(has_permission(CollectionPermissionEnum.READ)),
     current_user: User = Depends(get_current_user),
     collection_service: CollectionService = Depends(get_collection_service),
-) -> List[CollectionPermissionResponse]:
+) -> list[CollectionPermissionResponse]:
     """Get all permissions for a collection."""
 
     return collection_service.get_collection_permissions(collection_id)

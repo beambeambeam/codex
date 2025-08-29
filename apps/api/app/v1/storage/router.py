@@ -1,12 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from typing import List
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
+from ..models.user import User
+from ..user.dependencies import get_current_user
+from .dependencies import get_storage_service
 from .schemas import FileResponse
 from .service import StorageService
-from .dependencies import get_storage_service
-from ..user.dependencies import get_current_user
-from ..models.user import User
-
 
 router = APIRouter(prefix="/storage", tags=["storage"])
 
@@ -38,13 +36,13 @@ async def upload_file(
 
 @router.get(
     "/files",
-    response_model=List[FileResponse],
+    response_model=list[FileResponse],
     status_code=status.HTTP_200_OK,
 )
 def get_user_files(
     current_user: User = Depends(get_current_user),
     storage_service: StorageService = Depends(get_storage_service),
-) -> List[FileResponse]:
+) -> list[FileResponse]:
     """Get all files uploaded by the current user."""
 
     return storage_service.get_user_files(current_user.id)

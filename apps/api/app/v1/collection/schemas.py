@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
 from ..models.enum import CollectionPermissionEnum
 
 
@@ -28,7 +30,7 @@ class CollectionResponse(BaseModel):
     title: Optional[str]
     description: Optional[str]
     summary: Optional[str]
-    contributor: List[ContributorResponse] = Field(
+    contributor: list[ContributorResponse] = Field(
         default_factory=list,
         description="Array of contributors with display name and image",
     )

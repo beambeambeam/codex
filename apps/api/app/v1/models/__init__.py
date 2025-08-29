@@ -1,13 +1,12 @@
 """Database models."""
 
+from . import knowledge_graph
 from .base import Base
-from .user import User, Account, Session
 from .collection import Collection, CollectionAudit
-from .file import File
 from .document import Document, DocumentAudit
 from .enum import CollectionActionEnum, DocumentActionEnum, FileResouceEnum
-from . import knowledge_graph
-
+from .file import File
+from .user import Account, Session, User
 
 __all__ = [
     "Base",

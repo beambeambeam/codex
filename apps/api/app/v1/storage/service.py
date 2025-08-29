@@ -4,15 +4,16 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
-from fastapi import HTTPException, status, UploadFile
+
+from fastapi import HTTPException, UploadFile, status
 from minio import Minio
 from minio.error import S3Error
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from ...config import get_settings
-from .schemas import FileResponse
 from ..models.file import File
+from .schemas import FileResponse
 
 
 class StorageService:
@@ -152,7 +153,7 @@ class StorageService:
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file ID format"
-            )
+            ) from None
 
         try:
             file = (
@@ -177,7 +178,7 @@ class StorageService:
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file ID format"
-            )
+            ) from None
 
         try:
             file = (

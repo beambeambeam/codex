@@ -25,4 +25,33 @@ dev = [
 ]
 
 [tool.ty.src]
-exclude = ["alembic"]
+exclude = [".ruff_cache", ".svn", ".tox", ".venv", "dist"]
+
+[tool.ruff]
+exclude = [".ruff_cache", ".svn", ".tox", ".venv", "dist"]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "UP",
+  "B",
+  "SIM",
+  "I",
+]
+ignore = ["E501"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.flake8-bugbear]
+extend-immutable-calls = [
+  "fastapi.Depends",
+  "fastapi.params.Depends",
+  "fastapi.Query",
+  "fastapi.params.Query",
+  "fastapi.Body",
+  'fastapi.File',
+  'fastapi.Form'
+]

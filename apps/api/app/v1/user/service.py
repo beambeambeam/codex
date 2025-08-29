@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from uuid import uuid4
 
 import bcrypt
-from typing import Optional
-
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
-from ..models.user import Account, User, Session as UserSession
+from ..models.user import Account, User
+from ..models.user import Session as UserSession
 
 
 class UserService:

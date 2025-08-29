@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.v1 import app_v1_route
-from scalar_fastapi import get_scalar_api_reference, Theme
+from scalar_fastapi import Theme, get_scalar_api_reference
 
+from app.v1 import app_v1_route
 
 app = FastAPI(
     title="The Codex API",

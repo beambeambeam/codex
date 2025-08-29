@@ -1,37 +1,37 @@
-from sqlalchemy.orm import Session, joinedload
+import math
+import re
+import uuid
+from datetime import datetime, timezone
+from typing import Optional
+from uuid import UUID
+
 from sqlalchemy.exc import IntegrityError
-from ..models.document import Document, Tag, DocumentTag
+from sqlalchemy.orm import Session, joinedload
+
+from ...utils.color import generateRandomColor
+from ..models.collection import Collection
+from ..models.document import Document, DocumentAudit, DocumentTag, Tag
+from ..models.enum import DocumentActionEnum
 from ..models.file import File
 from ..models.user import User
-from ..models.collection import Collection
+from ..schemas.graph import KnowledgeGraph
+from ..storage.schemas import FileResponse
+from ..storage.service import StorageService
+from ..user.schemas import UserInfoSchema
 from .schemas import (
     DocumentCreateRequest,
-    DocumentUpdateRequest,
     DocumentResponse,
-    PaginatedDocumentResponse,
-    TagCreateRequest,
-    TagUpdateRequest,
-    TagResponse,
     DocumentTagCreateRequest,
     DocumentTagResponse,
+    DocumentUpdateRequest,
+    PaginatedDocumentResponse,
+    TagCreateRequest,
+    TagResponse,
+    TagUpdateRequest,
 )
-from ..models.document import DocumentAudit
-from ..storage.service import StorageService
-from ..models.enum import DocumentActionEnum
-from ..storage.schemas import FileResponse
-from datetime import datetime, timezone
-from typing import Optional, List
-from uuid import UUID
-import uuid
-import re
-from ..user.schemas import UserInfoSchema
-from ..schemas.graph import KnowledgeGraph
-import math
-from ...utils.color import generateRandomColor
 
 _UUID_PATTERN = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-    re.IGNORECASE,
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
 
 
@@ -175,7 +175,7 @@ class DocumentService:
 
         except IntegrityError as e:
             self.db.rollback()
-            raise ValueError(f"Database integrity error: {str(e)}")
+            raise ValueError(f"Database integrity error: {str(e)}") from e
 
     def delete_document(self, document_id: str, user_id: Optional[str] = None) -> None:
         """Delete a document by ID, audit the deletion, and commit the transaction."""
@@ -221,7 +221,7 @@ class DocumentService:
 
         return self._document_to_response(document)
 
-    def get_documents_by_collection(self, collection_id: str) -> List[DocumentResponse]:
+    def get_documents_by_collection(self, collection_id: str) -> list[DocumentResponse]:
         """Retrieve all documents for a specific collection."""
         documents = (
             self.db.query(Document)
@@ -396,7 +396,7 @@ class DocumentService:
         """Move a document to a different collection."""
         return self.update_document_collection(document_id, collection_id, user_id)
 
-    def get_documents_without_collection(self) -> List[DocumentResponse]:
+    def get_documents_without_collection(self) -> list[DocumentResponse]:
         """Retrieve all documents that are not assigned to any collection."""
         documents = (
             self.db.query(Document)
@@ -458,9 +458,9 @@ class DocumentService:
             )
         except IntegrityError as e:
             self.db.rollback()
-            raise ValueError(f"Database integrity error: {str(e)}")
+            raise ValueError(f"Database integrity error: {str(e)}") from e
 
-    def get_tags_by_collection(self, collection_id: str) -> List[TagResponse]:
+    def get_tags_by_collection(self, collection_id: str) -> list[TagResponse]:
         """Get all tags for a specific collection."""
         tags = self.db.query(Tag).filter(Tag.collection_id == collection_id).all()
 
@@ -583,7 +583,7 @@ class DocumentService:
             )
         except IntegrityError as e:
             self.db.rollback()
-            raise ValueError(f"Database integrity error: {str(e)}")
+            raise ValueError(f"Database integrity error: {str(e)}") from e
 
     def remove_tag_from_document(self, document_id: str, tag_id: str) -> None:
         """Remove a tag from a document."""
@@ -600,7 +600,7 @@ class DocumentService:
         self.db.delete(document_tag)
         self.db.commit()
 
-    def get_document_tags(self, document_id: str) -> List[TagResponse]:
+    def get_document_tags(self, document_id: str) -> list[TagResponse]:
         """Get all tags for a specific document."""
         document_tags = (
             self.db.query(DocumentTag)
@@ -621,8 +621,8 @@ class DocumentService:
         ]
 
     def update_document_tags(
-        self, document_id: str, tag_ids: List[str]
-    ) -> List[TagResponse]:
+        self, document_id: str, tag_ids: list[str]
+    ) -> list[TagResponse]:
         """Update all tags for a document in one operation."""
         try:
             # Get current document tags
@@ -675,14 +675,14 @@ class DocumentService:
 
         except IntegrityError as e:
             self.db.rollback()
-            raise ValueError(f"Database integrity error: {str(e)}")
+            raise ValueError(f"Database integrity error: {str(e)}") from e
         except Exception as e:
             self.db.rollback()
-            raise ValueError(f"Error updating document tags: {str(e)}")
+            raise ValueError(f"Error updating document tags: {str(e)}") from e
 
     def replace_document_tags(
-        self, document_id: str, tag_items: List[str]
-    ) -> List[TagResponse]:
+        self, document_id: str, tag_items: list[str]
+    ) -> list[TagResponse]:
         """Replace all tags for a document.
 
         Accepts a list of tag identifiers which can be UUID strings or new tag
@@ -699,8 +699,8 @@ class DocumentService:
                 "Cannot create tags for a document without a collection_id"
             )
 
-        existing_tag_ids: List[str] = []
-        new_titles: List[str] = []
+        existing_tag_ids: list[str] = []
+        new_titles: list[str] = []
 
         for item in tag_items:
             if isinstance(item, str) and _UUID_PATTERN.match(item):
@@ -710,7 +710,7 @@ class DocumentService:
             else:
                 existing_tag_ids.append(str(item))
 
-        created_ids: List[str] = []
+        created_ids: list[str] = []
 
         for title in new_titles:
             tag = (
@@ -745,7 +745,7 @@ class DocumentService:
                 if tag2:
                     created_ids.append(str(tag2.id))
                 else:
-                    raise ValueError(f"Unable to create tag '{title}'")
+                    raise ValueError(f"Unable to create tag '{title}'") from None
 
         all_tag_ids = existing_tag_ids + created_ids
 
@@ -796,7 +796,7 @@ class DocumentAuditService:
         # Don't commit here - let the calling service handle the transaction
         return audit
 
-    def get_audits_for_document(self, document_id: str) -> List[DocumentAudit]:
+    def get_audits_for_document(self, document_id: str) -> list[DocumentAudit]:
         """Retrieve all audit records for a given document."""
 
         return (

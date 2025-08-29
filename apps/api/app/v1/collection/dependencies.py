@@ -1,10 +1,12 @@
-from fastapi import Depends, HTTPException, status
 from typing import Callable
-from .service import CollectionService
+
+from fastapi import Depends, HTTPException, status
+
 from ...db import get_db
-from ..user.dependencies import get_current_user
-from ..models.user import User
 from ..models.enum import CollectionPermissionEnum
+from ..models.user import User
+from ..user.dependencies import get_current_user
+from .service import CollectionService
 
 
 def get_collection_service(db=Depends(get_db)) -> CollectionService:

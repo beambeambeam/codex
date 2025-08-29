@@ -1,12 +1,14 @@
 # All imports at the top, no duplicates
-from typing import Optional, List
-from uuid import UUID
-from pydantic import BaseModel, Field
 from datetime import datetime
-from ..storage.schemas import FileResponse
-from ..schemas.graph import KnowledgeGraph
-from ..user.schemas import UserInfoSchema
+from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from ..models.enum import DocumentActionEnum
+from ..schemas.graph import KnowledgeGraph
+from ..storage.schemas import FileResponse
+from ..user.schemas import UserInfoSchema
 
 
 # Tag schemas
@@ -41,7 +43,7 @@ class DocumentTagCreateRequest(BaseModel):
 
 class DocumentTagUpdateRequest(BaseModel):
     document_id: UUID = Field(..., description="ID of the document")
-    tag_ids: List[str] = Field(
+    tag_ids: list[str] = Field(
         ...,
         description="List of tag IDs (UUIDs) or tag titles (strings) to assign to the document",
     )
@@ -102,14 +104,14 @@ class DocumentResponse(BaseModel):
     is_vectorized: bool
     is_graph_extracted: bool
     knowledge_graph: Optional[KnowledgeGraph]
-    tags: Optional[List[TagResponse]] = None
+    tags: Optional[list[TagResponse]] = None
 
     class Config:
         from_attributes = True
 
 
 class PaginatedDocumentResponse(BaseModel):
-    documents: List[DocumentResponse]
+    documents: list[DocumentResponse]
     total: int
     page: int
     per_page: int
