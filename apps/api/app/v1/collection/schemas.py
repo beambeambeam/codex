@@ -107,3 +107,6 @@ class CollectionAiPreferenceResponse(BaseModel):
     sensitivity: Optional[str] = Field(None, example="Handle sensitive data with care")
     created_at: str = Field(..., example="2024-01-01T00:00:00Z")
     updated_at: str = Field(..., example="2024-01-01T00:00:00Z")
+
+    class Config:
+        from_attributes = True
